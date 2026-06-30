@@ -2,14 +2,23 @@
 
 _Last updated: 2026-06-30_
 
-> **Implementation status:** The Phase 0 demand-test surface and the Phase 1
-> foundation have a first slice landed in code — Sign-In With Ethereum,
-> stateless sessions, a server-side `UserDataStore` (file-backed default,
-> Postgres schema in `migrations/001_init.sql`), cross-device sync for
-> net-worth history and tracked positions with a localStorage guest fallback,
-> and a `/pricing` page with a waitlist. What remains in Phase 1: swapping the
-> file store for Postgres in production and adding the scheduled server-side
-> daily snapshot job. See §3 for the full plan.
+> **Implementation status:** Phase 0 (demand test) and Phase 1 (backend +
+> accounts) are landed in code:
+> - Sign-In With Ethereum, stateless HMAC sessions, smart-wallet-aware verify.
+> - Server-side `UserDataStore` with **two** backends — a file store (default)
+>   and a **Postgres** adapter (`src/lib/server/postgresStore.ts`, schema in
+>   `migrations/001_init.sql`) selected automatically when `DATABASE_URL` is set.
+> - Cross-device sync for net-worth history and tracked positions, with a
+>   localStorage guest fallback.
+> - **Scheduled daily snapshot job** (`/api/cron/snapshot`, wired via
+>   `vercel.json`) that recomputes each tracked wallet's net worth server-side
+>   so history accrues even when the user isn't visiting.
+> - `/pricing` page with a waitlist.
+>
+> Phase 1 is functionally complete; the remaining production step is purely
+> operational — provision a Postgres database, apply the migration, and set
+> `DATABASE_URL` / `CRON_SECRET`. Next up is **Phase 2 (auto-detection)**. See
+> §3 for the full plan.
 
 This document assesses where the app is today and lays out a phased path from
 "working demo" to a product that can be legitimately sold. It exists because

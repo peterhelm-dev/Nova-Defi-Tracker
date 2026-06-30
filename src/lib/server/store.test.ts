@@ -64,6 +64,14 @@ describe("FileStore", () => {
     expect(await second.getSnapshots("0xabc")).toEqual([snapshot]);
   });
 
+  it("lists users that have any stored data", async () => {
+    const store = await freshStore();
+    await store.putSnapshots("0xAAA", [snapshot]);
+    await store.putPositions("0xBBB", [position]);
+    const users = await store.listUsers();
+    expect(users.sort()).toEqual(["0xaaa", "0xbbb"]);
+  });
+
   it("de-dupes waitlist emails", async () => {
     const store = await freshStore();
     await store.addWaitlist("Test@Example.com ", "pricing");

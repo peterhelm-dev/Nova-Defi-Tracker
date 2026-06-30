@@ -32,14 +32,21 @@ Sign-in uses [SIWE](https://eips.ethereum.org/EIPS/eip-4361); the server
 verifies the signature in a smart-wallet-aware way (ERC-1271/6492, so the
 Coinbase Smart Wallet works) and issues a stateless, HMAC-signed session
 cookie (`SESSION_SECRET`). Per-account data is read/written through a small
-`UserDataStore` seam (`src/lib/server/store.ts`). The shipped default is a
-JSON file store (`./.data`, override with `DATA_DIR`) — enough for a single
-server. For production, provision Postgres with `migrations/001_init.sql` and
-implement the same interface. See `docs/MARKET-FIT-ROADMAP.md` for the phased
-plan this is the first step of.
+`UserDataStore` seam (`src/lib/server/store.ts`) with two backends:
+
+- **File store** (default) — JSON at `./.data` (override with `DATA_DIR`),
+  fine for a single server / development.
+- **Postgres** — used automatically when `DATABASE_URL` is set
+  (`src/lib/server/postgresStore.ts`). Apply `migrations/001_init.sql` first.
+  Production-grade and safe across serverless / multiple instances.
+
+A scheduled job (`/api/cron/snapshot`, wired via `vercel.json` and protected by
+`CRON_SECRET`) recomputes each tracked wallet's net worth server-side once a
+day, so history keeps accruing even when a user isn't visiting.
 
 A `/pricing` page with a waitlist (`/api/waitlist`) is included as a Phase 0
-demand test for the planned paid "Pro" tier.
+demand test for the planned paid "Pro" tier. See `docs/MARKET-FIT-ROADMAP.md`
+for the phased plan.
 
 ## Why no DeFi position auto-detection?
 

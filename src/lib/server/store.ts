@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import type { NetWorthSnapshot, TrackedPosition } from "@/types";
+import { PostgresStore } from "./postgresStore";
 
 /**
  * Server-side persistence for Phase 1.
@@ -22,6 +23,8 @@ export interface UserDataStore {
   getPositions(address: string): Promise<TrackedPosition[]>;
   putPositions(address: string, positions: TrackedPosition[]): Promise<void>;
   addWaitlist(email: string, ref?: string): Promise<void>;
+  /** Addresses with any stored data — drives the scheduled snapshot job. */
+  listUsers(): Promise<string[]>;
 }
 
 type Persisted = {
@@ -107,20 +110,35 @@ class FileStore implements UserDataStore {
       await this.flush();
     }
   }
+
+  async listUsers(): Promise<string[]> {
+    await this.load();
+    return [
+      ...new Set([
+        ...Object.keys(this.data.snapshots),
+        ...Object.keys(this.data.positions),
+      ]),
+    ];
+  }
 }
 
 let store: UserDataStore | undefined;
 
 /**
- * Returns the process-wide store singleton. Point this at a Postgres-backed
- * implementation when `DATABASE_URL` is configured to make it production-grade.
+ * Returns the process-wide store singleton. Uses the Postgres-backed store when
+ * `DATABASE_URL` is configured (production-grade, multi-instance safe) and
+ * otherwise the local file store (fine for a single server / development).
  */
 export function getStore(): UserDataStore {
   if (!store) {
-    const file = process.env.DATA_DIR
-      ? join(process.env.DATA_DIR, "store.json")
-      : join(process.cwd(), ".data", "store.json");
-    store = new FileStore(file);
+    if (process.env.DATABASE_URL) {
+      store = new PostgresStore(process.env.DATABASE_URL);
+    } else {
+      const file = process.env.DATA_DIR
+        ? join(process.env.DATA_DIR, "store.json")
+        : join(process.cwd(), ".data", "store.json");
+      store = new FileStore(file);
+    }
   }
   return store;
 }
