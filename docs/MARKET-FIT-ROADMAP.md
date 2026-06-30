@@ -2,6 +2,15 @@
 
 _Last updated: 2026-06-30_
 
+> **Implementation status:** The Phase 0 demand-test surface and the Phase 1
+> foundation have a first slice landed in code — Sign-In With Ethereum,
+> stateless sessions, a server-side `UserDataStore` (file-backed default,
+> Postgres schema in `migrations/001_init.sql`), cross-device sync for
+> net-worth history and tracked positions with a localStorage guest fallback,
+> and a `/pricing` page with a waitlist. What remains in Phase 1: swapping the
+> file store for Postgres in production and adding the scheduled server-side
+> daily snapshot job. See §3 for the full plan.
+
 This document assesses where the app is today and lays out a phased path from
 "working demo" to a product that can be legitimately sold. It exists because
 the four things that block monetization — automatic portfolio detection, a

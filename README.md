@@ -20,6 +20,26 @@ all from free public data sources, no signup required.
 - **DeFi pool explorer** — live TVL/APY for Base pools from
   [DeFiLlama](https://defillama.com/), searchable and sortable. "Track" any
   pool with a USD amount to fold it into your net worth and allocation chart.
+- **Accounts & cross-device sync** — connect a wallet and optionally **Sign in
+  to sync** (Sign-In With Ethereum). Signed in, your net-worth history and
+  tracked positions are saved server-side and follow you across devices,
+  surviving a browser-cache clear. Not signed in, everything still works in
+  guest mode against `localStorage` — no account required.
+
+## Accounts, sync, and the server store
+
+Sign-in uses [SIWE](https://eips.ethereum.org/EIPS/eip-4361); the server
+verifies the signature in a smart-wallet-aware way (ERC-1271/6492, so the
+Coinbase Smart Wallet works) and issues a stateless, HMAC-signed session
+cookie (`SESSION_SECRET`). Per-account data is read/written through a small
+`UserDataStore` seam (`src/lib/server/store.ts`). The shipped default is a
+JSON file store (`./.data`, override with `DATA_DIR`) — enough for a single
+server. For production, provision Postgres with `migrations/001_init.sql` and
+implement the same interface. See `docs/MARKET-FIT-ROADMAP.md` for the phased
+plan this is the first step of.
+
+A `/pricing` page with a waitlist (`/api/waitlist`) is included as a Phase 0
+demand test for the planned paid "Pro" tier.
 
 ## Why no DeFi position auto-detection?
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/hooks/useAuth";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { useNetWorthHistory } from "@/hooks/useNetWorthHistory";
 import { useTrackedPositions } from "@/hooks/useTrackedPositions";
@@ -21,12 +22,14 @@ export function Dashboard() {
     pricesUnavailable,
     pricesUpdatedAt,
   } = useWalletHoldings();
+  const { authedAddress } = useAuth();
   const { positions, addPosition, removePosition, totalUsd: defiUsd } =
-    useTrackedPositions();
+    useTrackedPositions(authedAddress);
   const history = useNetWorthHistory(
     walletUsd,
     defiUsd,
     !!address && !isLoading,
+    authedAddress,
   );
 
   return (

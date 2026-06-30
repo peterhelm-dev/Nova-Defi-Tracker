@@ -7,6 +7,8 @@ import {
   WalletDropdown,
   WalletDropdownDisconnect,
 } from "@coinbase/onchainkit/wallet";
+import Link from "next/link";
+import { SyncControl } from "./SyncControl";
 
 export function Header() {
   return (
@@ -20,20 +22,29 @@ export function Header() {
           <p className="text-xs text-white/50">Onchain net worth, built on Base</p>
         </div>
       </div>
-      <Wallet>
-        <ConnectWallet className="bg-accent hover:bg-accent/90">
-          <Avatar className="h-6 w-6" />
-          <Name />
-        </ConnectWallet>
-        <WalletDropdown>
-          <Identity className="px-4 pt-3 pb-2">
-            <Avatar />
+      <div className="flex items-center gap-4">
+        <Link
+          href="/pricing"
+          className="hidden text-sm text-white/60 hover:text-white sm:block"
+        >
+          Pricing
+        </Link>
+        <SyncControl />
+        <Wallet>
+          <ConnectWallet className="bg-accent hover:bg-accent/90">
+            <Avatar className="h-6 w-6" />
             <Name />
-            <Address />
-          </Identity>
-          <WalletDropdownDisconnect />
-        </WalletDropdown>
-      </Wallet>
+          </ConnectWallet>
+          <WalletDropdown>
+            <Identity className="px-4 pt-3 pb-2">
+              <Avatar />
+              <Name />
+              <Address />
+            </Identity>
+            <WalletDropdownDisconnect />
+          </WalletDropdown>
+        </Wallet>
+      </div>
     </header>
   );
 }
