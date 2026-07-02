@@ -77,6 +77,20 @@ billing on, access requires a live (active/trialing) subscription; with billing
 off, dev falls back to treating signed-in users as Pro. The auto-detection
 route and every paid surface read this one check.
 
+## Trust & legitimacy
+
+- **Legal pages** — `/terms` (including a prominent "not financial advice"
+  disclaimer) and `/privacy` (written to match the app's actual data flows),
+  plus `/support` with an FAQ and a contact address
+  (`NEXT_PUBLIC_SUPPORT_EMAIL`). All linked from the footer. Have a lawyer
+  review the legal pages before charging real money — they're an accurate
+  starting point, not counsel.
+- **Error handling** — route-level and global error boundaries plus a custom
+  404, so a crash degrades to a friendly recovery screen instead of a blank
+  page. The route boundary is the hook point for an error-monitoring SDK.
+- **Security headers** — `nosniff`, `X-Frame-Options: DENY` (the app sets auth
+  cookies), referrer and permissions policies, set in `next.config.ts`.
+
 **Without an indexer key the app is unchanged** — free, Base-only, on public
 data, with DeFi positions tracked manually: browse the live pool leaderboard,
 hit **Track**, enter what you put in, and it's folded into your totals and

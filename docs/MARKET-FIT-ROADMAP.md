@@ -35,7 +35,15 @@ _Last updated: 2026-06-30_
 > enforced server-side from live subscription state (`isEntitledPro`). The
 > pricing page CTA adapts (upgrade → manage, waitlist fallback). Remaining is
 > operational: set the Stripe keys/price/webhook and create the Stripe product.
-> Next: **Phase 4 (trust & legitimacy)** — legal pages, support, monitoring.
+>
+> **Phase 4 (trust & legitimacy)** is landed: `/terms` (with the "not financial
+> advice" disclaimer), `/privacy` (matching actual data flows), `/support` with
+> FAQ + contact, footer legal links, route/global error boundaries + custom
+> 404, and baseline security headers. Remaining before charging real money:
+> legal review of the pages, a monitored support mailbox
+> (`NEXT_PUBLIC_SUPPORT_EMAIL`), an error-monitoring SDK (the boundary is the
+> hook point), and uptime monitoring. Next: **Phase 5 (differentiation)** —
+> PnL/cost basis, alerts, exports — guided by what waitlist/usage data says.
 
 This document assesses where the app is today and lays out a phased path from
 "working demo" to a product that can be legitimately sold. It exists because

@@ -72,6 +72,29 @@ test.describe("Dashboard", () => {
     await expect(rows.nth(1)).toContainText("Aerodrome");
   });
 
+  test("reaches the terms page from the footer", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: "Terms" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Terms of Service" }),
+    ).toBeVisible();
+  });
+
+  test("shows the privacy policy", async ({ page }) => {
+    await page.goto("/privacy");
+    await expect(
+      page.getByRole("heading", { name: "Privacy Policy" }),
+    ).toBeVisible();
+  });
+
+  test("shows the support page with FAQ", async ({ page }) => {
+    await page.goto("/support");
+    await expect(page.getByRole("heading", { name: "Support" })).toBeVisible();
+    await expect(
+      page.getByText("Is this safe? Can it touch my funds?"),
+    ).toBeVisible();
+  });
+
   test("tracks a DeFi pool position", async ({ page }) => {
     await page.goto("/");
 
