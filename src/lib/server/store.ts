@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import type { NetWorthSnapshot, TrackedPosition } from "@/types";
+import type { NetWorthSnapshot, Subscription, TrackedPosition } from "@/types";
 import { PostgresStore } from "./postgresStore";
 
 /**
@@ -25,15 +25,27 @@ export interface UserDataStore {
   addWaitlist(email: string, ref?: string): Promise<void>;
   /** Addresses with any stored data — drives the scheduled snapshot job. */
   listUsers(): Promise<string[]>;
+  getSubscription(address: string): Promise<Subscription | null>;
+  setSubscription(address: string, subscription: Subscription): Promise<void>;
+  /** Reverse lookup for webhooks, which reference a Stripe customer, not us. */
+  getAddressByCustomer(customerId: string): Promise<string | null>;
 }
 
 type Persisted = {
   snapshots: Record<string, NetWorthSnapshot[]>;
   positions: Record<string, TrackedPosition[]>;
   waitlist: { email: string; ref?: string; at: number }[];
+  subscriptions: Record<string, Subscription>;
+  customerAddress: Record<string, string>;
 };
 
-const EMPTY: Persisted = { snapshots: {}, positions: {}, waitlist: [] };
+const EMPTY: Persisted = {
+  snapshots: {},
+  positions: {},
+  waitlist: [],
+  subscriptions: {},
+  customerAddress: {},
+};
 
 function key(address: string): string {
   return address.toLowerCase();
@@ -119,6 +131,26 @@ class FileStore implements UserDataStore {
         ...Object.keys(this.data.positions),
       ]),
     ];
+  }
+
+  async getSubscription(address: string): Promise<Subscription | null> {
+    await this.load();
+    return this.data.subscriptions[key(address)] ?? null;
+  }
+
+  async setSubscription(address: string, subscription: Subscription): Promise<void> {
+    await this.load();
+    const addr = key(address);
+    this.data.subscriptions[addr] = subscription;
+    if (subscription.stripeCustomerId) {
+      this.data.customerAddress[subscription.stripeCustomerId] = addr;
+    }
+    await this.flush();
+  }
+
+  async getAddressByCustomer(customerId: string): Promise<string | null> {
+    await this.load();
+    return this.data.customerAddress[customerId] ?? null;
   }
 }
 

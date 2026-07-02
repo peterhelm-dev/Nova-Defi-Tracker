@@ -73,3 +73,23 @@ export type AutoPortfolio = {
   provider: string;
   updatedAt: number;
 };
+
+export type SubscriptionStatus =
+  | "none"
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled";
+
+/** A wallet's billing state, mirrored from Stripe by the webhook. */
+export type Subscription = {
+  plan: "free" | "pro";
+  status: SubscriptionStatus;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  /** Unix seconds; when the current paid period ends. */
+  currentPeriodEnd?: number;
+  /** Whether Stripe has flagged this subscription to cancel at period end. */
+  cancelAtPeriodEnd?: boolean;
+  updatedAt: number;
+};

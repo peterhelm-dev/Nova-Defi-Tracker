@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import type { NetWorthSnapshot, TrackedPosition } from "@/types";
+import type { NetWorthSnapshot, Subscription, TrackedPosition } from "@/types";
 import type { UserDataStore } from "./store";
 
 /**
@@ -121,5 +121,70 @@ export class PostgresStore implements UserDataStore {
     const pool = await this.pool();
     const { rows } = await pool.query("SELECT address FROM users");
     return rows.map((r) => r.address as string);
+  }
+
+  async getSubscription(address: string): Promise<Subscription | null> {
+    const pool = await this.pool();
+    const { rows } = await pool.query(
+      `SELECT plan, status,
+              stripe_customer_id AS "stripeCustomerId",
+              stripe_subscription_id AS "stripeSubscriptionId",
+              current_period_end AS "currentPeriodEnd",
+              cancel_at_period_end AS "cancelAtPeriodEnd",
+              updated_at AS "updatedAt"
+         FROM subscriptions
+        WHERE address = $1`,
+      [address.toLowerCase()],
+    );
+    if (rows.length === 0) return null;
+    const r = rows[0];
+    return {
+      plan: r.plan,
+      status: r.status,
+      stripeCustomerId: r.stripeCustomerId ?? undefined,
+      stripeSubscriptionId: r.stripeSubscriptionId ?? undefined,
+      currentPeriodEnd: r.currentPeriodEnd == null ? undefined : Number(r.currentPeriodEnd),
+      cancelAtPeriodEnd: r.cancelAtPeriodEnd ?? undefined,
+      updatedAt: Number(r.updatedAt),
+    };
+  }
+
+  async setSubscription(address: string, s: Subscription): Promise<void> {
+    const key = address.toLowerCase();
+    await this.ensureUser(key);
+    const pool = await this.pool();
+    await pool.query(
+      `INSERT INTO subscriptions
+         (address, plan, status, stripe_customer_id, stripe_subscription_id,
+          current_period_end, cancel_at_period_end, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (address) DO UPDATE SET
+         plan = EXCLUDED.plan,
+         status = EXCLUDED.status,
+         stripe_customer_id = EXCLUDED.stripe_customer_id,
+         stripe_subscription_id = EXCLUDED.stripe_subscription_id,
+         current_period_end = EXCLUDED.current_period_end,
+         cancel_at_period_end = EXCLUDED.cancel_at_period_end,
+         updated_at = EXCLUDED.updated_at`,
+      [
+        key,
+        s.plan,
+        s.status,
+        s.stripeCustomerId ?? null,
+        s.stripeSubscriptionId ?? null,
+        s.currentPeriodEnd ?? null,
+        s.cancelAtPeriodEnd ?? null,
+        s.updatedAt,
+      ],
+    );
+  }
+
+  async getAddressByCustomer(customerId: string): Promise<string | null> {
+    const pool = await this.pool();
+    const { rows } = await pool.query(
+      "SELECT address FROM subscriptions WHERE stripe_customer_id = $1",
+      [customerId],
+    );
+    return rows.length > 0 ? (rows[0].address as string) : null;
   }
 }

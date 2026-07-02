@@ -59,8 +59,23 @@ rewards, loans), each already priced.
 
 The indexer sits behind a provider seam (`src/lib/server/portfolio/`), so
 swapping or adding providers (DeBank, Zapper, Covalent, Alchemy) doesn't touch
-the route or the client. Entitlement is a seam too (`isPro`, driven by
-`PRO_ADDRESSES` today) that Phase 3 billing replaces with subscription state.
+the route or the client.
+
+## Billing (Pro subscriptions)
+
+Pro is sold via Stripe when configured (`STRIPE_SECRET_KEY`,
+`STRIPE_PRO_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`; apply
+`migrations/002_subscriptions.sql`). The `/pricing` page's Pro CTA adapts to
+state — **Upgrade** (Stripe Checkout) → **Manage** (Stripe Billing Portal) —
+and falls back to the waitlist when billing isn't live. Subscription lifecycle
+events arrive at `/api/billing/webhook` (signature-verified) and are mirrored
+into the store.
+
+Entitlement is enforced **server-side** from that subscription state
+(`isEntitledPro`): `PRO_ADDRESSES` grants comps regardless of billing; with
+billing on, access requires a live (active/trialing) subscription; with billing
+off, dev falls back to treating signed-in users as Pro. The auto-detection
+route and every paid surface read this one check.
 
 **Without an indexer key the app is unchanged** — free, Base-only, on public
 data, with DeFi positions tracked manually: browse the live pool leaderboard,

@@ -1,20 +1,33 @@
-/**
- * Pro-tier entitlement check. This is the seam Phase 3 (billing) fills in:
- * today it reads a static allowlist so the paid path can be exercised, later
- * it becomes a lookup against subscription state (Stripe/webhooks).
- *
- * Behavior:
- * - `PRO_ADDRESSES` set  → only those comma-separated addresses are Pro.
- * - `PRO_ADDRESSES` unset → every signed-in user is treated as Pro, so a
- *   configured indexer is usable in development without a billing system.
- */
-export function isPro(address: string): boolean {
-  const list = process.env.PRO_ADDRESSES;
-  if (!list) return true;
-  const allow = list
+import { isBillingConfigured, isEntitled } from "./billing";
+import { getStore } from "./store";
+
+function allowlist(): string[] {
+  return (process.env.PRO_ADDRESSES ?? "")
     .toLowerCase()
     .split(",")
     .map((entry) => entry.trim())
     .filter(Boolean);
-  return allow.includes(address.toLowerCase());
+}
+
+/**
+ * Whether an address is entitled to Pro. This is the seam Phase 2 stubbed and
+ * Phase 3 now fills with real billing:
+ *
+ * - `PRO_ADDRESSES` always wins (comps / team / grandfathering).
+ * - Billing configured → entitlement is a live subscription (active/trialing).
+ * - Billing NOT configured → dev fallback: everyone is Pro unless
+ *   `PRO_ADDRESSES` is set (in which case only the allowlist is).
+ */
+export async function isEntitledPro(address: string): Promise<boolean> {
+  const addr = address.toLowerCase();
+  const allow = allowlist();
+
+  if (allow.includes(addr)) return true;
+
+  if (!isBillingConfigured()) {
+    return allow.length === 0;
+  }
+
+  const subscription = await getStore().getSubscription(addr);
+  return isEntitled(subscription);
 }

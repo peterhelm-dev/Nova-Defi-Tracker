@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
-import { isPro } from "@/lib/server/entitlements";
+import { isEntitledPro } from "@/lib/server/entitlements";
 import { getPortfolioProvider } from "@/lib/server/portfolio";
 
 export const runtime = "nodejs";
@@ -28,7 +28,7 @@ export async function GET() {
     return NextResponse.json({ configured: false });
   }
 
-  if (!isPro(address)) {
+  if (!(await isEntitledPro(address))) {
     return NextResponse.json({ configured: true, entitled: false });
   }
 

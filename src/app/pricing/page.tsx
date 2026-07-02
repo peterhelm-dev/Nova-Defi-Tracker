@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
-import { WaitlistForm } from "@/components/WaitlistForm";
+import { ProCta } from "@/components/ProCta";
 
 export const metadata: Metadata = {
   title: "Pricing — Base Wealth Tracker",
@@ -113,13 +113,7 @@ export default function PricingPage() {
                 ))}
               </ul>
               {tier.highlight ? (
-                <div className="flex flex-col gap-3">
-                  <p className="text-xs text-white/50">
-                    Pro isn&apos;t live yet. Join the waitlist and help shape it —
-                    you&apos;ll get early access and founding-member pricing.
-                  </p>
-                  <WaitlistForm />
-                </div>
+                <ProCta />
               ) : (
                 <Link
                   href="/"

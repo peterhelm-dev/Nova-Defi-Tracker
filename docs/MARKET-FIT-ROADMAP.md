@@ -28,6 +28,14 @@ _Last updated: 2026-06-30_
 > entitlement seam (`isPro` / `PRO_ADDRESSES`) is in place for Phase 3 billing
 > to fill. Remaining Phase 2 work is operational + hardening: obtain a real key,
 > verify the mapper against live responses, and tune coverage. See §3.
+>
+> **Phase 3 (billing)** is landed: Stripe Checkout + Billing Portal + a
+> signature-verified webhook (`/api/billing/*`), subscription state persisted in
+> the store (`migrations/002_subscriptions.sql`), and the entitlement seam now
+> enforced server-side from live subscription state (`isEntitledPro`). The
+> pricing page CTA adapts (upgrade → manage, waitlist fallback). Remaining is
+> operational: set the Stripe keys/price/webhook and create the Stripe product.
+> Next: **Phase 4 (trust & legitimacy)** — legal pages, support, monitoring.
 
 This document assesses where the app is today and lays out a phased path from
 "working demo" to a product that can be legitimately sold. It exists because
