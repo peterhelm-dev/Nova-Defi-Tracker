@@ -17,8 +17,17 @@ _Last updated: 2026-06-30_
 >
 > Phase 1 is functionally complete; the remaining production step is purely
 > operational — provision a Postgres database, apply the migration, and set
-> `DATABASE_URL` / `CRON_SECRET`. Next up is **Phase 2 (auto-detection)**. See
-> §3 for the full plan.
+> `DATABASE_URL` / `CRON_SECRET`.
+>
+> **Phase 2 (auto-detection)** has a working first slice landed too: a
+> portfolio-provider seam (`src/lib/server/portfolio/`) with a Zerion adapter,
+> a `/api/portfolio` route scoped to the signed-in wallet, and dashboard wiring
+> that switches from the curated Base flow to automatic, complete, multi-chain
+> detection (tokens + DeFi positions) when `ZERION_API_KEY` is set and the user
+> is entitled. Multi-chain rides along for free via the indexer. A lightweight
+> entitlement seam (`isPro` / `PRO_ADDRESSES`) is in place for Phase 3 billing
+> to fill. Remaining Phase 2 work is operational + hardening: obtain a real key,
+> verify the mapper against live responses, and tune coverage. See §3.
 
 This document assesses where the app is today and lays out a phased path from
 "working demo" to a product that can be legitimately sold. It exists because

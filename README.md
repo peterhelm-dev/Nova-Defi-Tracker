@@ -48,13 +48,24 @@ A `/pricing` page with a waitlist (`/api/waitlist`) is included as a Phase 0
 demand test for the planned paid "Pro" tier. See `docs/MARKET-FIT-ROADMAP.md`
 for the phased plan.
 
-## Why no DeFi position auto-detection?
+## Automatic portfolio detection (Pro)
 
-Automatically detecting which LP/vault tokens a wallet holds across every
-Base protocol requires a paid indexer (Zapper, DeBank, Zerion, etc.). To keep
-this app running on free public APIs only, DeFi positions are tracked
-manually: browse the live pool leaderboard, hit **Track**, enter what you put
-in, and it's included in your totals and charts from then on.
+Detecting which tokens and LP/vault positions a wallet holds across every
+protocol and chain requires a paid indexer. That's wired as an optional **Pro**
+tier: set `ZERION_API_KEY` and a signed-in, entitled user's dashboard switches
+from the curated Base flow to automatic, complete, **multi-chain** detection
+via `/api/portfolio` — all tokens plus DeFi positions (deposits, staked,
+rewards, loans), each already priced.
+
+The indexer sits behind a provider seam (`src/lib/server/portfolio/`), so
+swapping or adding providers (DeBank, Zapper, Covalent, Alchemy) doesn't touch
+the route or the client. Entitlement is a seam too (`isPro`, driven by
+`PRO_ADDRESSES` today) that Phase 3 billing replaces with subscription state.
+
+**Without an indexer key the app is unchanged** — free, Base-only, on public
+data, with DeFi positions tracked manually: browse the live pool leaderboard,
+hit **Track**, enter what you put in, and it's folded into your totals and
+charts from then on.
 
 ## Tech stack
 
