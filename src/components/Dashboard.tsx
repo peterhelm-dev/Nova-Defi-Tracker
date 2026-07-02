@@ -1,10 +1,14 @@
 "use client";
 
+import { useAuth } from "@/hooks/useAuth";
+import { useAutoPortfolio } from "@/hooks/useAutoPortfolio";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { useNetWorthHistory } from "@/hooks/useNetWorthHistory";
 import { useTrackedPositions } from "@/hooks/useTrackedPositions";
 import { AssetAllocationChart } from "./AssetAllocationChart";
+import { AutoDetectionBanner } from "./AutoDetectionBanner";
 import { DefiPoolsSection } from "./DefiPoolsSection";
+import { DetectedPositionsCard } from "./DetectedPositionsCard";
 import { EmptyWalletState } from "./EmptyWalletState";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
@@ -15,18 +19,34 @@ import { TokenHoldingsTable } from "./TokenHoldingsTable";
 export function Dashboard() {
   const {
     address,
-    holdings,
-    totalUsd: walletUsd,
-    isLoading,
+    holdings: walletHoldings,
+    totalUsd: walletHoldingsUsd,
+    isLoading: walletLoading,
     pricesUnavailable,
     pricesUpdatedAt,
   } = useWalletHoldings();
-  const { positions, addPosition, removePosition, totalUsd: defiUsd } =
-    useTrackedPositions();
+  const { authedAddress } = useAuth();
+  const auto = useAutoPortfolio(!!authedAddress);
+  const {
+    positions,
+    addPosition,
+    removePosition,
+    totalUsd: manualDefiUsd,
+  } = useTrackedPositions(authedAddress);
+
+  // When Pro auto-detection is available, it supersedes the curated Base-only
+  // flow (complete + multi-chain); otherwise fall back to the free flow.
+  const usingAuto = auto.portfolio !== null;
+  const holdings = usingAuto ? auto.portfolio!.tokens : walletHoldings;
+  const walletUsd = usingAuto ? auto.portfolio!.walletUsd : walletHoldingsUsd;
+  const defiUsd = usingAuto ? auto.portfolio!.defiUsd : manualDefiUsd;
+  const isLoading = usingAuto ? false : walletLoading;
+
   const history = useNetWorthHistory(
     walletUsd,
     defiUsd,
     !!address && !isLoading,
+    authedAddress,
   );
 
   return (
@@ -37,6 +57,13 @@ export function Dashboard() {
           <EmptyWalletState />
         ) : (
           <>
+            <AutoDetectionBanner
+              isAuthed={authedAddress !== null}
+              configured={auto.configured}
+              entitled={auto.entitled}
+              isLoading={auto.isLoading}
+              portfolio={auto.portfolio}
+            />
             <NetWorthSummary
               walletUsd={walletUsd}
               defiUsd={defiUsd}
@@ -53,13 +80,19 @@ export function Dashboard() {
               <AssetAllocationChart holdings={holdings} defiUsd={defiUsd} />
             </div>
             <TokenHoldingsTable holdings={holdings} isLoading={isLoading} />
+            {usingAuto ? (
+              <DetectedPositionsCard positions={auto.portfolio!.positions} />
+            ) : null}
           </>
         )}
-        <DefiPoolsSection
-          positions={positions}
-          onAdd={addPosition}
-          onRemove={removePosition}
-        />
+        {/* Manual tracking is the free-tier path; auto-detection supersedes it. */}
+        {!usingAuto ? (
+          <DefiPoolsSection
+            positions={positions}
+            onAdd={addPosition}
+            onRemove={removePosition}
+          />
+        ) : null}
       </main>
       <Footer />
     </div>
