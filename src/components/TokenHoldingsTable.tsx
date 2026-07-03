@@ -1,17 +1,41 @@
 "use client";
 
+import { toCsv } from "@/lib/csv";
 import { formatPercent, formatTokenAmount, formatUsd } from "@/lib/format";
 import type { TokenHolding } from "@/types";
+import { ExportCsvButton } from "./ExportCsvButton";
 
 type TokenHoldingsTableProps = {
   holdings: TokenHolding[];
   isLoading: boolean;
 };
 
+function holdingsCsv(holdings: TokenHolding[]): string {
+  return toCsv(
+    ["symbol", "name", "address", "balance", "price_usd", "change_24h_pct", "value_usd"],
+    holdings.map((h) => [
+      h.symbol,
+      h.name,
+      h.address,
+      h.balance,
+      h.priceUsd,
+      h.change24h,
+      h.valueUsd,
+    ]),
+  );
+}
+
 export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTableProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="text-sm font-medium text-white/50">Token holdings</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-white/50">Token holdings</p>
+        <ExportCsvButton
+          filenamePrefix="holdings"
+          getCsv={() => holdingsCsv(holdings)}
+          disabled={holdings.length === 0}
+        />
+      </div>
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>

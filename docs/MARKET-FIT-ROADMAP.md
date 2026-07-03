@@ -44,6 +44,10 @@ _Last updated: 2026-06-30_
 > (`NEXT_PUBLIC_SUPPORT_EMAIL`), an error-monitoring SDK (the boundary is the
 > hook point), and uptime monitoring. Next: **Phase 5 (differentiation)** —
 > PnL/cost basis, alerts, exports — guided by what waitlist/usage data says.
+>
+> **Phase 5 first slice:** CSV export of net-worth history and holdings is
+> shipped (free tier — it exports data the user already sees). PnL/cost-basis
+> and tax-ready exports remain the Pro-grade export promise.
 
 This document assesses where the app is today and lays out a phased path from
 "working demo" to a product that can be legitimately sold. It exists because
