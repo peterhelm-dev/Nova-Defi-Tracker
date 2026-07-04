@@ -15,7 +15,9 @@ export default defineConfig({
     command: `npm run dev -- -p ${PORT}`,
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
+    // Dev-server cold start can exceed 60s on slow/cold filesystems (seen in
+    // CI-like sandboxes); give it headroom instead of flaking.
+    timeout: 120_000,
   },
   projects: [
     {

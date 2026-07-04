@@ -48,6 +48,13 @@ _Last updated: 2026-06-30_
 > **Phase 5 first slice:** CSV export of net-worth history and holdings is
 > shipped (free tier — it exports data the user already sees). PnL/cost-basis
 > and tax-ready exports remain the Pro-grade export promise.
+>
+> **Phase 5 second slice + Phase 0 wiring:** a Performance card (1d/7d/30d/
+> all-time returns computed from the daily snapshot series, with CSV export)
+> now sits on the dashboard — the first step toward full PnL/cost-basis, which
+> still needs acquisition-price history from an indexer. Optional cookie-less
+> analytics (Plausible) load when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set,
+> completing the Phase 0 measurement loop; the privacy page discloses it.
 
 This document assesses where the app is today and lays out a phased path from
 "working demo" to a product that can be legitimately sold. It exists because

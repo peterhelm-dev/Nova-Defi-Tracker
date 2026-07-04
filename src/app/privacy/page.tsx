@@ -64,6 +64,11 @@ export default function PrivacyPage() {
           <strong>Payments</strong> — Stripe processes payments and holds your
           payment details under its own privacy policy.
         </li>
+        <li>
+          <strong>Analytics</strong> — if enabled, we use cookie-less,
+          privacy-respecting analytics (Plausible) that counts aggregate page
+          views only; it does not identify you or follow you across sites.
+        </li>
       </ul>
 
       <h2>Waitlist</h2>
