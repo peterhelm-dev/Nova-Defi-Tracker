@@ -55,6 +55,13 @@ _Last updated: 2026-06-30_
 > still needs acquisition-price history from an indexer. Optional cookie-less
 > analytics (Plausible) load when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set,
 > completing the Phase 0 measurement loop; the privacy page discloses it.
+>
+> **Phase 5 third slice — price alerts:** signed-in users set above/below USD
+> thresholds on ETH + curated Base tokens; an hourly cron
+> (`/api/cron/alerts`, `migrations/003_alerts.sql`) evaluates them with
+> one-alert-per-crossing semantics (fire → disarm → re-arm on cross-back) and
+> fired alerts surface in-app until dismissed. Email/push delivery is the
+> natural next layer behind the same evaluation.
 
 This document assesses where the app is today and lays out a phased path from
 "working demo" to a product that can be legitimately sold. It exists because

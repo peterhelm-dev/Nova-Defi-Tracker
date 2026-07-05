@@ -74,6 +74,35 @@ export type AutoPortfolio = {
   updatedAt: number;
 };
 
+export type AlertDirection = "above" | "below";
+
+/** A user-defined price alert on a token the app tracks. */
+export type AlertRule = {
+  id: string;
+  symbol: string;
+  /** Token contract address, or "native" for ETH. */
+  tokenAddress: string;
+  direction: AlertDirection;
+  thresholdUsd: number;
+  /**
+   * Fires only while armed; disarms on firing and re-arms once the price
+   * crosses back, so a rule alerts once per crossing instead of every hour.
+   */
+  armed: boolean;
+  createdAt: number;
+};
+
+/** A fired alert, kept until the user dismisses it. */
+export type AlertEvent = {
+  id: string;
+  ruleId: string;
+  symbol: string;
+  direction: AlertDirection;
+  thresholdUsd: number;
+  priceUsd: number;
+  triggeredAt: number;
+};
+
 export type SubscriptionStatus =
   | "none"
   | "trialing"

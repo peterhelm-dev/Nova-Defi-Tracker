@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isCronAuthorized } from "@/lib/server/cronAuth";
 import { computeWalletUsd } from "@/lib/server/holdings";
 import { getStore } from "@/lib/server/store";
 import type { Address } from "viem";
@@ -15,15 +16,6 @@ function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function isAuthorized(request: Request): boolean {
-  const secret = process.env.CRON_SECRET;
-  // If no secret is configured we refuse rather than run unauthenticated.
-  if (!secret) return false;
-  const auth = request.headers.get("authorization");
-  if (auth === `Bearer ${secret}`) return true;
-  return new URL(request.url).searchParams.get("secret") === secret;
-}
-
 /**
  * Records one net-worth snapshot per tracked wallet for today. Intended to be
  * hit by a daily scheduler (e.g. Vercel Cron — see vercel.json) so history
@@ -33,7 +25,7 @@ function isAuthorized(request: Request): boolean {
  * persist a misleading $0.
  */
 export async function POST(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

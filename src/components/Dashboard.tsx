@@ -5,6 +5,7 @@ import { useAutoPortfolio } from "@/hooks/useAutoPortfolio";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { useNetWorthHistory } from "@/hooks/useNetWorthHistory";
 import { useTrackedPositions } from "@/hooks/useTrackedPositions";
+import { AlertsCard } from "./AlertsCard";
 import { AssetAllocationChart } from "./AssetAllocationChart";
 import { AutoDetectionBanner } from "./AutoDetectionBanner";
 import { DefiPoolsSection } from "./DefiPoolsSection";
@@ -82,6 +83,7 @@ export function Dashboard() {
               <AssetAllocationChart holdings={holdings} defiUsd={defiUsd} />
             </div>
             <TokenHoldingsTable holdings={holdings} isLoading={isLoading} />
+            <AlertsCard authedAddress={authedAddress} />
             {usingAuto ? (
               <DetectedPositionsCard positions={auto.portfolio!.positions} />
             ) : null}
