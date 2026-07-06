@@ -8,13 +8,29 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { toCsv } from "@/lib/csv";
 import { formatUsd } from "@/lib/format";
 import type { NetWorthSnapshot } from "@/types";
+import { ExportCsvButton } from "./ExportCsvButton";
+
+function historyCsv(history: NetWorthSnapshot[]): string {
+  return toCsv(
+    ["date", "wallet_usd", "defi_usd", "total_usd"],
+    history.map((s) => [s.date, s.walletUsd, s.defiUsd, s.totalUsd]),
+  );
+}
 
 export function NetWorthChart({ history }: { history: NetWorthSnapshot[] }) {
   return (
     <div className="h-full rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="text-sm font-medium text-white/50">Net worth history</p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-white/50">Net worth history</p>
+        <ExportCsvButton
+          filenamePrefix="net-worth-history"
+          getCsv={() => historyCsv(history)}
+          disabled={history.length === 0}
+        />
+      </div>
       {history.length < 2 ? (
         <div className="flex h-64 items-center justify-center text-center text-sm text-white/40">
           Come back tomorrow — history builds up one snapshot per day as you

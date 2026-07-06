@@ -1,5 +1,11 @@
 import type { Pool } from "pg";
-import type { NetWorthSnapshot, Subscription, TrackedPosition } from "@/types";
+import type {
+  AlertEvent,
+  AlertRule,
+  NetWorthSnapshot,
+  Subscription,
+  TrackedPosition,
+} from "@/types";
 import type { UserDataStore } from "./store";
 
 /**
@@ -186,5 +192,82 @@ export class PostgresStore implements UserDataStore {
       [customerId],
     );
     return rows.length > 0 ? (rows[0].address as string) : null;
+  }
+
+  async getAlertRules(address: string): Promise<AlertRule[]> {
+    const pool = await this.pool();
+    const { rows } = await pool.query(
+      `SELECT id, symbol, token_address AS "tokenAddress", direction,
+              threshold_usd AS "thresholdUsd", armed, created_at AS "createdAt"
+         FROM alert_rules
+        WHERE address = $1
+        ORDER BY created_at DESC`,
+      [address.toLowerCase()],
+    );
+    return rows.map((r) => ({ ...r, createdAt: Number(r.createdAt) })) as AlertRule[];
+  }
+
+  async putAlertRules(address: string, rules: AlertRule[]): Promise<void> {
+    const key = address.toLowerCase();
+    await this.ensureUser(key);
+    const pool = await this.pool();
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query("DELETE FROM alert_rules WHERE address = $1", [key]);
+      for (const r of rules) {
+        await client.query(
+          `INSERT INTO alert_rules
+             (id, address, symbol, token_address, direction, threshold_usd, armed, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [r.id, key, r.symbol, r.tokenAddress, r.direction, r.thresholdUsd, r.armed, r.createdAt],
+        );
+      }
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async getAlertEvents(address: string): Promise<AlertEvent[]> {
+    const pool = await this.pool();
+    const { rows } = await pool.query(
+      `SELECT id, rule_id AS "ruleId", symbol, direction,
+              threshold_usd AS "thresholdUsd", price_usd AS "priceUsd",
+              triggered_at AS "triggeredAt"
+         FROM alert_events
+        WHERE address = $1
+        ORDER BY triggered_at DESC`,
+      [address.toLowerCase()],
+    );
+    return rows.map((r) => ({ ...r, triggeredAt: Number(r.triggeredAt) })) as AlertEvent[];
+  }
+
+  async putAlertEvents(address: string, events: AlertEvent[]): Promise<void> {
+    const key = address.toLowerCase();
+    await this.ensureUser(key);
+    const pool = await this.pool();
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query("DELETE FROM alert_events WHERE address = $1", [key]);
+      for (const e of events) {
+        await client.query(
+          `INSERT INTO alert_events
+             (id, address, rule_id, symbol, direction, threshold_usd, price_usd, triggered_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [e.id, key, e.ruleId, e.symbol, e.direction, e.thresholdUsd, e.priceUsd, e.triggeredAt],
+        );
+      }
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 }

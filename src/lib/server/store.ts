@@ -1,6 +1,12 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import type { NetWorthSnapshot, Subscription, TrackedPosition } from "@/types";
+import type {
+  AlertEvent,
+  AlertRule,
+  NetWorthSnapshot,
+  Subscription,
+  TrackedPosition,
+} from "@/types";
 import { PostgresStore } from "./postgresStore";
 
 /**
@@ -29,6 +35,10 @@ export interface UserDataStore {
   setSubscription(address: string, subscription: Subscription): Promise<void>;
   /** Reverse lookup for webhooks, which reference a Stripe customer, not us. */
   getAddressByCustomer(customerId: string): Promise<string | null>;
+  getAlertRules(address: string): Promise<AlertRule[]>;
+  putAlertRules(address: string, rules: AlertRule[]): Promise<void>;
+  getAlertEvents(address: string): Promise<AlertEvent[]>;
+  putAlertEvents(address: string, events: AlertEvent[]): Promise<void>;
 }
 
 type Persisted = {
@@ -37,6 +47,8 @@ type Persisted = {
   waitlist: { email: string; ref?: string; at: number }[];
   subscriptions: Record<string, Subscription>;
   customerAddress: Record<string, string>;
+  alertRules: Record<string, AlertRule[]>;
+  alertEvents: Record<string, AlertEvent[]>;
 };
 
 const EMPTY: Persisted = {
@@ -45,6 +57,8 @@ const EMPTY: Persisted = {
   waitlist: [],
   subscriptions: {},
   customerAddress: {},
+  alertRules: {},
+  alertEvents: {},
 };
 
 function key(address: string): string {
@@ -151,6 +165,28 @@ class FileStore implements UserDataStore {
   async getAddressByCustomer(customerId: string): Promise<string | null> {
     await this.load();
     return this.data.customerAddress[customerId] ?? null;
+  }
+
+  async getAlertRules(address: string): Promise<AlertRule[]> {
+    await this.load();
+    return this.data.alertRules[key(address)] ?? [];
+  }
+
+  async putAlertRules(address: string, rules: AlertRule[]): Promise<void> {
+    await this.load();
+    this.data.alertRules[key(address)] = rules;
+    await this.flush();
+  }
+
+  async getAlertEvents(address: string): Promise<AlertEvent[]> {
+    await this.load();
+    return this.data.alertEvents[key(address)] ?? [];
+  }
+
+  async putAlertEvents(address: string, events: AlertEvent[]): Promise<void> {
+    await this.load();
+    this.data.alertEvents[key(address)] = events;
+    await this.flush();
   }
 }
 

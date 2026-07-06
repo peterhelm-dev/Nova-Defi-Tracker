@@ -5,6 +5,7 @@ import { useAutoPortfolio } from "@/hooks/useAutoPortfolio";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { useNetWorthHistory } from "@/hooks/useNetWorthHistory";
 import { useTrackedPositions } from "@/hooks/useTrackedPositions";
+import { AlertsCard } from "./AlertsCard";
 import { AssetAllocationChart } from "./AssetAllocationChart";
 import { AutoDetectionBanner } from "./AutoDetectionBanner";
 import { DefiPoolsSection } from "./DefiPoolsSection";
@@ -14,6 +15,7 @@ import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { NetWorthChart } from "./NetWorthChart";
 import { NetWorthSummary } from "./NetWorthSummary";
+import { PerformanceCard } from "./PerformanceCard";
 import { TokenHoldingsTable } from "./TokenHoldingsTable";
 
 export function Dashboard() {
@@ -73,6 +75,7 @@ export function Dashboard() {
               pricesUnavailable={pricesUnavailable}
               pricesUpdatedAt={pricesUpdatedAt}
             />
+            <PerformanceCard history={history} />
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2">
                 <NetWorthChart history={history} />
@@ -80,6 +83,7 @@ export function Dashboard() {
               <AssetAllocationChart holdings={holdings} defiUsd={defiUsd} />
             </div>
             <TokenHoldingsTable holdings={holdings} isLoading={isLoading} />
+            <AlertsCard authedAddress={authedAddress} />
             {usingAuto ? (
               <DetectedPositionsCard positions={auto.portfolio!.positions} />
             ) : null}

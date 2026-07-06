@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "@coinbase/onchainkit/styles.css";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -47,6 +48,15 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+        {/* Privacy-respecting analytics (no cookies, no cross-site tracking).
+            Loads only when a Plausible domain is configured. */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ? (
+          <Script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+          />
+        ) : null}
       </body>
     </html>
   );
