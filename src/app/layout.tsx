@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 const description =
   "Track your onchain net worth on Base — token balances, allocation, history, and DeFi pool positions.";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
