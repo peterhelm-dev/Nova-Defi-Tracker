@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAutoPortfolio } from "@/hooks/useAutoPortfolio";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
@@ -19,8 +20,11 @@ import { PerformanceCard } from "./PerformanceCard";
 import { TokenHoldingsTable } from "./TokenHoldingsTable";
 
 export function Dashboard() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const {
-    address,
+    address: rawAddress,
     holdings: walletHoldings,
     totalUsd: walletHoldingsUsd,
     isLoading: walletLoading,
@@ -35,6 +39,11 @@ export function Dashboard() {
     removePosition,
     totalUsd: manualDefiUsd,
   } = useTrackedPositions(authedAddress);
+
+  // Defer wallet-dependent state until after hydration so server and client
+  // agree on the initial render (wagmi restores address from storage only on
+  // the client, which would otherwise cause a tree mismatch).
+  const address = mounted ? rawAddress : undefined;
 
   // When Pro auto-detection is available, it supersedes the curated Base-only
   // flow (complete + multi-chain); otherwise fall back to the free flow.
