@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
 /**
@@ -12,8 +12,10 @@ export function SyncControl() {
   const { isConnected, isAuthed, signIn, signOut } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  if (!isConnected) return null;
+  if (!mounted || !isConnected) return null;
 
   async function run(action: () => Promise<void>) {
     setBusy(true);
