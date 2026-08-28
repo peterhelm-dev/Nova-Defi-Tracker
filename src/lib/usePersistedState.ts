@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useRef, useSyncExternalStore } from "react";
 import { storage } from "./storage";
 
 const cache = new Map<string, unknown>();
@@ -34,21 +34,26 @@ function notify(key: string) {
  * real persisted value swaps in without a hydration mismatch.
  */
 export function usePersistedState<T>(key: string, fallback: T) {
+  // Capture the initial fallback in a ref so its identity never changes between
+  // renders. This prevents setValue from getting a new reference on every render
+  // (which would trigger any useEffect that depends on it in a loop).
+  const fallbackRef = useRef(fallback);
+
   const value = useSyncExternalStore(
     (listener) => subscribe(key, listener),
-    () => getSnapshot(key, fallback),
-    () => fallback,
+    () => getSnapshot(key, fallbackRef.current),
+    () => fallbackRef.current,
   );
 
   const setValue = useCallback(
     (next: T | ((prev: T) => T)) => {
-      const prev = getSnapshot(key, fallback);
+      const prev = getSnapshot(key, fallbackRef.current);
       const resolved = typeof next === "function" ? (next as (p: T) => T)(prev) : next;
       cache.set(key, resolved);
       storage.write(key, resolved);
       notify(key);
     },
-    [key, fallback],
+    [key],
   );
 
   return [value, setValue] as const;
