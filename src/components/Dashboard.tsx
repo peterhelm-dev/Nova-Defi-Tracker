@@ -6,6 +6,7 @@ import { useAutoPortfolio } from "@/hooks/useAutoPortfolio";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { useNetWorthHistory } from "@/hooks/useNetWorthHistory";
 import { useTrackedPositions } from "@/hooks/useTrackedPositions";
+import { AiChatWidget } from "./AiChatWidget";
 import { AlertsCard } from "./AlertsCard";
 import { AssetAllocationChart } from "./AssetAllocationChart";
 import { AutoDetectionBanner } from "./AutoDetectionBanner";
@@ -108,6 +109,12 @@ export function Dashboard() {
         ) : null}
       </main>
       <Footer />
+      <AiChatWidget
+        address={address}
+        walletUsd={walletUsd}
+        defiUsd={defiUsd}
+        holdings={holdings}
+      />
     </div>
   );
 }

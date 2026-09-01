@@ -11,6 +11,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.122.0",
     "@coinbase/onchainkit": "^1.1.2",
     "@tanstack/react-query": "^5.101.1",
     "next": "16.2.9",
