@@ -1,3 +1,4 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 // Conservative hardening baseline. A full Content-Security-Policy is left out
@@ -12,6 +13,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];

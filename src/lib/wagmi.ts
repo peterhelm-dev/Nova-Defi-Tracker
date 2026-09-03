@@ -8,7 +8,7 @@ export const wagmiConfig = createConfig({
   chains: [base, mainnet],
   connectors: [
     coinbaseWallet({
-      appName: "Base Wealth Tracker",
+      appName: "NOVA",
       preference: "all",
     }),
   ],

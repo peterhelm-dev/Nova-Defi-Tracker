@@ -1,5 +1,5 @@
 import { formatUnits } from "viem";
-import { BASE_TOKENS, type BaseToken } from "./tokens";
+import { BASE_TOKENS, ETH_ICON_URL, type BaseToken } from "./tokens";
 import type { PriceResponse, TokenHolding } from "@/types";
 
 type Erc20BalanceResult = { status: "success" | "failure"; result?: unknown };
@@ -19,6 +19,9 @@ export function buildHoldings(params: {
     name: "Ether",
     address: "native",
     decimals: 18,
+    chain: "base",
+    iconUrl: ETH_ICON_URL,
+    fungibleId: null,
     balance: ethAmount,
     priceUsd: ethPrice,
     change24h: prices?.eth?.usd_24h_change ?? null,
@@ -38,6 +41,9 @@ export function buildHoldings(params: {
       name: token.name,
       address: token.address,
       decimals: token.decimals,
+      chain: "base",
+      iconUrl: token.iconUrl,
+      fungibleId: null,
       balance,
       priceUsd,
       change24h: priceEntry?.usd_24h_change ?? null,

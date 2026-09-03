@@ -21,7 +21,7 @@ export function InfoPage({
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
             B
           </span>
-          <span className="text-sm font-semibold text-white">Base Wealth Tracker</span>
+          <span className="text-sm font-semibold text-white">NOVA</span>
         </Link>
         <Link href="/" className="text-sm text-white/60 hover:text-white">
           ← Back to dashboard

@@ -4,8 +4,8 @@ import type { BaseToken } from "./tokens";
 import type { PriceResponse } from "@/types";
 
 const TOKENS: BaseToken[] = [
-  { symbol: "USDC", name: "USD Coin", address: "0xAAA", decimals: 6 },
-  { symbol: "WETH", name: "Wrapped Ether", address: "0xBBB", decimals: 18 },
+  { symbol: "USDC", name: "USD Coin", address: "0xAAA", decimals: 6, iconUrl: "https://example.com/usdc.png" },
+  { symbol: "WETH", name: "Wrapped Ether", address: "0xBBB", decimals: 18, iconUrl: "https://example.com/weth.png" },
 ];
 
 describe("buildHoldings", () => {
@@ -85,8 +85,8 @@ describe("buildHoldings", () => {
 describe("sumHoldingsUsd", () => {
   it("sums valueUsd across holdings", () => {
     const total = sumHoldingsUsd([
-      { symbol: "A", name: "A", address: "0x1", decimals: 18, balance: 1, priceUsd: 2, change24h: null, valueUsd: 2 },
-      { symbol: "B", name: "B", address: "0x2", decimals: 18, balance: 1, priceUsd: 3, change24h: null, valueUsd: 3 },
+      { symbol: "A", name: "A", address: "0x1", decimals: 18, chain: "base", iconUrl: null, fungibleId: null, balance: 1, priceUsd: 2, change24h: null, valueUsd: 2 },
+      { symbol: "B", name: "B", address: "0x2", decimals: 18, chain: "base", iconUrl: null, fungibleId: null, balance: 1, priceUsd: 3, change24h: null, valueUsd: 3 },
     ]);
     expect(total).toBe(5);
   });

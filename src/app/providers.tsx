@@ -6,6 +6,7 @@ import { useState } from "react";
 import { WagmiProvider } from "wagmi";
 import { base } from "wagmi/chains";
 import { wagmiConfig } from "@/lib/wagmi";
+import { PrivacyProvider } from "@/lib/privacy";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -18,14 +19,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
           chain={base}
           config={{
             appearance: {
-              name: "Base Wealth Tracker",
+              name: "NOVA",
               mode: "dark",
               theme: "default",
             },
             wallet: { display: "classic" },
           }}
         >
-          {children}
+          <PrivacyProvider>{children}</PrivacyProvider>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

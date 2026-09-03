@@ -35,7 +35,7 @@ export default async function Image() {
           >
             B
           </div>
-          <div style={{ fontSize: 56, fontWeight: 700 }}>Base Wealth Tracker</div>
+          <div style={{ fontSize: 56, fontWeight: 700 }}>NOVA</div>
         </div>
         <div style={{ marginTop: 32, fontSize: 30, color: "rgba(245,246,250,0.6)" }}>
           Track your onchain net worth and DeFi pools on Base.

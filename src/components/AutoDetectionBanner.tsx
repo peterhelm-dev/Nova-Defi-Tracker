@@ -5,7 +5,6 @@ import { formatUpdatedAt } from "@/lib/format";
 import type { AutoPortfolio } from "@/types";
 
 type Props = {
-  isAuthed: boolean;
   configured: boolean;
   entitled: boolean;
   isLoading: boolean;
@@ -13,12 +12,12 @@ type Props = {
 };
 
 /**
- * Communicates which data mode the dashboard is in: Pro auto-detection
- * (complete + multi-chain) when active, otherwise a slim upsell for it. Keeps
- * the free curated-Base experience clean while making the paid value legible.
+ * Communicates which data mode the dashboard is in: multi-chain
+ * auto-detection (the primary flow, works for any connected wallet) when
+ * active, otherwise a slim upsell for it. Keeps the fallback curated-Base
+ * experience clean while making the full detection value legible.
  */
 export function AutoDetectionBanner({
-  isAuthed,
   configured,
   entitled,
   isLoading,
@@ -52,7 +51,7 @@ export function AutoDetectionBanner({
   }
 
   const message =
-    isAuthed && configured && !entitled
+    configured && !entitled
       ? "Automatic multi-chain detection is a Pro feature."
       : "Get Pro: automatic detection of every token & DeFi position, across chains.";
 

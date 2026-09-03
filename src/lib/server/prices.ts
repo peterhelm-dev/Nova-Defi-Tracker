@@ -1,11 +1,15 @@
 import { BASE_TOKENS } from "@/lib/tokens";
-import type { PriceResponse } from "@/types";
+import { coingeckoPlatform, nativeCoinId } from "@/lib/coingeckoPlatforms";
+import type { PricePoint, PriceResponse } from "@/types";
 
-// CoinGecko Pro key enables the higher-rate-limit endpoint; demo key uses the
-// same public base URL but with the x-cg-demo-api-key header. Without any key
-// the free unauthenticated endpoint is used, which is heavily rate-limited.
+// CoinGecko Pro keys use the pro-api.coingecko.com host with the
+// x-cg-pro-api-key header; Demo keys (also prefixed "CG-", so the prefix
+// alone can't distinguish them) must stay on api.coingecko.com with the
+// x-cg-demo-api-key header. Set COINGECKO_PLAN=pro to opt into the Pro host;
+// defaults to demo/free behavior. Without any key the free unauthenticated
+// endpoint is used, which is heavily rate-limited.
 const API_KEY = process.env.COINGECKO_API_KEY ?? "";
-const IS_PRO = API_KEY.startsWith("CG-");
+const IS_PRO = process.env.COINGECKO_PLAN === "pro";
 const COINGECKO_BASE = IS_PRO
   ? "https://pro-api.coingecko.com/api/v3"
   : "https://api.coingecko.com/api/v3";
@@ -49,6 +53,48 @@ export async function fetchPrices(
     ]);
 
     return { tokens: tokenJson, eth: ethJson.ethereum };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Price history for one token, for a chart — a line of (timestamp, price),
+ * not full OHLC candles. Native assets (address "native") resolve to a
+ * per-chain coin id (e.g. Base/Ethereum ETH -> "ethereum"); ERC-20s use
+ * CoinGecko's contract-based endpoint directly, no id-resolution needed.
+ * Returns null when the chain/token isn't mapped to a known CoinGecko id —
+ * callers should show "chart unavailable" rather than nothing.
+ */
+export async function fetchTokenPriceHistory(
+  chain: string,
+  address: string,
+  days: number,
+): Promise<PricePoint[] | null> {
+  const headers = cgHeaders();
+  const isNative = address === "native";
+
+  const url = isNative
+    ? (() => {
+        const id = nativeCoinId(chain);
+        return id
+          ? `${COINGECKO_BASE}/coins/${id}/market_chart?vs_currency=usd&days=${days}`
+          : null;
+      })()
+    : (() => {
+        const platform = coingeckoPlatform(chain);
+        return platform
+          ? `${COINGECKO_BASE}/coins/${platform}/contract/${address.toLowerCase()}/market_chart/?vs_currency=usd&days=${days}`
+          : null;
+      })();
+
+  if (!url) return null;
+
+  try {
+    const res = await fetch(url, { next: { revalidate: 300 }, headers });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { prices?: [number, number][] };
+    return (json.prices ?? []).map(([t, priceUsd]) => ({ t, priceUsd }));
   } catch {
     return null;
   }

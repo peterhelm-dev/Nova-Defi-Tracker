@@ -20,3 +20,14 @@ export function getPortfolioProvider(): PortfolioProvider | null {
   }
   return provider;
 }
+
+/**
+ * PnL and gas-spend are Zerion-specific (not part of the generic
+ * PortfolioProvider seam other indexers would implement), so this returns the
+ * concrete provider rather than the interface. Null when Zerion isn't
+ * configured.
+ */
+export function getZerionProvider(): ZerionProvider | null {
+  const p = getPortfolioProvider();
+  return p instanceof ZerionProvider ? p : null;
+}

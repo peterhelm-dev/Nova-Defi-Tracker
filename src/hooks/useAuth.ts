@@ -3,7 +3,13 @@
 import { useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createSiweMessage } from "viem/siwe";
-import { useAccount, useChainId, useSignMessage } from "wagmi";
+import { base } from "wagmi/chains";
+import {
+  useAccount,
+  useChainId,
+  useSignMessage,
+  useSwitchChain,
+} from "wagmi";
 
 const SESSION_KEY = ["auth", "session"] as const;
 
@@ -24,6 +30,7 @@ export function useAuth() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { signMessageAsync } = useSignMessage();
+  const { switchChainAsync } = useSwitchChain();
   const queryClient = useQueryClient();
 
   const { data: authedAddress = null, isLoading } = useQuery({
@@ -35,18 +42,29 @@ export function useAuth() {
   const signIn = useCallback(async () => {
     if (!address) throw new Error("Connect a wallet first");
 
+    // The server verifies the signature against the wallet contract as
+    // deployed on Base — smart wallets keep a separate owner registry per
+    // chain, so a signature produced while connected to another chain (e.g.
+    // Ethereum mainnet) can be rejected even though the address matches.
+    // Force Base before asking for a signature.
+    let signInChainId = chainId;
+    if (chainId !== base.id) {
+      await switchChainAsync({ chainId: base.id });
+      signInChainId = base.id;
+    }
+
     const nonceRes = await fetch("/api/auth/nonce", { credentials: "same-origin" });
     if (!nonceRes.ok) throw new Error("Could not start sign-in");
     const { nonce } = (await nonceRes.json()) as { nonce: string };
 
     const message = createSiweMessage({
       address,
-      chainId,
+      chainId: signInChainId,
       domain: window.location.host,
       nonce,
       uri: window.location.origin,
       version: "1",
-      statement: "Sign in to Base Wealth Tracker to sync your portfolio.",
+      statement: "Sign in to NOVA to sync your portfolio.",
     });
 
     const signature = await signMessageAsync({ message });
@@ -63,7 +81,7 @@ export function useAuth() {
     }
 
     await queryClient.invalidateQueries({ queryKey: SESSION_KEY });
-  }, [address, chainId, signMessageAsync, queryClient]);
+  }, [address, chainId, signMessageAsync, switchChainAsync, queryClient]);
 
   const signOut = useCallback(async () => {
     await fetch("/api/auth/session", {

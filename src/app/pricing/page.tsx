@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { ProCta } from "@/components/ProCta";
 
 export const metadata: Metadata = {
-  title: "Pricing — Base Wealth Tracker",
+  title: "Pricing — NOVA",
   description:
     "Track your Base portfolio free, or join the waitlist for Pro: automatic multi-chain detection, full synced history, and alerts.",
 };
@@ -59,7 +59,7 @@ export default function PricingPage() {
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
             B
           </span>
-          <span className="text-sm font-semibold text-white">Base Wealth Tracker</span>
+          <span className="text-sm font-semibold text-white">NOVA</span>
         </Link>
         <Link href="/" className="text-sm text-white/60 hover:text-white">
           ← Back to dashboard

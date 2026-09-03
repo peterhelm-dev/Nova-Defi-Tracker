@@ -1,6 +1,7 @@
 "use client";
 
 import { formatPercent, formatUpdatedAt, formatUsd } from "@/lib/format";
+import { maskValue, usePrivacyMode } from "@/lib/privacy";
 import type { TokenHolding } from "@/types";
 
 type NetWorthSummaryProps = {
@@ -31,13 +32,17 @@ export function NetWorthSummary({
       sum + (h.change24h !== null ? (h.valueUsd / (pricedValue || 1)) * h.change24h : 0),
     0,
   );
+  const { privacyMode } = usePrivacyMode();
 
   return (
     <div className="rounded-2xl border border-white/10 bg-surface p-6">
       <p className="text-sm font-medium text-white/50">Total net worth</p>
       <div className="mt-2 flex flex-wrap items-baseline gap-3">
-        <span className="text-4xl font-semibold tracking-tight text-white">
-          {isLoading ? "—" : formatUsd(totalUsd)}
+        <span
+          className="text-4xl font-semibold tracking-tight text-white"
+          aria-label={isLoading ? undefined : `Total net worth ${formatUsd(totalUsd)}`}
+        >
+          {isLoading ? "—" : maskValue(formatUsd(totalUsd), privacyMode)}
         </span>
         {!isLoading && pricedValue > 0 && (
           <span
@@ -54,11 +59,15 @@ export function NetWorthSummary({
       <div className="mt-4 flex flex-wrap gap-4 text-sm text-white/60">
         <span>
           Wallet:{" "}
-          <span className="font-medium text-white">{formatUsd(walletUsd)}</span>
+          <span className="font-medium text-white">
+            {maskValue(formatUsd(walletUsd), privacyMode)}
+          </span>
         </span>
         <span>
           DeFi positions:{" "}
-          <span className="font-medium text-white">{formatUsd(defiUsd)}</span>
+          <span className="font-medium text-white">
+            {maskValue(formatUsd(defiUsd), privacyMode)}
+          </span>
         </span>
       </div>
       {pricesUnavailable && (

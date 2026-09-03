@@ -3,15 +3,15 @@ import Link from "next/link";
 import { InfoPage } from "@/components/InfoPage";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Base Wealth Tracker",
-  description: "What Base Wealth Tracker stores, where, and why.",
+  title: "Privacy Policy — NOVA",
+  description: "What NOVA stores, where, and why.",
 };
 
 export default function PrivacyPage() {
   return (
     <InfoPage title="Privacy Policy" updated="June 30, 2026">
       <p>
-        Base Wealth Tracker is built to need as little of your data as
+        NOVA is built to need as little of your data as
         possible. No email or password is required to use it, and there is no
         advertising or cross-site tracking. This page describes exactly what is
         stored, where, and why.

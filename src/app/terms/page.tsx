@@ -3,15 +3,15 @@ import Link from "next/link";
 import { InfoPage } from "@/components/InfoPage";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Base Wealth Tracker",
-  description: "The terms that govern your use of Base Wealth Tracker.",
+  title: "Terms of Service — NOVA",
+  description: "The terms that govern your use of NOVA.",
 };
 
 export default function TermsPage() {
   return (
     <InfoPage title="Terms of Service" updated="June 30, 2026">
       <p>
-        These terms govern your use of Base Wealth Tracker (the
+        These terms govern your use of NOVA (the
         &ldquo;Service&rdquo;). By connecting a wallet, signing in, or
         subscribing, you agree to them. If you don&apos;t agree, don&apos;t use
         the Service.

@@ -1,0 +1,31 @@
+{
+  "asOf": "2026-09-02T18:00:00Z",
+  "currency": "USD",
+  "wallet": { "address": "0x7A31D4F5A8B19C2D0E6F9A11B3C77F119CE8", "display": "0x7A31...9cE8", "connected": true },
+  "portfolio": { "value": 24860.42, "changeAbsolute": 1364.18, "changePercent": 5.8, "interval": "7D", "status": "fresh" },
+  "allocation": [
+    { "id": "blue-chips", "label": "Blue Chips", "value": 10451.78, "percent": 42, "type": "asset" },
+    { "id": "defi", "label": "DeFi", "value": 6458.23, "percent": 26, "type": "position" },
+    { "id": "stablecoins", "label": "Stablecoins", "value": 4205.11, "percent": 17, "type": "asset" },
+    { "id": "other", "label": "Other", "value": 2744.30, "percent": 10, "type": "asset" },
+    { "id": "cash", "label": "Cash", "value": 1001.00, "percent": 5, "type": "cash" }
+  ],
+  "defiPositions": [
+    { "id": "p1", "name": "Liquidity Vault", "strategy": "Concentrated ETH", "chain": "Ethereum", "value": 4215.67, "estimatedApy": 12.4, "risk": "moderate", "status": "indexed" },
+    { "id": "p2", "name": "Lend Market", "strategy": "Flexible USDC", "chain": "Base", "value": 3194.11, "estimatedApy": 6.7, "risk": "low", "status": "indexed" },
+    { "id": "p3", "name": "Yield Optimizer", "strategy": "ETH / STBL Basket", "chain": "Arbitrum", "value": 2345.54, "estimatedApy": 8.1, "risk": "elevated", "status": "indexed" },
+    { "id": "p4", "name": "Options Vault", "strategy": "ETH Covered Calls", "chain": "Ethereum", "value": 1490.00, "estimatedApy": null, "risk": "unknown", "status": "stale" }
+  ],
+  "risk": { "score": 72, "level": "moderate", "updatedAt": "2026-09-02T17:58:00Z", "factors": [
+    { "id": "contract", "label": "Smart Contract Risk", "level": "low" },
+    { "id": "volatility", "label": "Market Volatility", "level": "moderate" },
+    { "id": "impermanent-loss", "label": "Impermanent Loss", "level": "moderate" },
+    { "id": "liquidity", "label": "Liquidity Risk", "level": "low" }
+  ] },
+  "positionDetail": { "positionId": "p1", "collateral": { "symbol": "ETH", "quantity": 2.35, "value": 4215.67 }, "debt": { "symbol": "USDC", "quantity": 1234.56, "value": 1234.56 }, "ltvPercent": 28.7, "healthFactor": 2.45, "liquidationPrice": 1240.50, "estimatedNetApy": 12.4 },
+  "activity": [
+    { "id": "a1", "type": "received", "quantity": 1.25, "symbol": "ETH", "status": "confirmed", "occurredAt": "2026-09-02T17:48:00Z" },
+    { "id": "a2", "type": "liquidity_added", "quantity": -0.75, "symbol": "ETH", "status": "confirmed", "occurredAt": "2026-09-02T17:15:00Z" },
+    { "id": "a3", "type": "staking_reward", "quantity": 18.34, "symbol": "NOVA", "status": "confirmed", "occurredAt": "2026-09-02T16:00:00Z" }
+  ]
+}

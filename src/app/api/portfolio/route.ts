@@ -1,3 +1,4 @@
+import { isAddress } from "viem";
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
 import { isEntitledPro } from "@/lib/server/entitlements";
@@ -7,20 +8,26 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Auto-detected, multi-chain portfolio for the signed-in wallet (Phase 2 Pro
- * feature). Scoped to the session address on purpose — we never let a caller
- * scan an arbitrary address on the paid indexer.
+ * Auto-detected, multi-chain portfolio for the connected wallet. This is the
+ * app's primary flow — every chain the wallet touches, not just Base — so it
+ * works for any connected wallet, signed in or not. A signed-in session
+ * address still takes precedence (it's the address other synced data, like
+ * snapshots, is scoped to); otherwise the client-supplied `address` query
+ * param is used, since there's no per-user data to protect here.
  *
  * Response contract lets the client degrade cleanly:
- * - 401 → not signed in.
- * - 200 { configured: false } → no indexer set up; use the free curated flow.
- * - 200 { configured: true, entitled: false } → signed in but not Pro.
+ * - 400 → no wallet address available.
+ * - 200 { configured: false } → no indexer set up.
+ * - 200 { configured: true, entitled: false } → indexer set up, not entitled.
  * - 200 { configured: true, entitled: true, portfolio } → detected holdings.
  */
-export async function GET() {
-  const address = await getSessionAddress();
-  if (!address) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function GET(request: Request) {
+  const sessionAddress = await getSessionAddress();
+  const queryAddress = new URL(request.url).searchParams.get("address");
+
+  const address = sessionAddress ?? queryAddress;
+  if (!address || !isAddress(address)) {
+    return NextResponse.json({ error: "A wallet address is required" }, { status: 400 });
   }
 
   const provider = getPortfolioProvider();

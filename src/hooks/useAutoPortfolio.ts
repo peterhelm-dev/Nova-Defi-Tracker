@@ -13,26 +13,29 @@ export type AutoPortfolioState = {
   portfolio: AutoPortfolio | null;
   /** An indexer is set up server-side. */
   configured: boolean;
-  /** The signed-in user is entitled to Pro auto-detection. */
+  /** The connected wallet is entitled to auto-detection. */
   entitled: boolean;
   isLoading: boolean;
   isError: boolean;
 };
 
 /**
- * Fetches the signed-in wallet's auto-detected multi-chain portfolio (Pro).
- * Enabled only when signed in; otherwise the dashboard uses the free curated
- * Base flow. Degrades quietly when no indexer is configured or the user isn't
- * entitled.
+ * Fetches the connected wallet's auto-detected, multi-chain portfolio. This
+ * is the app's primary flow — enabled as soon as a wallet is connected, no
+ * sign-in required. Degrades quietly when no indexer is configured or the
+ * wallet isn't entitled.
  */
-export function useAutoPortfolio(enabled: boolean): AutoPortfolioState {
+export function useAutoPortfolio(address: string | undefined): AutoPortfolioState {
+  const enabled = !!address;
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["auto-portfolio"],
+    queryKey: ["auto-portfolio", address],
     enabled,
     staleTime: 60_000,
     refetchInterval: enabled ? 120_000 : false,
     queryFn: async (): Promise<PortfolioResponse> => {
-      const res = await fetch("/api/portfolio", { credentials: "same-origin" });
+      const res = await fetch(`/api/portfolio?address=${address}`, {
+        credentials: "same-origin",
+      });
       if (!res.ok) throw new Error("Failed to load portfolio");
       return res.json();
     },

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { InfoPage } from "@/components/InfoPage";
 
 export const metadata: Metadata = {
-  title: "Support — Base Wealth Tracker",
-  description: "Get help with Base Wealth Tracker: FAQ and contact.",
+  title: "Support — NOVA",
+  description: "Get help with NOVA: FAQ and contact.",
 };
 
 const FAQ: { q: string; a: React.ReactNode }[] = [

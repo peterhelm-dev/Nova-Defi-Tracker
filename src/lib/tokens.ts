@@ -5,7 +5,15 @@ export type BaseToken = {
   name: string;
   address: Address;
   decimals: number;
+  iconUrl: string;
 };
+
+/** Trust Wallet's public asset CDN — no key required, stable per-chain/address URL pattern. */
+function trustWalletIcon(chain: "ethereum" | "base", address: string): string {
+  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${chain}/assets/${address}/logo.png`;
+}
+
+type BaseTokenSeed = Omit<BaseToken, "iconUrl">;
 
 /**
  * Curated list of well-known ERC-20s on Base mainnet, balance-checked via
@@ -13,7 +21,7 @@ export type BaseToken = {
  * address you add here against basescan.org before trusting it with real
  * balances.
  */
-export const BASE_TOKENS: BaseToken[] = [
+const BASE_TOKEN_SEEDS: BaseTokenSeed[] = [
   {
     symbol: "WETH",
     name: "Wrapped Ether",
@@ -69,3 +77,14 @@ export const BASE_TOKENS: BaseToken[] = [
     decimals: 18,
   },
 ];
+
+export const BASE_TOKENS: BaseToken[] = BASE_TOKEN_SEEDS.map((token) => ({
+  ...token,
+  iconUrl: trustWalletIcon("base", token.address),
+}));
+
+/** Native ETH's icon — reuses the well-known mainnet WETH logo Trust Wallet hosts. */
+export const ETH_ICON_URL = trustWalletIcon(
+  "ethereum",
+  "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+);

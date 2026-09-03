@@ -1,24 +1,111 @@
 @import "tailwindcss";
 
+/*
+ * NOVA design tokens — mirrors design-handoff/design-tokens.json 1:1.
+ * Keep these two files in sync if the token source changes.
+ */
 :root {
-  --background: #05060a;
-  --foreground: #f5f6fa;
-  --accent: #0052ff;
-  --surface: #0d0f17;
-  --surface-border: rgba(255, 255, 255, 0.08);
+  /* color.background */
+  --background: #060816;
+  --background-sidebar: #080b1c;
+  --background-overlay: #0b1024;
+
+  /* color.surface */
+  --surface: #0d1226;
+  --surface-raised: #12182e;
+  --surface-hover: #171e38;
+
+  /* color.border */
+  --border-subtle: #202945;
+  --border-strong: #354063;
+
+  /* color.text */
+  --foreground: #f6f7ff;
+  --text-secondary: #aeb7d2;
+  --text-muted: #7f89a8;
+  --text-inverse: #090b18;
+
+  /* color.brand */
+  --accent: #7c4dff;
+  --brand-secondary: #cf4dff;
+  --brand-blue: #3478ff;
+  --brand-glow: #a56cff;
+
+  /* color.semantic */
+  --positive: #4de59a;
+  --warning: #ffb84d;
+  --negative: #ff5c73;
+  --info: #66a3ff;
+  --focus: #b995ff;
+
+  /* gradient */
+  --gradient-brand: linear-gradient(110deg, #c246e9 0%, #754cff 50%, #3478ff 100%);
+  --gradient-chart: linear-gradient(180deg, rgba(176, 65, 255, 0.32) 0%, rgba(124, 77, 255, 0) 100%);
+
+  /* radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  /* shadow */
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.22);
+  --shadow-glow: 0 0 32px rgba(124, 77, 255, 0.18);
+
+  /* layout */
+  --sidebar-width: 232px;
+  --content-max: 1440px;
+
+  /* Back-compat alias for older components written against this name. */
+  --surface-border: var(--border-subtle);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-sidebar: var(--background-sidebar);
+  --color-background-overlay: var(--background-overlay);
   --color-foreground: var(--foreground);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-inverse: var(--text-inverse);
   --color-accent: var(--accent);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-glow: var(--brand-glow);
   --color-surface: var(--surface);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-hover: var(--surface-hover);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-positive: var(--positive);
+  --color-warning: var(--warning);
+  --color-negative: var(--negative);
+  --color-info: var(--info);
+  --color-focus: var(--focus);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible keyboard focus ring per DESIGN_SPEC.md accessibility rules. */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
