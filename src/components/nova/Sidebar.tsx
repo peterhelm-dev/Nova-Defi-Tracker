@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { isDonationEnabled } from "@/lib/donation";
 import { NoriCoachCard } from "./NoriCoachCard";
 import { SIDEBAR_ITEMS } from "./navItems";
 
@@ -45,6 +46,15 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      {isDonationEnabled() && (
+        <Link
+          href="/donate"
+          className="mb-3 rounded-lg px-3 py-2 text-xs font-medium text-text-muted transition-colors duration-200 hover:bg-surface-hover hover:text-foreground"
+        >
+          ☕ Support NOVA
+        </Link>
+      )}
 
       <NoriCoachCard
         state="neutral"

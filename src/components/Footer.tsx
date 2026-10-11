@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isDonationEnabled } from "@/lib/donation";
 
 export function Footer() {
   return (
@@ -22,6 +23,11 @@ export function Footer() {
         <Link href="/support" className="hover:text-white/60">
           Support
         </Link>
+        {isDonationEnabled() ? (
+          <Link href="/donate" className="hover:text-white/60">
+            Donate
+          </Link>
+        ) : null}
       </nav>
     </footer>
   );
