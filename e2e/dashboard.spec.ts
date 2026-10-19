@@ -98,7 +98,7 @@ test.describe("Dashboard", () => {
   test("pricing presents Pro as coming soon", async ({ page }) => {
     await page.goto("/pricing");
     await expect(page.getByRole("heading", { name: "Free to use. Pro is not for sale." })).toBeVisible();
-    await expect(page.getByText("Coming soon")).toBeVisible();
+    await expect(page.getByText("Coming soon").first()).toBeVisible();
     await expect(page.getByRole("button", { name: "Upgrade to Pro" })).toHaveCount(0);
   });
 
