@@ -1,19 +1,24 @@
 import { NextResponse } from "next/server";
 import { fetchPrices } from "@/lib/server/prices";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+const CACHE_CONTROL = "public, s-maxage=300, stale-while-revalidate=900";
+
+/**
+ * ETH plus the curated Base token list. The payload ignores query params —
+ * callers that need one token's history use /api/token-chart. Spot prices
+ * come from Alchemy when ALCHEMY_API_KEY is set, otherwise CoinGecko.
+ */
 export async function GET() {
   const payload = await fetchPrices();
 
   if (!payload) {
-    return NextResponse.json(
-      { error: "Price provider unavailable" },
-      { status: 502 },
-    );
+    return NextResponse.json({ error: "Price provider unavailable" }, { status: 502 });
   }
 
   return NextResponse.json(payload, {
-    headers: {
-      "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
-    },
+    headers: { "Cache-Control": CACHE_CONTROL },
   });
 }

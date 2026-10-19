@@ -131,12 +131,17 @@ const COIN_IDS = [
 type CoinPrice = { usd?: number; usd_24h_change?: number };
 
 async function fetchCoinPrices(): Promise<Record<string, CoinPrice>> {
+  const key = process.env.COINGECKO_API_KEY?.trim() ?? "";
+  const isPro = process.env.COINGECKO_PLAN === "pro";
+  const host = isPro ? "https://pro-api.coingecko.com" : "https://api.coingecko.com";
+  const headers: HeadersInit = key
+    ? isPro
+      ? { "x-cg-pro-api-key": key }
+      : { "x-cg-demo-api-key": key }
+    : {};
   const url =
-    `https://api.coingecko.com/api/v3/simple/price?ids=${COIN_IDS.join(",")}` +
+    `${host}/api/v3/simple/price?ids=${COIN_IDS.join(",")}` +
     "&vs_currencies=usd&include_24hr_change=true";
-  const headers: HeadersInit = {};
-  const key = process.env.COINGECKO_API_KEY;
-  if (key && process.env.COINGECKO_PLAN !== "pro") headers["x-cg-demo-api-key"] = key;
 
   const res = await fetch(url, { headers, cache: "no-store" });
   if (!res.ok) return {};

@@ -55,13 +55,18 @@ If `ALCHEMY_API_KEY` is missing or Alchemy errors, Novafolio falls back to
 public RPCs plus CoinGecko and shows native coins and a short major-token list.
 The dashboard says so. Nothing crashes.
 
+The same Alchemy key prices the curated token list (`/api/prices`) and fills
+in a chart when CoinGecko is rate-limited. You do not need a separate price
+key. CoinGecko's free token endpoint allows only one contract address per
+call, which is why a batched request comes back as an error.
+
 ## Optional keys
 
 | Variable | Where | Why |
 | --- | --- | --- |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | [cloud.reown.com](https://cloud.reown.com) (free) | QR / mobile wallets. Omit it and the button stays hidden. |
 | `NEXT_PUBLIC_ONCHAINKIT_API_KEY` | [portal.cdp.coinbase.com](https://portal.cdp.coinbase.com) (free) | Coinbase’s Base RPC. Public RPCs are used otherwise. |
-| `COINGECKO_API_KEY` | CoinGecko demo dashboard | Only if public price calls start failing. |
+| `COINGECKO_API_KEY` | CoinGecko demo dashboard | Optional fallback. Leave unset while `ALCHEMY_API_KEY` is set. If you add a Demo key, leave `COINGECKO_PLAN` empty. Set `COINGECKO_PLAN=pro` only for a paid Pro key. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | A mailbox you read | Shown on `/support`. If unset, the page does not invent an address. |
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Plausible | Set to `novafolio.app` if you want cookie-less analytics. Unset = none. |
 | `DATABASE_URL` | Neon or Supabase free Postgres | Turns on sign-in sync, the waitlist, and daily snapshots. |
