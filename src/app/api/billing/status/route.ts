@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
 import { isBillingConfigured, isEntitled } from "@/lib/server/billing";
 import { isEntitledPro } from "@/lib/server/entitlements";
+import { isDurableStoreAvailable } from "@/lib/server/persistence";
 import { getStore } from "@/lib/server/store";
 
 export const runtime = "nodejs";
@@ -17,6 +18,18 @@ export async function GET() {
   const address = await getSessionAddress();
   if (!address) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!isDurableStoreAvailable()) {
+    return NextResponse.json({
+      configured: false,
+      entitled: false,
+      plan: "free",
+      status: "none",
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      hasSubscription: false,
+    });
   }
 
   const configured = isBillingConfigured();
