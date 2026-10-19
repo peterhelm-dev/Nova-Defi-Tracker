@@ -1,7 +1,7 @@
 "use client";
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { formatUsd } from "@/lib/format";
+import { formatChainName, formatUsd } from "@/lib/format";
 import type { TokenHolding } from "@/types";
 
 const COLORS = [
@@ -24,11 +24,21 @@ export function AssetAllocationChart({
   holdings,
   defiUsd,
 }: AssetAllocationChartProps) {
+  const priced = holdings.filter((holding) => holding.valueUsd > 0);
+  const symbolCount = new Map<string, number>();
+  for (const holding of priced) {
+    symbolCount.set(holding.symbol, (symbolCount.get(holding.symbol) ?? 0) + 1);
+  }
   const slices = [
-    ...holdings
-      .filter((h) => h.valueUsd > 0)
-      .map((h) => ({ name: h.symbol, value: h.valueUsd })),
-    ...(defiUsd > 0 ? [{ name: "DeFi positions", value: defiUsd }] : []),
+    ...priced.map((holding) => ({
+      id: `${holding.chain}:${holding.address}:${holding.symbol}`,
+      name:
+        (symbolCount.get(holding.symbol) ?? 0) > 1
+          ? `${holding.symbol} · ${formatChainName(holding.chain)}`
+          : holding.symbol,
+      value: holding.valueUsd,
+    })),
+    ...(defiUsd > 0 ? [{ id: "defi", name: "DeFi positions", value: defiUsd }] : []),
   ].sort((a, b) => b.value - a.value);
 
   return (
@@ -53,7 +63,7 @@ export function AssetAllocationChart({
                   strokeWidth={0}
                 >
                   {slices.map((slice, index) => (
-                    <Cell key={slice.name} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={slice.id} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip
@@ -69,7 +79,7 @@ export function AssetAllocationChart({
           </div>
           <ul className="mt-2 flex flex-wrap gap-3 text-xs text-white/60">
             {slices.map((slice, index) => (
-              <li key={slice.name} className="flex items-center gap-1.5">
+              <li key={slice.id} className="flex items-center gap-1.5">
                 <span
                   className="h-2 w-2 rounded-full"
                   style={{ background: COLORS[index % COLORS.length] }}

@@ -36,6 +36,7 @@ async function mockApiRoutes(page: Page) {
 test.describe("Dashboard", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
+      if (localStorage.getItem("nova:e2e-tour") === "1") return;
       localStorage.setItem("nova:tour-complete", "true");
     });
     await mockApiRoutes(page);
@@ -51,7 +52,7 @@ test.describe("Dashboard", () => {
         name: "Track all your crypto wallets in one place",
       }),
     ).toBeVisible();
-    await expect(page.getByText(/Read-only and non-custodial/)).toBeVisible();
+    await expect(page.getByText(/Read-only and non-custodial/).first()).toBeVisible();
   });
 
   test("loads, searches, and sorts the DeFi pools section", async ({
@@ -181,7 +182,10 @@ test.describe("Dashboard", () => {
 
   test("shows a skippable tour once and can replay it from settings", async ({ page }) => {
     await page.addInitScript(() => {
+      localStorage.setItem("nova:e2e-tour", "1");
+      if (sessionStorage.getItem("nova:e2e-tour-started") === "1") return;
       localStorage.removeItem("nova:tour-complete");
+      sessionStorage.setItem("nova:e2e-tour-started", "1");
     });
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "This is Novafolio" })).toBeVisible();

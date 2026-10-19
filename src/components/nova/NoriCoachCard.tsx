@@ -68,7 +68,7 @@ export function NoriCoachCard({
           className="h-full w-full object-contain"
         />
       </span>
-      <div className={`min-w-0 flex-1 ${isCenter ? "text-center" : "text-left"}`}>
+      <div className={`min-w-0 flex-1 ${onDismiss ? "pr-8" : ""} ${isCenter ? "text-center" : "text-left"}`}>
         <p className="text-[11px] font-medium tracking-wide text-accent uppercase">Nori says</p>
         {size === "hero" ? (
           <h2 className="mt-0.5 text-lg font-semibold text-foreground">{title}</h2>

@@ -18,7 +18,7 @@ const PREVIEW = [
   },
   {
     symbol: "AERO",
-    name: "Aerodrome",
+    name: "Aero",
     chain: "base",
     address: "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
     amount: "220",

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { SyncControl } from "@/components/SyncControl";
-import { SOUND_STORAGE_KEY, TOUR_STORAGE_KEY } from "@/lib/experience";
+import { NORI_STORAGE_KEY, SOUND_STORAGE_KEY, TOUR_STORAGE_KEY } from "@/lib/experience";
 import { usePrivacyMode } from "@/lib/privacy";
 import { usePersistedState } from "@/lib/usePersistedState";
 import { shortenAddress } from "@/lib/format";
@@ -15,6 +15,7 @@ export default function SettingsPage() {
   const { privacyMode, togglePrivacyMode } = usePrivacyMode();
   const [soundOn, setSoundOn] = usePersistedState(SOUND_STORAGE_KEY, true);
   const [, setTourComplete] = usePersistedState(TOUR_STORAGE_KEY, false);
+  const [noriHidden, setNoriHidden] = usePersistedState(NORI_STORAGE_KEY, false);
   const [showPositionPreview, setShowPositionPreview] = useState(false);
 
   return (
@@ -105,6 +106,19 @@ export default function SettingsPage() {
         >
           Replay the tour
         </button>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm text-foreground">Nori</p>
+            <p className="text-xs text-text-muted">The small note at the bottom of the sidebar.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setNoriHidden((hidden) => !hidden)}
+            className="pressable rounded-lg border border-border-subtle px-3 py-1.5 text-sm text-text-secondary hover:border-border-strong hover:text-foreground"
+          >
+            {noriHidden ? "Show Nori" : "Hide Nori"}
+          </button>
+        </div>
       </section>
 
       <section className="rounded-xl border border-border-subtle bg-surface p-5">
