@@ -1,62 +1,51 @@
 @import "tailwindcss";
 
 /*
- * NOVA design tokens — mirrors design-handoff/design-tokens.json 1:1.
- * Keep these two files in sync if the token source changes.
+ * Novafolio visual tokens. Warm ink and copper — calm, readable, and
+ * deliberately unlike a neon trading terminal.
  */
 :root {
-  /* color.background */
-  --background: #060816;
-  --background-sidebar: #080b1c;
-  --background-overlay: #0b1024;
+  --background: #1a1511;
+  --background-sidebar: #14110e;
+  --background-overlay: #241c16;
 
-  /* color.surface */
-  --surface: #0d1226;
-  --surface-raised: #12182e;
-  --surface-hover: #171e38;
+  --surface: #261e18;
+  --surface-raised: #31261e;
+  --surface-hover: #3a2d23;
 
-  /* color.border */
-  --border-subtle: #202945;
-  --border-strong: #354063;
+  --border-subtle: #43362c;
+  --border-strong: #6a5342;
 
-  /* color.text */
-  --foreground: #f6f7ff;
-  --text-secondary: #aeb7d2;
-  --text-muted: #7f89a8;
-  --text-inverse: #090b18;
+  --foreground: #f6efe6;
+  --text-secondary: #d4c4b2;
+  --text-muted: #a8927c;
+  --text-inverse: #1c1612;
 
-  /* color.brand */
-  --accent: #7c4dff;
-  --brand-secondary: #cf4dff;
-  --brand-blue: #3478ff;
-  --brand-glow: #a56cff;
+  --accent: #c4784a;
+  --brand-secondary: #e0a36a;
+  --brand-blue: #7f9aa8;
+  --brand-glow: #e7b48a;
 
-  /* color.semantic */
-  --positive: #4de59a;
-  --warning: #ffb84d;
-  --negative: #ff5c73;
-  --info: #66a3ff;
-  --focus: #b995ff;
+  --positive: #8fbf98;
+  --warning: #e0a15c;
+  --negative: #e08a7c;
+  --info: #8aafc0;
+  --focus: #e7c4a2;
 
-  /* gradient */
-  --gradient-brand: linear-gradient(110deg, #c246e9 0%, #754cff 50%, #3478ff 100%);
-  --gradient-chart: linear-gradient(180deg, rgba(176, 65, 255, 0.32) 0%, rgba(124, 77, 255, 0) 100%);
+  --gradient-brand: linear-gradient(120deg, #e0a36a 0%, #c4784a 48%, #8f6a4a 100%);
+  --gradient-chart: linear-gradient(180deg, rgba(196, 120, 74, 0.35) 0%, rgba(196, 120, 74, 0) 100%);
 
-  /* radius */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 22px;
 
-  /* shadow */
-  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.22);
-  --shadow-glow: 0 0 32px rgba(124, 77, 255, 0.18);
+  --shadow-card: 0 16px 40px rgba(28, 16, 8, 0.28);
+  --shadow-glow: 0 0 40px rgba(196, 120, 74, 0.16);
 
-  /* layout */
   --sidebar-width: 232px;
   --content-max: 1440px;
 
-  /* Back-compat alias for older components written against this name. */
   --surface-border: var(--border-subtle);
 }
 
@@ -82,21 +71,87 @@
   --color-negative: var(--negative);
   --color-info: var(--info);
   --color-focus: var(--focus);
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-source-sans);
+  --font-display: var(--font-fraunces);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), "Segoe UI", sans-serif;
   font-variant-numeric: tabular-nums;
 }
 
-/* Visible keyboard focus ring per DESIGN_SPEC.md accessibility rules. */
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  letter-spacing: -0.02em;
+}
+
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+
+.app-atmosphere {
+  background:
+    radial-gradient(900px 480px at 8% -10%, rgba(196, 120, 74, 0.2), transparent 60%),
+    radial-gradient(700px 420px at 100% 0%, rgba(127, 154, 168, 0.12), transparent 55%),
+    radial-gradient(800px 500px at 80% 110%, rgba(143, 191, 152, 0.08), transparent 50%);
+}
+
+.app-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pressable {
+    transition: transform 160ms ease, background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+  }
+
+  .pressable:hover {
+    transform: translateY(-1px);
+  }
+
+  .pressable:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .page-enter {
+    animation: page-rise 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .figure-settle {
+    animation: figure-settle 420ms ease;
+  }
+}
+
+@keyframes page-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes figure-settle {
+  from {
+    opacity: 0.4;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

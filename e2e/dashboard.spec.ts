@@ -35,6 +35,9 @@ async function mockApiRoutes(page: Page) {
 
 test.describe("Dashboard", () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("nova:tour-complete", "true");
+    });
     await mockApiRoutes(page);
   });
 
@@ -152,6 +155,11 @@ test.describe("Dashboard", () => {
     await page.getByRole("button", { name: "Add wallet" }).click();
     await expect(page.getByText("vitalik.eth")).toBeVisible();
     await expect(page.getByText("$3,000").first()).toBeVisible();
+
+    await page.getByRole("button", { name: "Customize" }).click();
+    await page.getByLabel("Nickname").fill("Cold storage");
+    await page.getByLabel("Nickname").blur();
+    await expect(page.getByText("Cold storage")).toBeVisible();
   });
 
   test("tracks a DeFi pool position", async ({ page }) => {
@@ -169,5 +177,22 @@ test.describe("Dashboard", () => {
     const trackedRow = page.locator("ul li", { hasText: "Aerodrome" });
     await expect(trackedRow).toBeVisible();
     await expect(trackedRow).toContainText("$500.00");
+  });
+
+  test("shows a skippable tour once and can replay it from settings", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("nova:tour-complete");
+    });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "This is Novafolio" })).toBeVisible();
+    await page.getByRole("button", { name: "Skip", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "This is Novafolio" })).toHaveCount(0);
+
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "This is Novafolio" })).toHaveCount(0);
+
+    await page.goto("/settings");
+    await page.getByRole("button", { name: "Replay the tour" }).click();
+    await expect(page.getByRole("heading", { name: "This is Novafolio" })).toBeVisible();
   });
 });

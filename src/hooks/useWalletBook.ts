@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo } from "react";
 import { isAddress } from "viem";
+import type { WalletAvatarChoice } from "@/lib/experience";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 export const MAX_WALLETS = 8;
@@ -10,6 +11,13 @@ export type SavedWallet = {
   address: string;
   label: string;
   source: "connected" | "watch";
+  nickname?: string;
+  avatar?: WalletAvatarChoice | null;
+};
+
+export type WalletIdentityPatch = {
+  nickname?: string;
+  avatar?: WalletAvatarChoice | null;
 };
 
 const STORAGE_KEY = "nova:wallets";
@@ -78,5 +86,20 @@ export function useWalletBook(connectedAddress?: string) {
     });
   }, [connected, setSaved]);
 
-  return { wallets, addWatch, removeWallet, keepConnected, saved };
+  const updateIdentity = useCallback((address: string, patch: WalletIdentityPatch) => {
+    const key = address.toLowerCase();
+    setSaved((prev) => {
+      const existing = prev.find((wallet) => wallet.address === key);
+      if (!existing) {
+        if (prev.length >= MAX_WALLETS) return prev;
+        return [
+          { address: key, label: "Saved wallet", source: "watch", ...patch },
+          ...prev,
+        ];
+      }
+      return prev.map((wallet) => (wallet.address === key ? { ...wallet, ...patch } : wallet));
+    });
+  }, [setSaved]);
+
+  return { wallets, addWatch, removeWallet, keepConnected, updateIdentity, saved };
 }

@@ -12,6 +12,7 @@ type NetWorthSummaryProps = {
   isLoading: boolean;
   pricesUnavailable: boolean;
   pricesUpdatedAt?: number;
+  onRefresh?: () => void;
 };
 
 export function NetWorthSummary({
@@ -22,6 +23,7 @@ export function NetWorthSummary({
   isLoading,
   pricesUnavailable,
   pricesUpdatedAt,
+  onRefresh,
 }: NetWorthSummaryProps) {
   const pricedValue = holdings.reduce(
     (sum, h) => sum + (h.priceUsd !== null ? h.valueUsd : 0),
@@ -35,11 +37,24 @@ export function NetWorthSummary({
   const { privacyMode } = usePrivacyMode();
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="text-sm font-medium text-white/50">Total net worth</p>
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-medium text-text-muted">Total net worth</p>
+        {onRefresh ? (
+          <button
+            type="button"
+            data-sound="off"
+            onClick={onRefresh}
+            className="text-xs text-text-muted hover:text-foreground"
+          >
+            Refresh balances
+          </button>
+        ) : null}
+      </div>
       <div className="mt-2 flex flex-wrap items-baseline gap-3">
         <span
-          className="text-4xl font-semibold tracking-tight text-white"
+          key={isLoading ? "loading" : formatUsd(totalUsd)}
+          className="figure-settle font-display text-4xl font-semibold tracking-tight text-foreground"
           aria-label={isLoading ? undefined : `Total net worth ${formatUsd(totalUsd)}`}
         >
           {isLoading ? "—" : maskValue(formatUsd(totalUsd), privacyMode)}

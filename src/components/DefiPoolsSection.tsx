@@ -4,7 +4,10 @@ import { Fragment, useMemo, useState } from "react";
 import { useDefiPools } from "@/hooks/useDefiPools";
 import { toCsv } from "@/lib/csv";
 import { formatPercent, formatUsd } from "@/lib/format";
+import { protocolIconUrl } from "@/lib/chainIcons";
+import { ChainIcon } from "./ChainIcon";
 import { ExportCsvButton } from "./ExportCsvButton";
+import { IconImg } from "./IconImg";
 import type { DefiPool, TrackedPosition } from "@/types";
 
 type SortKey = "tvl" | "apy";
@@ -107,7 +110,7 @@ export function DefiPoolsSection({
             {isLoading && (
               <tr>
                 <td colSpan={4} className="py-6 text-center text-white/40">
-                  Loading Base pools…
+                  Loading pools…
                 </td>
               </tr>
             )}
@@ -129,10 +132,25 @@ export function DefiPoolsSection({
               <Fragment key={pool.id}>
                 <tr>
                   <td className="py-3">
-                    <p className="font-medium text-white">{pool.project}</p>
-                    <p className="text-xs text-white/40">
-                      {pool.symbol} · {pool.chain}
-                    </p>
+                    <div className="flex items-center gap-3">
+                      <span className="relative shrink-0">
+                        <IconImg
+                          src={protocolIconUrl(pool.project)}
+                          alt=""
+                          fallbackText={pool.project}
+                          size={32}
+                        />
+                        <span className="absolute -right-1 -bottom-1">
+                          <ChainIcon chain={pool.chain} size={14} />
+                        </span>
+                      </span>
+                      <span>
+                        <p className="font-medium text-white">{pool.project}</p>
+                        <p className="text-xs text-white/40">
+                          {pool.symbol} · {pool.chain}
+                        </p>
+                      </span>
+                    </div>
                   </td>
                   <td className="py-3 whitespace-nowrap text-white/80">
                     {formatUsd(pool.tvlUsd)}
@@ -230,9 +248,19 @@ export function DefiPoolsSection({
                 key={position.id}
                 className="flex items-center justify-between py-2 text-sm"
               >
-                <div>
-                  <p className="font-medium text-white">{position.project}</p>
-                  <p className="text-xs text-white/40">{position.symbol}</p>
+                <div className="flex items-center gap-3">
+                  <span className="relative shrink-0">
+                    <IconImg
+                      src={protocolIconUrl(position.project)}
+                      alt=""
+                      fallbackText={position.project}
+                      size={28}
+                    />
+                  </span>
+                  <div>
+                    <p className="font-medium text-white">{position.project}</p>
+                    <p className="text-xs text-white/40">{position.symbol}</p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-white/80">

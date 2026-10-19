@@ -7,6 +7,7 @@ import { WagmiProvider } from "wagmi";
 import { base } from "wagmi/chains";
 import { PRODUCT_NAME } from "@/lib/brand";
 import { wagmiConfig } from "@/lib/wagmi";
+import { SoundProvider } from "@/components/SoundProvider";
 import { PrivacyProvider } from "@/lib/privacy";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -30,7 +31,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
             },
           }}
         >
-          <PrivacyProvider>{children}</PrivacyProvider>
+          <PrivacyProvider>
+            <SoundProvider>{children}</SoundProvider>
+          </PrivacyProvider>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

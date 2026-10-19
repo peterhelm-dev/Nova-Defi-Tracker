@@ -76,7 +76,7 @@ export function TokenPriceChartModal({
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
-            <TokenAvatar iconUrl={iconUrl} symbol={symbol} chain={chain} size={28} />
+            <TokenAvatar iconUrl={iconUrl} symbol={symbol} chain={chain} address={address} size={28} />
             <div>
               <p className="text-sm font-semibold text-white">{symbol}</p>
               {last !== undefined && (
@@ -137,8 +137,8 @@ export function TokenPriceChartModal({
               <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
                 <defs>
                   <linearGradient id="tokenPriceFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#7c4dff" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#7c4dff" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#c4784a" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="#c4784a" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -161,7 +161,7 @@ export function TokenPriceChartModal({
                 />
                 <Tooltip
                   contentStyle={{
-                    background: "#0d1226",
+                    background: "#2a211b",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 12,
                   }}
@@ -172,7 +172,7 @@ export function TokenPriceChartModal({
                 <Area
                   type="monotone"
                   dataKey="price"
-                  stroke="#7c4dff"
+                  stroke="#c4784a"
                   strokeWidth={2}
                   fill="url(#tokenPriceFill)"
                 />

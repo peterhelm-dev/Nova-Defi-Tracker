@@ -1,4 +1,6 @@
 import { Footer } from "@/components/Footer";
+import { GuidedTour } from "@/components/GuidedTour";
+import { PageTransition } from "@/components/PageTransition";
 import { AppHeader } from "./AppHeader";
 import { BottomNav } from "./BottomNav";
 import { Sidebar } from "./Sidebar";
@@ -10,7 +12,10 @@ import { Sidebar } from "./Sidebar";
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="relative flex min-h-screen bg-background text-foreground">
+      <div className="app-atmosphere pointer-events-none absolute inset-0" aria-hidden>
+        <div className="app-grain" />
+      </div>
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-white"
@@ -22,13 +27,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <AppHeader />
         <main
           id="main-content"
-          className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 min-[1200px]:px-8"
+          className="relative mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 min-[1200px]:px-8"
         >
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
         <Footer className="pb-24 min-[600px]:pb-6" />
       </div>
       <BottomNav />
+      <GuidedTour />
     </div>
   );
 }

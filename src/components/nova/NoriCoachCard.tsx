@@ -27,6 +27,7 @@ type NoriCoachCardProps = {
   size?: "coach" | "hero";
   /** "row" (default, image beside text) or "center" (stacked, for empty/onboarding states). */
   layout?: "row" | "center";
+  onDismiss?: () => void;
   className?: string;
 };
 
@@ -42,35 +43,39 @@ export function NoriCoachCard({
   action,
   size = "coach",
   layout = "row",
+  onDismiss,
   className = "",
 }: NoriCoachCardProps) {
-  const displayHeight = size === "hero" ? 128 : 56;
+  const displayHeight = size === "hero" ? 96 : 52;
   const asset = ASSET_BY_STATE[state];
-  const displayWidth = Math.round((asset.width / asset.height) * displayHeight);
   const isCenter = layout === "center";
 
   return (
     <div
-      className={`flex gap-3 rounded-xl border bg-surface-raised p-4 ${ACCENT_BY_STATE[state]} ${
-        isCenter ? "flex-col items-center text-center" : "items-start"
+      className={`relative flex gap-3 rounded-xl border bg-surface-raised p-3 ${ACCENT_BY_STATE[state]} ${
+        isCenter ? "flex-col items-center text-center" : "items-center text-left"
       } ${className}`}
     >
-      <Image
-        src={asset.src}
-        alt=""
-        width={asset.width}
-        height={asset.height}
-        className="shrink-0"
-        style={{ height: displayHeight, width: displayWidth }}
-      />
-      <div className="min-w-0">
-        <p className="text-xs font-medium text-accent">Nori says</p>
+      <span
+        className="flex shrink-0 items-center justify-center overflow-hidden"
+        style={{ width: displayHeight, height: displayHeight }}
+      >
+        <Image
+          src={asset.src}
+          alt=""
+          width={asset.width}
+          height={asset.height}
+          className="h-full w-full object-contain"
+        />
+      </span>
+      <div className={`min-w-0 flex-1 ${isCenter ? "text-center" : "text-left"}`}>
+        <p className="text-[11px] font-medium tracking-wide text-accent uppercase">Nori says</p>
         {size === "hero" ? (
           <h2 className="mt-0.5 text-lg font-semibold text-foreground">{title}</h2>
         ) : (
-          <p className="mt-0.5 text-sm font-semibold text-foreground">{title}</p>
+          <p className="mt-0.5 text-sm font-semibold leading-snug text-foreground">{title}</p>
         )}
-        <p className="mt-1 text-sm text-text-secondary">{message}</p>
+        <p className="mt-1 text-sm leading-snug text-text-secondary">{message}</p>
         {action && (
           <button
             type="button"
@@ -81,6 +86,15 @@ export function NoriCoachCard({
           </button>
         )}
       </div>
+      {onDismiss ? (
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="absolute top-2 right-2 text-[11px] text-text-muted hover:text-foreground"
+        >
+          Hide
+        </button>
+      ) : null}
     </div>
   );
 }

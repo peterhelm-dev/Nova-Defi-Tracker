@@ -17,6 +17,7 @@ export type AutoPortfolioState = {
   degraded: boolean;
   isLoading: boolean;
   isError: boolean;
+  refetch: () => Promise<unknown>;
 };
 
 function mergeTokens(tokens: TokenHolding[]): TokenHolding[] {
@@ -88,5 +89,6 @@ export function useAutoPortfolio(addresses: string[]): AutoPortfolioState {
     degraded: queries.some((query) => query.data?.degraded) || merged?.coverage === "major-tokens",
     isLoading: unique.length > 0 && queries.some((query) => query.isLoading),
     isError: unique.length > 0 && queries.every((query) => query.isError),
+    refetch: () => Promise.all(queries.map((query) => query.refetch())),
   };
 }

@@ -5,14 +5,14 @@ import { formatUsd } from "@/lib/format";
 import type { TokenHolding } from "@/types";
 
 const COLORS = [
-  "#0052ff",
-  "#33c9eb",
-  "#7c5cff",
-  "#22c55e",
-  "#f59e0b",
-  "#ec4899",
-  "#14b8a6",
-  "#a3a3a3",
+  "#c4784a",
+  "#8fbf98",
+  "#e0a36a",
+  "#7f9aa8",
+  "#d4c4b2",
+  "#a66b4a",
+  "#6e8f84",
+  "#a89888",
 ];
 
 type AssetAllocationChartProps = {
@@ -58,7 +58,7 @@ export function AssetAllocationChart({
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: "#0d0f17",
+                    background: "#2a211b",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 12,
                   }}

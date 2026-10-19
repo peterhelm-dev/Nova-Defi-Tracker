@@ -4,13 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { SyncControl } from "@/components/SyncControl";
+import { SOUND_STORAGE_KEY, TOUR_STORAGE_KEY } from "@/lib/experience";
 import { usePrivacyMode } from "@/lib/privacy";
+import { usePersistedState } from "@/lib/usePersistedState";
 import { shortenAddress } from "@/lib/format";
 import { PositionDetailModal } from "@/components/nova/PositionDetailModal";
 
 export default function SettingsPage() {
   const { address, isConnected } = useAccount();
   const { privacyMode, togglePrivacyMode } = usePrivacyMode();
+  const [soundOn, setSoundOn] = usePersistedState(SOUND_STORAGE_KEY, true);
+  const [, setTourComplete] = usePersistedState(TOUR_STORAGE_KEY, false);
   const [showPositionPreview, setShowPositionPreview] = useState(false);
 
   return (
@@ -58,6 +62,49 @@ export default function SettingsPage() {
             />
           </button>
         </div>
+      </section>
+
+      <section className="rounded-xl border border-border-subtle bg-surface p-5">
+        <h2 className="text-sm font-semibold text-foreground">Sound</h2>
+        <div className="mt-3 flex items-center justify-between">
+          <div className="pr-4">
+            <p className="text-sm text-foreground">Interface sounds</p>
+            <p className="text-xs text-text-muted">
+              Soft clicks and a quiet chime when a wallet is added or balances refresh.
+              Off stays silent. Sounds never play before you interact with the page.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={soundOn}
+            aria-label="Interface sounds"
+            onClick={() => setSoundOn((value) => !value)}
+            className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ${
+              soundOn ? "bg-accent" : "bg-white/10"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform duration-200 ${
+                soundOn ? "translate-x-5" : "translate-x-0.5"
+              }`}
+            />
+          </button>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border-subtle bg-surface p-5">
+        <h2 className="text-sm font-semibold text-foreground">Tour</h2>
+        <p className="mt-1 text-xs text-text-muted">
+          A short look at Portfolio, the menu, wallets, and DeFi. Shown once, then only if you ask.
+        </p>
+        <button
+          type="button"
+          onClick={() => setTourComplete(false)}
+          className="pressable mt-3 rounded-lg border border-border-subtle px-3 py-1.5 text-sm text-text-secondary hover:border-border-strong hover:text-foreground"
+        >
+          Replay the tour
+        </button>
       </section>
 
       <section className="rounded-xl border border-border-subtle bg-surface p-5">

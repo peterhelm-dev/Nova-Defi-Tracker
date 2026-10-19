@@ -52,6 +52,7 @@ export function TokenPnlCard({ holdings, tokenPnl, isLoading }: TokenPnlCardProp
                   iconUrl={holding?.iconUrl ?? null}
                   symbol={holding?.symbol ?? row.fungibleId}
                   chain={holding?.chain ?? "unknown"}
+                  address={holding?.address}
                 />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-white">

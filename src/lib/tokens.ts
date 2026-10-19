@@ -1,4 +1,5 @@
 import type { Address } from "viem";
+import { trustWalletTokenIcon } from "./tokenIcons";
 
 export type BaseToken = {
   symbol: string;
@@ -10,7 +11,7 @@ export type BaseToken = {
 
 /** Trust Wallet's public asset CDN — no key required, stable per-chain/address URL pattern. */
 function trustWalletIcon(chain: "ethereum" | "base", address: string): string {
-  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/${chain}/assets/${address}/logo.png`;
+  return trustWalletTokenIcon(chain, address) ?? "";
 }
 
 type BaseTokenSeed = Omit<BaseToken, "iconUrl">;

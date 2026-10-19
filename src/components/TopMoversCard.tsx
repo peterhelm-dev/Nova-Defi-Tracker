@@ -72,6 +72,7 @@ function MoverList({
                 iconUrl={holding.iconUrl}
                 symbol={holding.symbol}
                 chain={holding.chain}
+                address={holding.address}
                 size={20}
               />
               {holding.symbol}
