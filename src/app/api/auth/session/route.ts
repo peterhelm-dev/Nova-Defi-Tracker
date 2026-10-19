@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { isAccountSyncAvailable } from "@/lib/server/persistence";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/server/session";
 
 export const runtime = "nodejs";
@@ -9,7 +10,10 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const store = await cookies();
   const session = verifySessionToken(store.get(SESSION_COOKIE)?.value);
-  return NextResponse.json({ address: session?.address ?? null });
+  return NextResponse.json({
+    address: session?.address ?? null,
+    syncAvailable: isAccountSyncAvailable(),
+  });
 }
 
 /** Signs out by clearing the session cookie. */

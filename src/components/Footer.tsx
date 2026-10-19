@@ -1,15 +1,15 @@
 import Link from "next/link";
 
-export function Footer() {
+export function Footer({ className = "" }: { className?: string }) {
   return (
-    <footer className="mx-auto max-w-6xl px-6 py-6 text-center text-xs text-white/30">
+    <footer className={`mx-auto w-full max-w-6xl px-6 py-6 text-center text-xs text-text-muted ${className}`}>
       <p>
         Read-only and non-custodial — this app never has access to your keys
-        or funds. Balances are read directly from Base; prices and pool data
-        come from CoinGecko and DeFiLlama and may be delayed or unavailable.
-        Nothing here is investment advice.
+        or funds. Balances come from public chain data; prices and pool data
+        come from CoinGecko, Alchemy, and DeFiLlama and may be delayed or
+        unavailable. Nothing here is investment advice.
       </p>
-      <nav className="mt-3 flex items-center justify-center gap-4">
+      <nav className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
         <Link href="/pricing" className="hover:text-white/60">
           Pricing
         </Link>

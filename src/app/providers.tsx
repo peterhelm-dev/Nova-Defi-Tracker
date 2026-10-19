@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { WagmiProvider } from "wagmi";
 import { base } from "wagmi/chains";
+import { PRODUCT_NAME } from "@/lib/brand";
 import { wagmiConfig } from "@/lib/wagmi";
 import { PrivacyProvider } from "@/lib/privacy";
 
@@ -19,11 +20,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
           chain={base}
           config={{
             appearance: {
-              name: "NOVA",
+              name: PRODUCT_NAME,
               mode: "dark",
               theme: "default",
             },
-            wallet: { display: "classic" },
+            wallet: {
+              display: "classic",
+              supportedWallets: { rabby: true, trust: false, frame: false },
+            },
           }}
         >
           <PrivacyProvider>{children}</PrivacyProvider>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
 import { getStripe } from "@/lib/server/billing";
+import { requireDurableStore } from "@/lib/server/persistence";
 import { getStore } from "@/lib/server/store";
 
 export const runtime = "nodejs";
@@ -11,6 +12,9 @@ export const dynamic = "force-dynamic";
  * cancel. Requires an existing Stripe customer for the signed-in wallet.
  */
 export async function POST(request: Request) {
+  const unavailable = requireDurableStore();
+  if (unavailable) return unavailable;
+
   const address = await getSessionAddress();
   if (!address) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

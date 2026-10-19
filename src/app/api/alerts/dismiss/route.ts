@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
+import { requireDurableStore } from "@/lib/server/persistence";
 import { getStore } from "@/lib/server/store";
 
 export const runtime = "nodejs";
@@ -7,6 +8,9 @@ export const dynamic = "force-dynamic";
 
 /** Dismisses one fired alert (or all of them when eventId is omitted). */
 export async function POST(request: Request) {
+  const unavailable = requireDurableStore();
+  if (unavailable) return unavailable;
+
   const address = await getSessionAddress();
   if (!address) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

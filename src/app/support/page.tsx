@@ -3,8 +3,8 @@ import Link from "next/link";
 import { InfoPage } from "@/components/InfoPage";
 
 export const metadata: Metadata = {
-  title: "Support — NOVA",
-  description: "Get help with NOVA: FAQ and contact.",
+  title: "Support",
+  description: "Get help with Novafolio: FAQ and contact.",
 };
 
 const FAQ: { q: string; a: React.ReactNode }[] = [
@@ -14,7 +14,7 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "My balance or a token is missing.",
-    a: "The free tier reads a curated list of major Base tokens. Pro auto-detection covers every token and DeFi position across chains — see the pricing page. If Pro misses something, tell us and we'll chase it with the data provider.",
+    a: "With an Alchemy key, Novafolio lists the tokens that indexer returns on Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Avalanche. Without that key, only native coins and a short list of major tokens are read, so other balances stay hidden. DeFi positions are manual unless you track them yourself. Solana isn't included.",
   },
   {
     q: "Where is my history stored?",
@@ -24,10 +24,9 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
     q: "How do I cancel Pro?",
     a: (
       <>
-        Open <Link href="/pricing">the pricing page</Link> while signed in and
-        choose &ldquo;Manage subscription&rdquo; — it takes you to the Stripe
-        billing portal where you can cancel. Access runs to the end of the paid
-        period.
+        Pro is not for sale, so there is nothing to cancel. If a paid plan
+        launches later, cancellation will be on the{" "}
+        <Link href="/pricing">pricing page</Link>.
       </>
     ),
   },
@@ -48,16 +47,25 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
 ];
 
 export default function SupportPage() {
-  const email =
-    process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@basewealthtracker.app";
+  const email = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
 
   return (
     <InfoPage title="Support">
       <p>
         Stuck, found a bug, or missing a feature? Check the FAQ below — if that
-        doesn&apos;t cover it, email{" "}
-        <a href={`mailto:${email}`}>{email}</a> and include your wallet address
-        (never your keys or seed phrase; we will never ask for them).
+        doesn&apos;t cover it
+        {email ? (
+          <>
+            , email <a href={`mailto:${email}`}>{email}</a> and include your
+            wallet address
+          </>
+        ) : (
+          <>
+            , a support email is not published on this deployment yet. Check
+            back after the operator sets one
+          </>
+        )}{" "}
+        (never send keys or a seed phrase; Novafolio will never ask for them).
       </p>
 
       <h2>Frequently asked questions</h2>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isCronAuthorized } from "@/lib/server/cronAuth";
+import { isDurableStoreAvailable } from "@/lib/server/persistence";
 import { computeWalletUsd } from "@/lib/server/holdings";
 import { getStore } from "@/lib/server/store";
 import type { Address } from "viem";
@@ -25,6 +26,12 @@ function todayKey(): string {
  * persist a misleading $0.
  */
 export async function POST(request: Request) {
+  // No database on this host: nothing to snapshot, and Hobby cron should not
+  // fail the deployment for a feature that is intentionally off.
+  if (!isDurableStoreAvailable()) {
+    return NextResponse.json({ ok: true, skipped: "no-database" });
+  }
+
   if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

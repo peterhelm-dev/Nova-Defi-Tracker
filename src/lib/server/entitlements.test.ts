@@ -43,6 +43,13 @@ describe("isEntitledPro", () => {
     expect(await isEntitledPro(ADDR)).toBe(true);
   });
 
+  it("production without billing does not grant Pro", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const { isEntitledPro } = await load();
+    expect(await isEntitledPro(ADDR)).toBe(false);
+    vi.unstubAllEnvs();
+  });
+
   it("dev fallback: everyone is Pro when billing off and no allowlist", async () => {
     const { isEntitledPro } = await load();
     expect(await isEntitledPro(ADDR)).toBe(true);

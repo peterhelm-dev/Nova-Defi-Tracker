@@ -6,13 +6,17 @@ import { useBilling } from "@/hooks/useBilling";
 import { WaitlistForm } from "./WaitlistForm";
 
 /**
- * The Pro tier's call to action, adapting to billing state:
- * - not signed in            → sign-in prompt + waitlist capture
- * - billing not configured   → waitlist (Pro not live yet)
- * - signed in, not entitled  → Upgrade (Stripe Checkout)
- * - entitled                 → active state + Manage (Stripe Portal)
+ * Pro stays dormant until Stripe and a database are both configured.
+ * Until then the only action is the waitlist — and only when emails can
+ * actually be stored.
  */
-export function ProCta() {
+export function ProCta({
+  billingLive,
+  waitlistOpen,
+}: {
+  billingLive: boolean;
+  waitlistOpen: boolean;
+}) {
   const billing = useBilling();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +32,25 @@ export function ProCta() {
     }
   }
 
+  if (!billingLive) {
+    return (
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-white/70">
+          Pro is coming soon. It is not for sale, and Novafolio will not take a payment.
+          Join the waitlist if you want a note when that changes.
+        </p>
+        {waitlistOpen ? (
+          <WaitlistForm />
+        ) : (
+          <p className="text-sm text-white/50">
+            The waitlist is closed on this deployment because there is no database
+            to store emails. Novafolio will not pretend to collect them.
+          </p>
+        )}
+      </div>
+    );
+  }
+
   if (!billing.isSignedIn) {
     return (
       <div className="flex flex-col gap-3">
@@ -36,27 +59,14 @@ export function ProCta() {
           <Link href="/" className="text-accent hover:underline">
             sign in
           </Link>{" "}
-          to upgrade instantly — or join the waitlist for updates.
+          to subscribe.
         </p>
-        <WaitlistForm />
       </div>
     );
   }
 
   if (billing.isLoading) {
     return <p className="text-sm text-white/50">Checking your plan…</p>;
-  }
-
-  if (!billing.configured) {
-    return (
-      <div className="flex flex-col gap-3">
-        <p className="text-xs text-white/50">
-          Pro isn&apos;t live yet. Join the waitlist for early access and
-          founding-member pricing.
-        </p>
-        <WaitlistForm />
-      </div>
-    );
   }
 
   if (billing.entitled) {

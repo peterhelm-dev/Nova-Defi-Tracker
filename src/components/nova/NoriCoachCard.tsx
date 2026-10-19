@@ -65,7 +65,11 @@ export function NoriCoachCard({
       />
       <div className="min-w-0">
         <p className="text-xs font-medium text-accent">Nori says</p>
-        <p className="mt-0.5 text-sm font-semibold text-foreground">{title}</p>
+        {size === "hero" ? (
+          <h2 className="mt-0.5 text-lg font-semibold text-foreground">{title}</h2>
+        ) : (
+          <p className="mt-0.5 text-sm font-semibold text-foreground">{title}</p>
+        )}
         <p className="mt-1 text-sm text-text-secondary">{message}</p>
         {action && (
           <button

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "nova.privacy-mode";
 
@@ -11,32 +11,41 @@ type PrivacyContextValue = {
 
 const PrivacyContext = createContext<PrivacyContextValue | null>(null);
 
-export function PrivacyProvider({ children }: { children: React.ReactNode }) {
-  const [privacyMode, setPrivacyMode] = useState(false);
+const listeners = new Set<() => void>();
 
-  useEffect(() => {
+function readPrivacy(): boolean {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function subscribe(onStoreChange: () => void) {
+  listeners.add(onStoreChange);
+  return () => listeners.delete(onStoreChange);
+}
+
+function emit() {
+  listeners.forEach((listener) => listener());
+}
+
+export function PrivacyProvider({ children }: { children: React.ReactNode }) {
+  const privacyMode = useSyncExternalStore(subscribe, readPrivacy, () => false);
+
+  const togglePrivacyMode = useCallback(() => {
+    const next = !readPrivacy();
     try {
-      setPrivacyMode(window.localStorage.getItem(STORAGE_KEY) === "1");
+      window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
     } catch {
-      // Storage unavailable (private mode, disabled) — default stays off.
+      // The toggle still applies for listeners in this tab.
     }
+    emit();
   }, []);
 
   const value = useMemo<PrivacyContextValue>(
-    () => ({
-      privacyMode,
-      togglePrivacyMode: () =>
-        setPrivacyMode((prev) => {
-          const next = !prev;
-          try {
-            window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
-          } catch {
-            // Ignore — the toggle still works for this session.
-          }
-          return next;
-        }),
-    }),
-    [privacyMode],
+    () => ({ privacyMode, togglePrivacyMode }),
+    [privacyMode, togglePrivacyMode],
   );
 
   return <PrivacyContext.Provider value={value}>{children}</PrivacyContext.Provider>;

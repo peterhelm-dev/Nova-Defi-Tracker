@@ -45,7 +45,7 @@ test.describe("Dashboard", () => {
 
     await expect(
       page.getByRole("heading", {
-        name: "Connect a wallet to see your Base net worth",
+        name: "Track all your crypto wallets in one place",
       }),
     ).toBeVisible();
     await expect(page.getByText(/Read-only and non-custodial/)).toBeVisible();
@@ -67,7 +67,7 @@ test.describe("Dashboard", () => {
     await expect(rows.first()).toContainText("Moonwell");
 
     await page.getByPlaceholder("Search project or pair…").fill("");
-    await page.getByRole("combobox").selectOption("apy");
+    await page.getByRole("combobox", { name: "Sort pools" }).selectOption("apy");
     await expect(rows.first()).toContainText("Moonwell");
     await expect(rows.nth(1)).toContainText("Aerodrome");
   });
@@ -93,6 +93,65 @@ test.describe("Dashboard", () => {
     await expect(
       page.getByText("Is this safe? Can it touch my funds?"),
     ).toBeVisible();
+  });
+
+  test("pricing presents Pro as coming soon", async ({ page }) => {
+    await page.goto("/pricing");
+    await expect(page.getByRole("heading", { name: "Free to use. Pro is not for sale." })).toBeVisible();
+    await expect(page.getByText("Coming soon").first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Upgrade to Pro" })).toHaveCount(0);
+  });
+
+  test("adds a watch-only wallet and shows its balances", async ({ page }) => {
+    await page.route("**/api/ens**", (route) =>
+      route.fulfill({
+        json: {
+          address: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+          name: "vitalik.eth",
+        },
+      }),
+    );
+    await page.route("**/api/portfolio**", (route) =>
+      route.fulfill({
+        json: {
+          configured: true,
+          entitled: true,
+          degraded: false,
+          portfolio: {
+            address: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+            tokens: [
+              {
+                symbol: "ETH",
+                name: "Ethereum",
+                address: "native",
+                decimals: 18,
+                chain: "ethereum",
+                iconUrl: null,
+                fungibleId: null,
+                balance: 1,
+                priceUsd: 3000,
+                change24h: 1,
+                valueUsd: 3000,
+              },
+            ],
+            positions: [],
+            walletUsd: 3000,
+            defiUsd: 0,
+            totalUsd: 3000,
+            chains: ["ethereum"],
+            provider: "alchemy",
+            coverage: "detected",
+            updatedAt: Date.now(),
+          },
+        },
+      }),
+    );
+
+    await page.goto("/");
+    await page.getByLabel("Wallet address or ENS").fill("vitalik.eth");
+    await page.getByRole("button", { name: "Add wallet" }).click();
+    await expect(page.getByText("vitalik.eth")).toBeVisible();
+    await expect(page.getByText("$3,000").first()).toBeVisible();
   });
 
   test("tracks a DeFi pool position", async ({ page }) => {

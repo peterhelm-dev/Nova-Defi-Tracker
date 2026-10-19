@@ -84,6 +84,12 @@ export type AutoPortfolio = {
   totalUsd: number;
   chains: string[];
   provider: string;
+  /**
+   * "detected" — an indexer listed the tokens it found.
+   * "major-tokens" — no indexer key, so only native assets and a short
+   * list of major tokens were read from public RPCs.
+   */
+  coverage?: "detected" | "major-tokens";
   updatedAt: number;
 };
 

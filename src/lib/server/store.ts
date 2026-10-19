@@ -7,6 +7,7 @@ import type {
   Subscription,
   TrackedPosition,
 } from "@/types";
+import { isDurableStoreAvailable } from "./persistence";
 import { PostgresStore } from "./postgresStore";
 
 /**
@@ -201,6 +202,10 @@ export function getStore(): UserDataStore {
   if (!store) {
     if (process.env.DATABASE_URL) {
       store = new PostgresStore(process.env.DATABASE_URL);
+    } else if (!isDurableStoreAvailable()) {
+      throw new Error(
+        "DATABASE_URL is required on Vercel. The file store does not persist on serverless.",
+      );
     } else {
       const file = process.env.DATA_DIR
         ? join(process.env.DATA_DIR, "store.json")

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { evaluateAlertRules } from "@/lib/alerts";
 import { isCronAuthorized } from "@/lib/server/cronAuth";
+import { isDurableStoreAvailable } from "@/lib/server/persistence";
 import { fetchPrices } from "@/lib/server/prices";
 import { getStore } from "@/lib/server/store";
 
@@ -17,6 +18,10 @@ const MAX_EVENTS = 50;
  * for now; an email/push channel can be added behind the same evaluation.
  */
 export async function POST(request: Request) {
+  if (!isDurableStoreAvailable()) {
+    return NextResponse.json({ ok: true, skipped: "no-database" });
+  }
+
   if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

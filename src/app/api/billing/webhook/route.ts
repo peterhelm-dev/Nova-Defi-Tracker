@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe, subscriptionFromStripe } from "@/lib/server/billing";
+import { requireDurableStore } from "@/lib/server/persistence";
 import { getStore } from "@/lib/server/store";
 
 export const runtime = "nodejs";
@@ -31,6 +32,9 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
+
+  const unavailable = requireDurableStore();
+  if (unavailable) return unavailable;
 
   const store = getStore();
 

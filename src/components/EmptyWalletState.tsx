@@ -3,14 +3,14 @@
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
 import { NoriCoachCard } from "./nova/NoriCoachCard";
 
-/** "Disconnected wallet" state, per DESIGN_SPEC.md required application states. */
+/** Shown until the visitor connects a wallet or adds a watch-only address. */
 export function EmptyWalletState() {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-border-subtle bg-surface px-6 py-16 text-center">
+    <div className="flex w-full flex-col items-center gap-4 rounded-2xl border border-border-subtle bg-surface px-6 py-10 text-center">
       <NoriCoachCard
         state="neutral"
-        title="Connect a wallet to see your net worth"
-        message="We'll detect your token balances and DeFi positions across every chain your wallet touches, price them live, and chart your net worth over time."
+        title="Track all your crypto wallets in one place"
+        message="Connect Coinbase, MetaMask, or Rabby — or paste an address above. Novafolio is read-only and non-custodial. Nothing here is financial advice."
         size="hero"
         layout="center"
         className="max-w-md border-none bg-transparent p-0"

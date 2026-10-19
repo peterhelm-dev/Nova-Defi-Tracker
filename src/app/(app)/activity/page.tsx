@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useActivity } from "@/hooks/useActivity";
 import { RecentActivityCard } from "@/components/nova/RecentActivityCard";
 import { NoriCoachCard } from "@/components/nova/NoriCoachCard";
+import { useIsClient } from "@/lib/useIsClient";
 
 export default function ActivityPage() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const isClient = useIsClient();
   const { address } = useAccount();
-  const { activity, configured, isLoading } = useActivity(mounted ? address : undefined, 50);
+  const { activity, configured, isLoading } = useActivity(isClient ? address : undefined, 50);
 
-  if (!mounted || !address) {
+  if (!isClient || !address) {
     return (
       <NoriCoachCard
         state="neutral"
@@ -30,7 +29,7 @@ export default function ActivityPage() {
       <NoriCoachCard
         state="thinking"
         title="No activity indexer configured"
-        message="Recent activity needs a multi-chain indexer — none is set up in this environment."
+        message="Transaction history isn't part of the free token lookup. It stays off unless a Zerion key is added later."
         size="hero"
         layout="center"
         className="mx-auto max-w-md"

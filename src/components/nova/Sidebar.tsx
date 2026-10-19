@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BrandMark } from "@/components/BrandMark";
 import { NoriCoachCard } from "./NoriCoachCard";
 import { SIDEBAR_ITEMS } from "./navItems";
 
@@ -12,10 +12,7 @@ export function Sidebar() {
 
   return (
     <aside className="hidden min-[1200px]:flex w-[232px] shrink-0 flex-col border-r border-border-subtle bg-background-sidebar px-4 py-6">
-      <Link href="/" className="flex items-center gap-2 px-2">
-        <Image src="/nova/app-icon.png" alt="" width={28} height={28} className="rounded-lg" />
-        <span className="font-display text-lg font-bold text-foreground">NOVA</span>
-      </Link>
+      <BrandMark className="px-2" wordmarkClassName="font-display text-lg font-bold text-foreground" />
 
       <nav className="mt-8 flex flex-1 flex-col gap-1">
         {SIDEBAR_ITEMS.map((item) => {
@@ -48,8 +45,8 @@ export function Sidebar() {
 
       <NoriCoachCard
         state="neutral"
-        title="Your cosmic guide through DeFi."
-        message="Ask me about anything on your portfolio."
+        title="Not financial advice"
+        message="Novafolio reads public chain data. It can't move funds or tell you what to buy."
         size="coach"
       />
     </aside>

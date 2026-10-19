@@ -3,15 +3,15 @@ import Link from "next/link";
 import { InfoPage } from "@/components/InfoPage";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — NOVA",
-  description: "What NOVA stores, where, and why.",
+  title: "Privacy Policy",
+  description: "What Novafolio stores, where, and why.",
 };
 
 export default function PrivacyPage() {
   return (
     <InfoPage title="Privacy Policy" updated="June 30, 2026">
       <p>
-        NOVA is built to need as little of your data as
+        Novafolio is built to need as little of your data as
         possible. No email or password is required to use it, and there is no
         advertising or cross-site tracking. This page describes exactly what is
         stored, where, and why.
@@ -56,9 +56,10 @@ export default function PrivacyPage() {
           to them.
         </li>
         <li>
-          <strong>Portfolio detection (Pro)</strong> — your wallet address is
-          sent to the configured portfolio indexer (e.g. Zerion) to detect your
-          holdings. Wallet addresses are public on-chain data by nature.
+          <strong>Token detection</strong> — your wallet address is sent to
+          Alchemy when an API key is configured, so tokens can be listed across
+          chains. Without that key, Novafolio reads a short list of major tokens from
+          public RPCs instead. Wallet addresses are already public onchain.
         </li>
         <li>
           <strong>Payments</strong> — Stripe processes payments and holds your

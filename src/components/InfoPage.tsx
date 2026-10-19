@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "./BrandMark";
 import { Footer } from "./Footer";
 
 /**
@@ -17,12 +18,7 @@ export function InfoPage({
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
-            B
-          </span>
-          <span className="text-sm font-semibold text-white">NOVA</span>
-        </Link>
+        <BrandMark />
         <Link href="/" className="text-sm text-white/60 hover:text-white">
           ← Back to dashboard
         </Link>
