@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import { useAuth } from "@/hooks/useAuth";
 import { useActivity } from "@/hooks/useActivity";
 import { useAutoPortfolio } from "@/hooks/useAutoPortfolio";
 import { useGasSpend } from "@/hooks/useGasSpend";
-import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { useNetWorthHistory } from "@/hooks/useNetWorthHistory";
 import { useTrackedPositions } from "@/hooks/useTrackedPositions";
 import { useTokenPnl } from "@/hooks/useTokenPnl";
+import { useWalletBook } from "@/hooks/useWalletBook";
 import { useWalletPnl } from "@/hooks/useWalletPnl";
+import { useIsClient } from "@/lib/useIsClient";
 import { AlertsCard } from "./AlertsCard";
 import { AssetAllocationChart } from "./AssetAllocationChart";
-import { AutoDetectionBanner } from "./AutoDetectionBanner";
 import { ChainBreakdownCard, type ChainTotal } from "./ChainBreakdownCard";
 import { DefiPoolsSection } from "./DefiPoolsSection";
 import { DetectedPositionsCard } from "./DetectedPositionsCard";
@@ -21,182 +21,152 @@ import { EmptyWalletState } from "./EmptyWalletState";
 import { GasSpendCard } from "./GasSpendCard";
 import { NetWorthChart } from "./NetWorthChart";
 import { NetWorthSummary } from "./NetWorthSummary";
-import { NoriCoachCard } from "./nova/NoriCoachCard";
 import { RecentActivityCard } from "./nova/RecentActivityCard";
-import { RiskOverviewCard } from "./nova/RiskOverviewCard";
-import { StakingRewardsCard } from "./nova/StakingRewardsCard";
 import { PerformanceCard } from "./PerformanceCard";
 import { PnlCard } from "./PnlCard";
 import { TokenHoldingsTable } from "./TokenHoldingsTable";
 import { TokenPnlCard } from "./TokenPnlCard";
 import { TopMoversCard } from "./TopMoversCard";
+import { WalletBook } from "./WalletBook";
+import { WalletConnectButton } from "./WalletConnectButton";
 
 export function Dashboard() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  const {
-    address: rawAddress,
-    holdings: walletHoldings,
-    totalUsd: walletHoldingsUsd,
-    isLoading: walletLoading,
-    pricesUnavailable,
-    pricesUpdatedAt,
-  } = useWalletHoldings();
+  const isClient = useIsClient();
+  const { address: rawConnected } = useAccount();
+  const connected = isClient ? rawConnected : undefined;
   const { authedAddress } = useAuth();
-  const auto = useAutoPortfolio(mounted ? rawAddress : undefined);
-  const pnl = useWalletPnl(mounted ? rawAddress : undefined);
-  const gasSpend = useGasSpend(mounted ? rawAddress : undefined);
-  const activity = useActivity(mounted ? rawAddress : undefined, 5);
-  const {
-    positions,
-    addPosition,
-    removePosition,
-    totalUsd: manualDefiUsd,
-  } = useTrackedPositions(authedAddress);
+  const book = useWalletBook(connected);
+  const addresses = isClient ? book.wallets.map((wallet) => wallet.address) : [];
 
-  // Defer wallet-dependent state until after hydration so server and client
-  // agree on the initial render (wagmi restores address from storage only on
-  // the client, which would otherwise cause a tree mismatch).
-  const address = mounted ? rawAddress : undefined;
-
-  // Multi-chain auto-detection is the primary flow for any connected wallet;
-  // fall back to the curated Base-only flow only if it's unavailable.
-  const usingAuto = auto.portfolio !== null;
-  const holdings = usingAuto ? auto.portfolio!.tokens : walletHoldings;
-  const walletUsd = usingAuto ? auto.portfolio!.walletUsd : walletHoldingsUsd;
-  const defiUsd = usingAuto ? auto.portfolio!.defiUsd : manualDefiUsd;
-  const isLoading = usingAuto ? false : walletLoading;
-
-  const history = useNetWorthHistory(
-    walletUsd,
-    defiUsd,
-    !!address && !isLoading,
+  const auto = useAutoPortfolio(addresses);
+  const primary = connected ?? addresses[0];
+  const pnl = useWalletPnl(primary);
+  const gasSpend = useGasSpend(primary);
+  const activity = useActivity(primary, 5);
+  const { positions, addPosition, removePosition, totalUsd: manualDefiUsd } = useTrackedPositions(
     authedAddress,
   );
 
-  const detectedPositions = usingAuto ? auto.portfolio!.positions : [];
+  const portfolio = auto.portfolio;
+  const holdings = portfolio?.tokens ?? [];
+  const detectedPositions = portfolio?.positions ?? [];
+  const walletUsd = portfolio?.walletUsd ?? 0;
+  const defiUsd =
+    detectedPositions.length > 0 ? (portfolio?.defiUsd ?? 0) : (portfolio?.defiUsd ?? 0) + manualDefiUsd;
+  const isLoading = auto.isLoading;
+
+  const history = useNetWorthHistory(walletUsd, defiUsd, addresses.length > 0 && !isLoading, authedAddress);
 
   const topFungibleIds = [...holdings]
-    .filter((h) => h.fungibleId)
+    .filter((holding) => holding.fungibleId)
     .sort((a, b) => b.valueUsd - a.valueUsd)
     .slice(0, 10)
-    .map((h) => h.fungibleId!);
-  const tokenPnl = useTokenPnl(
-    usingAuto && mounted ? rawAddress : undefined,
-    topFungibleIds,
-  );
+    .map((holding) => holding.fungibleId!);
+  const tokenPnl = useTokenPnl(primary, topFungibleIds);
 
   const chainTotals: ChainTotal[] = (() => {
     const byChain = new Map<string, number>();
     for (const holding of holdings) {
       byChain.set(holding.chain, (byChain.get(holding.chain) ?? 0) + holding.valueUsd);
     }
-    if (usingAuto) {
-      for (const position of detectedPositions) {
-        byChain.set(position.chain, (byChain.get(position.chain) ?? 0) + position.valueUsd);
-      }
-    } else if (manualDefiUsd > 0) {
-      byChain.set("base", (byChain.get("base") ?? 0) + manualDefiUsd);
+    for (const position of detectedPositions) {
+      byChain.set(position.chain, (byChain.get(position.chain) ?? 0) + position.valueUsd);
+    }
+    if (detectedPositions.length === 0 && manualDefiUsd > 0) {
+      byChain.set("defi", (byChain.get("defi") ?? 0) + manualDefiUsd);
     }
     return [...byChain.entries()].map(([chain, valueUsd]) => ({ chain, valueUsd }));
   })();
 
   const diversificationItems: DiversificationItem[] = [
-    ...holdings.map((h) => ({ label: h.symbol, valueUsd: h.valueUsd })),
-    ...detectedPositions.map((p) => ({
-      label: p.protocol ? `${p.symbol} (${p.protocol})` : p.symbol,
-      valueUsd: p.valueUsd,
+    ...holdings.map((holding) => ({ label: holding.symbol, valueUsd: holding.valueUsd })),
+    ...detectedPositions.map((position) => ({
+      label: position.protocol ? `${position.symbol} (${position.protocol})` : position.symbol,
+      valueUsd: position.valueUsd,
     })),
   ];
 
-  if (!address) return <EmptyWalletState />;
-
-  // "Empty wallet" — connected, but nothing found (distinct from
-  // "disconnected" above), per DESIGN_SPEC.md required states.
-  const isEmptyWallet =
-    !isLoading &&
-    !auto.isLoading &&
-    holdings.length === 0 &&
-    detectedPositions.length === 0 &&
-    defiUsd === 0;
-
-  if (isEmptyWallet) {
-    return (
-      <NoriCoachCard
-        state="neutral"
-        title="Nothing here yet"
-        message="Connect another address or explore what NOVA can track."
-        size="hero"
-        layout="center"
-        className="mx-auto max-w-md"
-      />
-    );
-  }
+  const showActivity = activity.configured || activity.isLoading;
 
   return (
     <div className="flex flex-col gap-6">
-      <AutoDetectionBanner
-        configured={auto.configured}
-        entitled={auto.entitled}
-        isLoading={auto.isLoading}
-        portfolio={auto.portfolio}
+      <WalletBook
+        connectedAddress={connected}
+        wallets={book.wallets}
+        saved={book.saved}
+        onAdd={book.addWatch}
+        onRemove={book.removeWallet}
+        onKeep={book.keepConnected}
       />
 
-      {/* Portfolio hero */}
-      <NetWorthSummary
-        walletUsd={walletUsd}
-        defiUsd={defiUsd}
-        totalUsd={walletUsd + defiUsd}
-        holdings={holdings}
-        isLoading={isLoading}
-        pricesUnavailable={pricesUnavailable}
-        pricesUpdatedAt={pricesUpdatedAt}
-      />
-      <PerformanceCard history={history} />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <NetWorthChart history={history} />
+      {addresses.length === 0 ? (
+        <div className="flex flex-col items-center gap-3">
+          <EmptyWalletState />
+          <WalletConnectButton />
         </div>
-        <AssetAllocationChart holdings={holdings} defiUsd={defiUsd} />
-      </div>
+      ) : (
+        <>
+          {portfolio?.coverage === "major-tokens" ? (
+            <p className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-2.5 text-sm text-foreground">
+              Showing major tokens from public data. An Alchemy API key detects
+              every token automatically — without it, long-tail balances stay hidden.
+            </p>
+          ) : null}
+          {auto.degraded && portfolio?.coverage !== "major-tokens" ? (
+            <p className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-2.5 text-sm text-foreground">
+              The token indexer didn&apos;t respond, so this view fell back to major tokens.
+            </p>
+          ) : null}
+          {auto.isError ? (
+            <p className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-2.5 text-sm text-foreground">
+              Portfolio data is temporarily unavailable. Tracked positions below are still saved in this browser.
+            </p>
+          ) : null}
 
-      {/* Main grid: allocation detail, DeFi positions, staking */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {usingAuto ? (
-          <DetectedPositionsCard positions={detectedPositions} />
-        ) : (
-          <DefiPoolsSection positions={positions} onAdd={addPosition} onRemove={removePosition} />
-        )}
-        <StakingRewardsCard />
-      </div>
+          <NetWorthSummary
+            walletUsd={walletUsd}
+            defiUsd={defiUsd}
+            totalUsd={walletUsd + defiUsd}
+            holdings={holdings}
+            isLoading={isLoading}
+            pricesUnavailable={auto.isError}
+            pricesUpdatedAt={portfolio?.updatedAt}
+          />
+          <PerformanceCard history={history} />
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <NetWorthChart history={history} />
+            </div>
+            <AssetAllocationChart holdings={holdings} defiUsd={defiUsd} />
+          </div>
 
-      {/* Secondary grid: risk overview and recent activity */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <RiskOverviewCard />
-        <RecentActivityCard activity={activity.activity} isLoading={activity.isLoading} />
-      </div>
+          {detectedPositions.length > 0 ? (
+            <DetectedPositionsCard positions={detectedPositions} />
+          ) : null}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ChainBreakdownCard totals={chainTotals} />
-        <DiversificationCard items={diversificationItems} totalUsd={walletUsd + defiUsd} />
-      </div>
-      {usingAuto && (pnl.configured || pnl.isLoading) ? (
-        <PnlCard pnl={pnl.pnl} isLoading={pnl.isLoading} />
-      ) : null}
-      {usingAuto && (tokenPnl.configured || tokenPnl.isLoading) ? (
-        <TokenPnlCard
-          holdings={holdings}
-          tokenPnl={tokenPnl.tokenPnl}
-          isLoading={tokenPnl.isLoading}
-        />
-      ) : null}
-      <TopMoversCard holdings={holdings} />
-      {usingAuto && (gasSpend.configured || gasSpend.isLoading) ? (
-        <GasSpendCard gas={gasSpend.gas} isLoading={gasSpend.isLoading} />
-      ) : null}
-      <TokenHoldingsTable holdings={holdings} isLoading={isLoading} />
-      <AlertsCard authedAddress={authedAddress} />
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <ChainBreakdownCard totals={chainTotals} />
+            <DiversificationCard items={diversificationItems} totalUsd={walletUsd + defiUsd} />
+          </div>
+          {pnl.configured || pnl.isLoading ? (
+            <PnlCard pnl={pnl.pnl} isLoading={pnl.isLoading} />
+          ) : null}
+          {tokenPnl.configured || tokenPnl.isLoading ? (
+            <TokenPnlCard holdings={holdings} tokenPnl={tokenPnl.tokenPnl} isLoading={tokenPnl.isLoading} />
+          ) : null}
+          <TopMoversCard holdings={holdings} />
+          {gasSpend.configured || gasSpend.isLoading ? (
+            <GasSpendCard gas={gasSpend.gas} isLoading={gasSpend.isLoading} />
+          ) : null}
+          <TokenHoldingsTable holdings={holdings} isLoading={isLoading} />
+          {showActivity ? (
+            <RecentActivityCard activity={activity.activity} isLoading={activity.isLoading} />
+          ) : null}
+          <AlertsCard authedAddress={authedAddress} />
+        </>
+      )}
+
+      <DefiPoolsSection positions={positions} onAdd={addPosition} onRemove={removePosition} />
     </div>
   );
 }

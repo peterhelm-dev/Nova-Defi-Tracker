@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
+import { requireDurableStore } from "@/lib/server/persistence";
 import { getStore } from "@/lib/server/store";
 import type { AlertRule } from "@/types";
 
@@ -26,6 +27,9 @@ function isRule(value: unknown): value is AlertRule {
 
 /** Rules plus any fired-and-undismissed events for the signed-in wallet. */
 export async function GET() {
+  const unavailable = requireDurableStore();
+  if (unavailable) return unavailable;
+
   const address = await getSessionAddress();
   if (!address) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -39,6 +43,9 @@ export async function GET() {
 
 /** Replaces the rule set (same replace-style contract as positions). */
 export async function PUT(request: Request) {
+  const unavailable = requireDurableStore();
+  if (unavailable) return unavailable;
+
   const address = await getSessionAddress();
   if (!address) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

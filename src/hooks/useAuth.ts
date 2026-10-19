@@ -13,11 +13,16 @@ import {
 
 const SESSION_KEY = ["auth", "session"] as const;
 
-async function fetchSession(): Promise<string | null> {
+type SessionState = { address: string | null; syncAvailable: boolean };
+
+async function fetchSession(): Promise<SessionState> {
   const res = await fetch("/api/auth/session", { credentials: "same-origin" });
-  if (!res.ok) return null;
-  const data = (await res.json()) as { address: string | null };
-  return data.address;
+  if (!res.ok) return { address: null, syncAvailable: false };
+  const data = (await res.json()) as { address?: string | null; syncAvailable?: boolean };
+  return {
+    address: data.address ?? null,
+    syncAvailable: data.syncAvailable === true,
+  };
 }
 
 /**
@@ -33,14 +38,19 @@ export function useAuth() {
   const { switchChainAsync } = useSwitchChain();
   const queryClient = useQueryClient();
 
-  const { data: authedAddress = null, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: SESSION_KEY,
     queryFn: fetchSession,
     staleTime: 60_000,
   });
+  const sessionAddress = data?.address ?? null;
+  const syncAvailable = data?.syncAvailable ?? false;
 
   const signIn = useCallback(async () => {
     if (!address) throw new Error("Connect a wallet first");
+    if (!syncAvailable) {
+      throw new Error("Cloud sync needs a database. Your portfolio stays in this browser.");
+    }
 
     // The server verifies the signature against the wallet contract as
     // deployed on Base — smart wallets keep a separate owner registry per
@@ -64,7 +74,7 @@ export function useAuth() {
       nonce,
       uri: window.location.origin,
       version: "1",
-      statement: "Sign in to NOVA to sync your portfolio.",
+      statement: "Sign in to Novafolio to sync your portfolio.",
     });
 
     const signature = await signMessageAsync({ message });
@@ -81,7 +91,7 @@ export function useAuth() {
     }
 
     await queryClient.invalidateQueries({ queryKey: SESSION_KEY });
-  }, [address, chainId, signMessageAsync, switchChainAsync, queryClient]);
+  }, [address, chainId, signMessageAsync, switchChainAsync, queryClient, syncAvailable]);
 
   const signOut = useCallback(async () => {
     await fetch("/api/auth/session", {
@@ -93,16 +103,18 @@ export function useAuth() {
 
   // A session is only meaningful while the matching wallet is connected.
   const isAuthed =
+    syncAvailable &&
     isConnected &&
-    !!authedAddress &&
+    !!sessionAddress &&
     !!address &&
-    authedAddress.toLowerCase() === address.toLowerCase();
+    sessionAddress.toLowerCase() === address.toLowerCase();
 
   return {
     address,
     isConnected,
-    authedAddress: isAuthed ? authedAddress : null,
+    authedAddress: isAuthed ? sessionAddress : null,
     isAuthed,
+    syncAvailable,
     isLoading,
     signIn,
     signOut,

@@ -1,3 +1,4 @@
+import { Footer } from "@/components/Footer";
 import { AppHeader } from "./AppHeader";
 import { BottomNav } from "./BottomNav";
 import { Sidebar } from "./Sidebar";
@@ -21,10 +22,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <AppHeader />
         <main
           id="main-content"
-          className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 pb-24 min-[600px]:pb-6 min-[1200px]:px-8"
+          className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 min-[1200px]:px-8"
         >
           {children}
         </main>
+        <Footer className="pb-24 min-[600px]:pb-6" />
       </div>
       <BottomNav />
     </div>

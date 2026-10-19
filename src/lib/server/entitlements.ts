@@ -25,6 +25,10 @@ export async function isEntitledPro(address: string): Promise<boolean> {
   if (allow.includes(addr)) return true;
 
   if (!isBillingConfigured()) {
+    // Dev convenience only. A production deploy without Stripe must not treat
+    // every wallet as Pro — that would turn the free launch into Pro the
+    // moment an indexer key is present.
+    if (process.env.NODE_ENV === "production") return false;
     return allow.length === 0;
   }
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireDurableStore } from "@/lib/server/persistence";
 import { getStore } from "@/lib/server/store";
 
 export const runtime = "nodejs";
@@ -18,6 +19,9 @@ type WaitlistBody = {
  * Postgres in production).
  */
 export async function POST(request: Request) {
+  const unavailable = requireDurableStore();
+  if (unavailable) return unavailable;
+
   let body: WaitlistBody;
   try {
     body = (await request.json()) as WaitlistBody;

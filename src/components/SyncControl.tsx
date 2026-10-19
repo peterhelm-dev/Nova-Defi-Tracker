@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsClient } from "@/lib/useIsClient";
 
 /**
  * Sign-In With Ethereum control. Only meaningful once a wallet is connected:
@@ -9,13 +10,20 @@ import { useAuth } from "@/hooks/useAuth";
  * portfolio syncs to the server and follows the user across devices.
  */
 export function SyncControl() {
-  const { isConnected, isAuthed, signIn, signOut } = useAuth();
+  const { isConnected, isAuthed, signIn, signOut, syncAvailable, isLoading } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const isClient = useIsClient();
 
-  if (!mounted || !isConnected) return null;
+  if (!isClient || !isConnected || isLoading) return null;
+
+  if (!syncAvailable) {
+    return (
+      <p className="max-w-[14rem] text-right text-[11px] leading-snug text-text-muted">
+        Saved in this browser. Cloud sync needs a database.
+      </p>
+    );
+  }
 
   async function run(action: () => Promise<void>) {
     setBusy(true);

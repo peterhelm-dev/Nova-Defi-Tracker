@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
+import { requireDurableStore } from "@/lib/server/persistence";
 import { getStore } from "@/lib/server/store";
 import type { TrackedPosition } from "@/types";
 
@@ -23,6 +24,9 @@ function isPosition(value: unknown): value is TrackedPosition {
 }
 
 export async function GET() {
+  const unavailable = requireDurableStore();
+  if (unavailable) return unavailable;
+
   const address = await getSessionAddress();
   if (!address) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -31,6 +35,9 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  const unavailable = requireDurableStore();
+  if (unavailable) return unavailable;
+
   const address = await getSessionAddress();
   if (!address) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

@@ -30,8 +30,8 @@ export function IconImg({ src, alt, fallbackText, size = 16, className = "" }: I
     );
   }
 
-  // eslint-disable-next-line @next/next/no-img-element -- external, per-row icons; next/image adds no value here
   return (
+    // eslint-disable-next-line @next/next/no-img-element -- external per-row icons; next/image needs a remote allowlist
     <img
       src={src}
       alt={alt}

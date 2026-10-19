@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
-import { getStripe } from "@/lib/server/billing";
+import { isProForSale, getStripe } from "@/lib/server/billing";
 import { getStore } from "@/lib/server/store";
 
 export const runtime = "nodejs";
@@ -15,6 +15,10 @@ export async function POST(request: Request) {
   const address = await getSessionAddress();
   if (!address) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!isProForSale()) {
+    return NextResponse.json({ error: "Pro is not for sale" }, { status: 501 });
   }
 
   const stripe = await getStripe();

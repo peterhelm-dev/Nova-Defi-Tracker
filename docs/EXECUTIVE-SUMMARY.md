@@ -1,4 +1,9 @@
-# Base Wealth Tracker — Executive Summary
+# Novafolio — Executive Summary
+
+The free public launch is **Novafolio** at [https://novafolio.app](https://novafolio.app):
+multi-chain, several wallets, no payment. The checklist that matches the code
+is [LAUNCH.md](./LAUNCH.md). The steps below this note describe a later Pro
+launch (Stripe, Zerion) and are not the free deploy.
 
 _Last updated: 2026-07-02 · Companion to `docs/MARKET-FIT-ROADMAP.md`_
 

@@ -131,8 +131,8 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
           <p className="text-sm text-white/40">Loading alerts…</p>
         ) : rules.length === 0 ? (
           <p className="text-sm text-white/40">
-            No alerts yet — they&apos;re checked hourly on the server, so they
-            work even while you&apos;re away.
+            No alerts yet — on the free host they&apos;re checked once a day,
+            so they still work while you&apos;re away.
           </p>
         ) : (
           <ul className="flex flex-col divide-y divide-white/5">

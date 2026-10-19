@@ -6,6 +6,7 @@ import {
   SESSION_TTL_SECONDS,
   createSessionToken,
 } from "@/lib/server/session";
+import { accountSyncBlockReason } from "@/lib/server/persistence";
 import { getPublicClient } from "@/lib/server/viemClient";
 import { NONCE_COOKIE } from "../nonce/route";
 
@@ -24,6 +25,11 @@ type VerifyBody = {
  * the Base public client.
  */
 export async function POST(request: Request) {
+  const blocked = accountSyncBlockReason();
+  if (blocked) {
+    return NextResponse.json({ error: blocked, code: "store_unavailable" }, { status: 503 });
+  }
+
   let body: VerifyBody;
   try {
     body = (await request.json()) as VerifyBody;

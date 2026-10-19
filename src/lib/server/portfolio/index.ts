@@ -1,33 +1,48 @@
+import { AlchemyProvider } from "./alchemy";
+import { PublicRpcProvider } from "./publicRpc";
 import type { PortfolioProvider } from "./provider";
 import { ZerionProvider } from "./zerion";
 
 export type { PortfolioProvider } from "./provider";
 
-let provider: PortfolioProvider | null | undefined;
+let provider: PortfolioProvider | undefined;
+let zerion: ZerionProvider | null | undefined;
+let publicProvider: PublicRpcProvider | undefined;
 
 /**
- * Returns the configured portfolio indexer, or null when none is set up (in
- * which case the app stays on the free curated-Base flow). Add more providers
- * here — the first configured one wins.
+ * Indexer used for automatic token detection.
+ *
+ * Alchemy's free portfolio API is the launch default: one call covers the
+ * major EVM chains, includes prices, and the free tier is large enough for a
+ * Hobby deploy when responses are cached. Zerion stays available when its key
+ * is the only one set (richer DeFi positions, much smaller free quota).
+ * With no key, the public-RPC fallback still returns major tokens.
  */
-export function getPortfolioProvider(): PortfolioProvider | null {
-  if (provider === undefined) {
-    if (process.env.ZERION_API_KEY) {
+export function getPortfolioProvider(): PortfolioProvider {
+  if (!provider) {
+    if (process.env.ALCHEMY_API_KEY) {
+      provider = new AlchemyProvider();
+    } else if (process.env.ZERION_API_KEY) {
       provider = new ZerionProvider(process.env.ZERION_API_KEY);
     } else {
-      provider = null;
+      provider = new PublicRpcProvider();
     }
   }
   return provider;
 }
 
+export function getPublicPortfolioProvider(): PublicRpcProvider {
+  if (!publicProvider) publicProvider = new PublicRpcProvider();
+  return publicProvider;
+}
+
 /**
- * PnL and gas-spend are Zerion-specific (not part of the generic
- * PortfolioProvider seam other indexers would implement), so this returns the
- * concrete provider rather than the interface. Null when Zerion isn't
- * configured.
+ * PnL, gas, and activity stay on Zerion. Null when that key isn't set, even
+ * if Alchemy is the portfolio provider.
  */
 export function getZerionProvider(): ZerionProvider | null {
-  const p = getPortfolioProvider();
-  return p instanceof ZerionProvider ? p : null;
+  if (zerion === undefined) {
+    zerion = process.env.ZERION_API_KEY ? new ZerionProvider(process.env.ZERION_API_KEY) : null;
+  }
+  return zerion;
 }

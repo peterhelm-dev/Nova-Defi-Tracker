@@ -1,7 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import Script from "next/script";
 import "@coinbase/onchainkit/styles.css";
+import {
+  PRODUCT_DESCRIPTION,
+  PRODUCT_NAME,
+  PRODUCT_TITLE,
+  canonicalSiteUrl,
+  metadataBaseUrl,
+} from "@/lib/brand";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -15,25 +22,33 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
-const description =
-  "NOVA — your cross-chain crypto and DeFi portfolio tracker. Token balances, allocation, DeFi positions, and risk, across every chain your wallet touches.";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: "NOVA",
-  description,
+  metadataBase: metadataBaseUrl(),
+  title: {
+    default: PRODUCT_TITLE,
+    template: `%s — ${PRODUCT_NAME}`,
+  },
+  description: PRODUCT_DESCRIPTION,
+  applicationName: PRODUCT_NAME,
+  alternates: { canonical: canonicalSiteUrl() },
   openGraph: {
-    title: "NOVA",
-    description,
+    title: PRODUCT_TITLE,
+    description: PRODUCT_DESCRIPTION,
+    siteName: PRODUCT_NAME,
     type: "website",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "NOVA",
-    description,
+    title: PRODUCT_TITLE,
+    description: PRODUCT_DESCRIPTION,
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#060816",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

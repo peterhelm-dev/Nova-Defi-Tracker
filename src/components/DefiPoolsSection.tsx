@@ -2,7 +2,9 @@
 
 import { Fragment, useMemo, useState } from "react";
 import { useDefiPools } from "@/hooks/useDefiPools";
+import { toCsv } from "@/lib/csv";
 import { formatPercent, formatUsd } from "@/lib/format";
+import { ExportCsvButton } from "./ExportCsvButton";
 import type { DefiPool, TrackedPosition } from "@/types";
 
 type SortKey = "tvl" | "apy";
@@ -63,16 +65,16 @@ export function DefiPoolsSection({
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
+    <div id="defi-pools" className="min-w-0 rounded-2xl border border-white/10 bg-surface p-4 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-white/50">Base DeFi pools</p>
+          <p className="text-sm font-medium text-white/50">DeFi pools</p>
           <p className="text-xs text-white/40">
-            Live TVL &amp; APY from DeFiLlama. Track a position to fold it
-            into your net worth.
+            Live TVL and APY from DeFiLlama. Track a position to fold it into
+            your net worth. This does not move funds.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -82,6 +84,7 @@ export function DefiPoolsSection({
           <select
             value={sortKey}
             onChange={(e) => setSortKey(e.target.value as SortKey)}
+            aria-label="Sort pools"
             className="rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent"
           >
             <option value="tvl">Sort by TVL</option>
@@ -90,8 +93,8 @@ export function DefiPoolsSection({
         </div>
       </div>
 
-      <div className="mt-4 overflow-x-auto">
-        <table className="w-full text-left text-sm">
+      <div className="mt-4 max-w-full overflow-x-auto">
+        <table className="w-full min-w-[36rem] text-left text-sm">
           <thead>
             <tr className="text-xs uppercase tracking-wide text-white/40">
               <th className="pb-3 font-medium">Pool</th>
@@ -127,7 +130,9 @@ export function DefiPoolsSection({
                 <tr>
                   <td className="py-3">
                     <p className="font-medium text-white">{pool.project}</p>
-                    <p className="text-xs text-white/40">{pool.symbol}</p>
+                    <p className="text-xs text-white/40">
+                      {pool.symbol} · {pool.chain}
+                    </p>
                   </td>
                   <td className="py-3 whitespace-nowrap text-white/80">
                     {formatUsd(pool.tvlUsd)}
@@ -187,13 +192,31 @@ export function DefiPoolsSection({
       </div>
 
       <div className="mt-6 border-t border-white/10 pt-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-medium text-white/50">
             Your tracked positions
           </p>
-          <p className="text-sm font-medium text-white">
-            {formatUsd(positionsTotal)}
-          </p>
+          <div className="flex items-center gap-3">
+            <ExportCsvButton
+              filenamePrefix="tracked-positions"
+              disabled={positions.length === 0}
+              getCsv={() =>
+                toCsv(
+                  ["project", "symbol", "amount_usd", "apy_at_entry", "added_at"],
+                  positions.map((position) => [
+                    position.project,
+                    position.symbol,
+                    position.amountUsd,
+                    position.apyAtEntry,
+                    new Date(position.addedAt).toISOString(),
+                  ]),
+                )
+              }
+            />
+            <p className="text-sm font-medium text-white">
+              {formatUsd(positionsTotal)}
+            </p>
+          </div>
         </div>
         {positions.length === 0 ? (
           <p className="mt-2 text-sm text-white/40">

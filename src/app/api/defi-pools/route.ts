@@ -13,7 +13,17 @@ type LlamaPool = {
 };
 
 const MIN_TVL_USD = 50_000;
-const MAX_POOLS = 60;
+const PER_CHAIN = 8;
+const CHAINS = new Set([
+  "Ethereum",
+  "Base",
+  "Arbitrum",
+  "Optimism",
+  "Polygon",
+  "BSC",
+  "Binance",
+  "Avalanche",
+]);
 
 export async function GET() {
   try {
@@ -30,10 +40,22 @@ export async function GET() {
 
     const json = (await res.json()) as { data: LlamaPool[] };
 
-    const pools: DefiPool[] = json.data
-      .filter((pool) => pool.chain === "Base" && pool.tvlUsd >= MIN_TVL_USD)
-      .sort((a, b) => b.tvlUsd - a.tvlUsd)
-      .slice(0, MAX_POOLS)
+    const byChain = new Map<string, LlamaPool[]>();
+    for (const pool of json.data) {
+      if (!CHAINS.has(pool.chain) || pool.tvlUsd < MIN_TVL_USD) continue;
+      const list = byChain.get(pool.chain) ?? [];
+      list.push(pool);
+      byChain.set(pool.chain, list);
+    }
+
+    const picked: LlamaPool[] = [];
+    for (const list of byChain.values()) {
+      list.sort((a, b) => b.tvlUsd - a.tvlUsd);
+      picked.push(...list.slice(0, PER_CHAIN));
+    }
+    picked.sort((a, b) => b.tvlUsd - a.tvlUsd);
+
+    const pools: DefiPool[] = picked
       .map((pool) => ({
         id: pool.pool,
         project: pool.project,

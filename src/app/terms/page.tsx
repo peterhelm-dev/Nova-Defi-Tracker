@@ -3,15 +3,15 @@ import Link from "next/link";
 import { InfoPage } from "@/components/InfoPage";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — NOVA",
-  description: "The terms that govern your use of NOVA.",
+  title: "Terms of Service",
+  description: "The terms that govern your use of Novafolio.",
 };
 
 export default function TermsPage() {
   return (
     <InfoPage title="Terms of Service" updated="June 30, 2026">
       <p>
-        These terms govern your use of NOVA (the
+        These terms govern your use of Novafolio (the
         &ldquo;Service&rdquo;). By connecting a wallet, signing in, or
         subscribing, you agree to them. If you don&apos;t agree, don&apos;t use
         the Service.
@@ -53,11 +53,11 @@ export default function TermsPage() {
 
       <h2>Pro subscriptions</h2>
       <p>
-        Paid plans are billed through Stripe on a recurring basis until
-        canceled. You can cancel any time from the billing portal on the{" "}
-        <Link href="/pricing">pricing page</Link>; access continues to the end
-        of the paid period. Except where required by law, payments are
-        non-refundable.
+        Pro is not currently offered for sale. Novafolio does not charge you to use
+        the free tracker. If paid plans are introduced later, they will be billed
+        through Stripe until canceled, and you will be able to cancel from the{" "}
+        <Link href="/pricing">pricing page</Link>. Except where required by law,
+        payments would be non-refundable.
       </p>
 
       <h2>Acceptable use</h2>

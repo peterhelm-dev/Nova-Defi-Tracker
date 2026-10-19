@@ -23,12 +23,13 @@ export type SessionPayload = {
 
 const DEV_FALLBACK_SECRET = "dev-insecure-session-secret-change-me";
 
-function secret(): string {
+function secret(): string | null {
   const fromEnv = process.env.SESSION_SECRET;
   if (fromEnv && fromEnv.length > 0) return fromEnv;
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("SESSION_SECRET must be set in production");
-  }
+  // Production must not sign cookies with a known default. Verification of a
+  // missing secret returns "signed out" instead of throwing, so public pages
+  // keep working on a zero-config deploy.
+  if (process.env.NODE_ENV === "production") return null;
   return DEV_FALLBACK_SECRET;
 }
 
@@ -40,8 +41,10 @@ function b64urlDecode(input: string): string {
   return Buffer.from(input, "base64url").toString("utf8");
 }
 
-function sign(data: string): string {
-  return createHmac("sha256", secret()).update(data).digest("base64url");
+function sign(data: string): string | null {
+  const key = secret();
+  if (!key) return null;
+  return createHmac("sha256", key).update(data).digest("base64url");
 }
 
 /** Serialize and sign a session payload into a cookie value. */
@@ -54,7 +57,11 @@ export function createSessionToken(
     exp: Math.floor(Date.now() / 1000) + ttlSeconds,
   };
   const body = b64urlEncode(JSON.stringify(payload));
-  return `${body}.${sign(body)}`;
+  const signature = sign(body);
+  if (!signature) {
+    throw new Error("SESSION_SECRET must be set in production");
+  }
+  return `${body}.${signature}`;
 }
 
 /**
@@ -69,6 +76,7 @@ export function verifySessionToken(token: string | undefined): SessionPayload | 
   const body = token.slice(0, dot);
   const providedSig = token.slice(dot + 1);
   const expectedSig = sign(body);
+  if (!expectedSig) return null;
 
   const a = Buffer.from(providedSig);
   const b = Buffer.from(expectedSig);

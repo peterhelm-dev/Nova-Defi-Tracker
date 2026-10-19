@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
 import type { Subscription, SubscriptionStatus } from "@/types";
+import { isDurableStoreAvailable } from "./persistence";
 
 /**
  * Stripe billing integration (Phase 3). The SDK is loaded lazily so it's only
@@ -10,6 +11,19 @@ import type { Subscription, SubscriptionStatus } from "@/types";
 
 export function isBillingConfigured(): boolean {
   return !!process.env.STRIPE_SECRET_KEY;
+}
+
+/**
+ * Pro can be purchased only when Stripe, the webhook, and a durable database
+ * are all configured. A partial setup must not show a checkout button.
+ */
+export function isProForSale(): boolean {
+  return (
+    isBillingConfigured() &&
+    !!process.env.STRIPE_PRO_PRICE_ID &&
+    !!process.env.STRIPE_WEBHOOK_SECRET &&
+    isDurableStoreAvailable()
+  );
 }
 
 let stripe: Stripe | null | undefined;
