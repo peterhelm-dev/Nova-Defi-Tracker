@@ -11,7 +11,7 @@ export default function ExplorePage() {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-text-secondary">
-        Live pool TVL and APY on the major chains, from public DeFiLlama data.
+        Pool TVL and APY on the major chains, when the yields source is available.
         Tracking a position is manual. Novafolio does not move funds, and these
         numbers are not financial advice.
       </p>

@@ -6,6 +6,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { formatPercent, formatUsd } from "@/lib/format";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import { researchItemId, type PoolHit, type PoolPoint, type ResearchItem, type TokenHit, type TokenProfile } from "@/lib/research";
+import { POOL_DATA_UNAVAILABLE } from "@/lib/yields";
 import { ChainIcon } from "./ChainIcon";
 import { IconImg } from "./IconImg";
 
@@ -45,7 +46,7 @@ export function ResearchDesk({
     queryFn: async () => {
       const res = await fetch(`/api/research/pools?q=${encodeURIComponent(query.trim())}`);
       if (!res.ok) throw new Error("search failed");
-      return (await res.json()) as { pools: PoolHit[] };
+      return (await res.json()) as { pools: PoolHit[]; unavailable?: boolean };
     },
   });
   const tokenDetail = useQuery({
@@ -63,7 +64,7 @@ export function ResearchDesk({
     queryFn: async () => {
       const res = await fetch(`/api/research/pool?id=${encodeURIComponent(poolId!)}`);
       if (!res.ok) throw new Error("detail failed");
-      return (await res.json()) as { pool: PoolHit; history: PoolPoint[] };
+      return (await res.json()) as { pool: PoolHit | null; history: PoolPoint[]; unavailable?: boolean };
     },
   });
 
@@ -162,10 +163,13 @@ export function ResearchDesk({
       ) : null}
 
       {tab === "pool" ? (
+        poolSearch.data?.unavailable || poolSearch.isError ? (
+          <p className="text-sm text-text-muted">{POOL_DATA_UNAVAILABLE}</p>
+        ) : (
         <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
           <ResultList
             loading={poolSearch.isFetching}
-            error={poolSearch.isError}
+            error={false}
             empty={query.trim().length < 2 ? "Type at least two letters." : "No pool matched."}
             items={(poolSearch.data?.pools ?? []).map((pool) => ({
               id: researchItemId("pool", pool.id),
@@ -193,8 +197,14 @@ export function ResearchDesk({
               saved: saved.some((item) => item.id === researchItemId("pool", pool.id)),
             }))}
           />
-          <PoolDetail detail={poolDetail.data} loading={poolDetail.isFetching} error={poolDetail.isError} />
+          <PoolDetail
+            detail={poolDetail.data}
+            loading={poolDetail.isFetching}
+            error={poolDetail.isError}
+            unavailable={poolDetail.data?.unavailable === true}
+          />
         </div>
+        )
       ) : null}
 
       {tab === "compare" ? (
@@ -381,14 +391,18 @@ function PoolDetail({
   detail,
   loading,
   error,
+  unavailable = false,
 }: {
-  detail?: { pool: PoolHit; history: PoolPoint[] };
+  detail?: { pool: PoolHit | null; history: PoolPoint[]; unavailable?: boolean };
   loading: boolean;
   error: boolean;
+  unavailable?: boolean;
 }) {
+  if (unavailable || detail?.unavailable || (error && !detail?.pool)) {
+    return <p className="text-sm text-text-muted">{POOL_DATA_UNAVAILABLE}</p>;
+  }
   if (!detail && loading) return <p className="text-sm text-text-muted">Opening the pool…</p>;
-  if (error) return <p className="text-sm text-warning">The pool detail didn’t load.</p>;
-  if (!detail) {
+  if (!detail?.pool) {
     return (
       <div className="rounded-3xl border border-dashed border-border-subtle px-6 py-16 text-sm text-text-muted">
         Choose a pool to see TVL, and how the yield splits between base and rewards.
@@ -396,6 +410,7 @@ function PoolDetail({
     );
   }
   const { pool, history } = detail;
+  if (!pool) return null;
   return (
     <article className="rounded-3xl border border-border-subtle bg-surface p-5">
       <div className="flex items-center gap-3">
@@ -442,14 +457,14 @@ function ComparePane({ items, onRemove }: { items: ResearchItem[]; onRemove: (id
           const raw = item.id.split(":").slice(1).join(":");
           if (item.kind === "token") {
             const res = await fetch(`/api/research/token?id=${encodeURIComponent(raw)}`);
-            if (!res.ok) return { item, profile: null as TokenProfile | null, pool: null as PoolHit | null };
+            if (!res.ok) return { item, profile: null as TokenProfile | null, pool: null as PoolHit | null, unavailable: false };
             const data = (await res.json()) as { profile: TokenProfile };
-            return { item, profile: data.profile, pool: null };
+            return { item, profile: data.profile, pool: null, unavailable: false };
           }
           const res = await fetch(`/api/research/pool?id=${encodeURIComponent(raw)}`);
-          if (!res.ok) return { item, profile: null, pool: null as PoolHit | null };
-          const data = (await res.json()) as { pool: PoolHit };
-          return { item, profile: null, pool: data.pool };
+          if (!res.ok) return { item, profile: null, pool: null as PoolHit | null, unavailable: true };
+          const data = (await res.json()) as { pool: PoolHit | null; unavailable?: boolean };
+          return { item, profile: null, pool: data.pool, unavailable: data.unavailable === true };
         }),
       );
     },
@@ -461,7 +476,7 @@ function ComparePane({ items, onRemove }: { items: ResearchItem[]; onRemove: (id
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {(details.data ?? items.map((item) => ({ item, profile: null, pool: null }))).map((column) => (
+      {(details.data ?? items.map((item) => ({ item, profile: null, pool: null, unavailable: false }))).map((column) => (
         <article key={column.item.id} className="rounded-2xl border border-border-subtle bg-surface p-4">
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -487,7 +502,9 @@ function ComparePane({ items, onRemove }: { items: ResearchItem[]; onRemove: (id
               <Row k="Reward APY" v={column.pool.apyReward === null ? "—" : `${column.pool.apyReward.toFixed(2)}%`} />
             </dl>
           ) : (
-            <p className="mt-3 text-sm text-text-muted">{details.isFetching ? "Loading…" : "Details unavailable."}</p>
+            <p className="mt-3 text-sm text-text-muted">
+              {details.isFetching ? "Loading…" : column.item.kind === "pool" || column.unavailable ? POOL_DATA_UNAVAILABLE : "Details unavailable."}
+            </p>
           )}
         </article>
       ))}
