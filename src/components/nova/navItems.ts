@@ -4,10 +4,10 @@ import {
   ExploreIcon,
   HomeIcon,
   ProfileIcon,
+  ResearchIcon,
   RewardsIcon,
   SettingsIcon,
   SwapIcon,
-  WatchlistIcon,
 } from "./icons";
 
 export type NavItem = {
@@ -26,7 +26,7 @@ export const SIDEBAR_ITEMS: NavItem[] = [
   { href: "/earn", label: "Earn", icon: EarnIcon, comingSoon: true },
   { href: "/rewards", label: "Rewards", icon: RewardsIcon, comingSoon: true },
   { href: "/activity", label: "Activity", icon: ActivityIcon },
-  { href: "/watchlist", label: "Watchlist", icon: WatchlistIcon, comingSoon: true },
+  { href: "/research", label: "Research", icon: ResearchIcon },
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
@@ -34,7 +34,7 @@ export const SIDEBAR_ITEMS: NavItem[] = [
 export const BOTTOM_NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Home", icon: HomeIcon },
   { href: "/explore", label: "Explore", icon: ExploreIcon },
-  { href: "/earn", label: "Earn", icon: EarnIcon, comingSoon: true },
+  { href: "/research", label: "Research", icon: ResearchIcon },
   { href: "/activity", label: "Activity", icon: ActivityIcon },
   { href: "/settings", label: "Profile", icon: ProfileIcon },
 ];
