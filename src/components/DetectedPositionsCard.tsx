@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { formatChainName, formatUsd } from "@/lib/format";
+import { protocolIconUrl } from "@/lib/chainIcons";
 import type { DetectedPosition } from "@/types";
 import { Badge } from "./Badge";
 import { TokenAvatar } from "./TokenAvatar";
@@ -91,7 +92,8 @@ export function DetectedPositionsCard({
     return [...byProtocol.entries()]
       .map(([protocol, items]) => ({
         protocol,
-        protocolIconUrl: items.find((p) => p.protocolIconUrl)?.protocolIconUrl ?? null,
+        protocolIconUrl: items.find((p) => p.protocolIconUrl)?.protocolIconUrl ?? protocolIconUrl(protocol),
+        healthFactor: items.find((p) => typeof p.healthFactor === "number" && p.healthFactor < 1_000_000)?.healthFactor ?? null,
         rows: groupIntoRows(items).sort((a, b) => b.totalUsd - a.totalUsd),
         totalUsd: items.reduce((sum, p) => sum + p.valueUsd, 0),
       }))
@@ -152,7 +154,12 @@ export function DetectedPositionsCard({
             <div key={group.protocol}>
               <div className="mb-1.5 flex items-center justify-between">
                 <Badge label={group.protocol} iconUrl={group.protocolIconUrl} />
-                <span className="text-xs font-medium tabular-nums text-white/50">
+                <span className="text-right text-xs font-medium tabular-nums text-white/50">
+                  {typeof group.healthFactor === "number" ? (
+                    <span className={group.healthFactor < 1.2 ? "text-negative" : "text-white/70"}>
+                      Health {group.healthFactor.toFixed(2)}
+                    </span>
+                  ) : null}{" "}
                   {formatUsd(group.totalUsd)}
                 </span>
               </div>
@@ -170,9 +177,12 @@ export function DetectedPositionsCard({
                           chain={row.position.chain}
                         />
                         <div className="min-w-0">
-                          <p className="truncate text-sm text-white/90">{row.position.symbol}</p>
+                          <p className="truncate text-sm text-white/90">{row.position.name}</p>
                           <p className="truncate text-xs text-white/40 capitalize">
-                            {row.position.kind}
+                            {formatChainName(row.position.chain)}
+                            {typeof row.position.amount === "number"
+                              ? ` · ${row.position.amount.toLocaleString("en-US", { maximumFractionDigits: 4 })}`
+                              : ""}
                           </p>
                         </div>
                       </div>

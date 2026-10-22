@@ -68,6 +68,10 @@ export type DetectedPosition = {
   /** Groups legs of one multi-token position (e.g. both sides of a liquidity pool) — same id across the group. Null when the position stands alone. */
   groupId: string | null;
   valueUsd: number;
+  /** Token amount. Borrows stay positive here; `valueUsd` carries the sign. */
+  amount?: number | null;
+  /** Aave health factor for this wallet on this chain, when the pool reported one. */
+  healthFactor?: number | null;
 };
 
 /**
@@ -123,13 +127,19 @@ export type TokenPnl = {
 /** One point in a token's price history, for a price chart. */
 export type PricePoint = { t: number; priceUsd: number };
 
-/** Gas fees paid, summed over the most recent page of transactions. */
+/** Gas fees paid over a recent window. `byAction` is set by the Alchemy reader. */
 export type GasSpendSummary = {
   totalUsd: number;
   txCount: number;
-  byChain: { chain: string; valueUsd: number }[];
+  byChain: { chain: string; valueUsd: number; txCount?: number }[];
+  /** transfer | approval | swap | contract | failed */
+  byAction?: { action: string; valueUsd: number; txCount: number }[];
+  failedTxCount?: number;
   /** Oldest transaction's mined_at in the sample — the window this summary actually covers. */
   oldestMinedAt: string | null;
+  windowDays?: number;
+  /** A chain or a gas-token price was missing, so the dollar total is incomplete. */
+  partial?: boolean;
   updatedAt: number;
 };
 

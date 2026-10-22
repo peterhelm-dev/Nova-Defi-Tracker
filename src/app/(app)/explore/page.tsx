@@ -12,7 +12,8 @@ export default function ExplorePage() {
     <div className="flex flex-col gap-4">
       <p className="text-sm text-text-secondary">
         Pool TVL and APY on the major chains, when the yields source is available.
-        Tracking a position is manual. Novafolio does not move funds, and these
+        Aave, Compound, and staking detected on the dashboard stay read-only.
+        Tracking any other pool is manual. Novafolio does not move funds, and these
         numbers are not financial advice.
       </p>
       <DefiPoolsSection positions={positions} onAdd={addPosition} onRemove={removePosition} />

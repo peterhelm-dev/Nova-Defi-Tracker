@@ -9,15 +9,16 @@ export type GasSpendState = {
   gas: GasSpendSummary | null;
   configured: boolean;
   isLoading: boolean;
+  isError: boolean;
 };
 
 /**
- * Fetches gas spend over the wallet's most recent transactions. No polling
- * interval and a long staleTime — same rate-limit reasoning as useWalletPnl.
+ * Gas paid over a recent window. Cached on the server. No polling — the same
+ * rate-limit reasoning as useWalletPnl.
  */
 export function useGasSpend(address: string | undefined): GasSpendState {
   const enabled = !!address;
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["gas-spend", address],
     enabled,
     staleTime: 10 * 60_000,
@@ -32,5 +33,6 @@ export function useGasSpend(address: string | undefined): GasSpendState {
     gas: data?.gas ?? null,
     configured: data?.configured ?? false,
     isLoading: enabled && isLoading,
+    isError: enabled && isError,
   };
 }

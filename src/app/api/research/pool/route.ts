@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isPoolId } from "@/lib/server/researchData";
+import { getProtocolFact } from "@/lib/server/protocolFact";
 import { loadYieldChart, loadYieldPools } from "@/lib/server/yields";
 
 export const runtime = "nodejs";
@@ -14,10 +15,17 @@ export async function GET(request: Request) {
   const pool = snapshot.data.find((item) => item.id === id) ?? null;
   if (!pool) return NextResponse.json({ pool: null, history: [], unavailable: false });
   const history = await loadYieldChart(id);
+  let protocol = null;
+  try {
+    protocol = await getProtocolFact(pool.project);
+  } catch {
+    protocol = null;
+  }
   return NextResponse.json(
     {
       pool,
       history: history.unavailable ? [] : history.data,
+      protocol,
       unavailable: false,
     },
     { headers: { "Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800" } },

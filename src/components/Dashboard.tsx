@@ -19,6 +19,8 @@ import { useIsClient } from "@/lib/useIsClient";
 import { playUiSound } from "@/lib/sounds";
 import type { WidgetId } from "@/lib/dashboardLayout";
 import { AlertsCard } from "./AlertsCard";
+import { ApprovalsCard } from "./ApprovalsCard";
+import { DustCard } from "./DustCard";
 import { AssetAllocationChart } from "./AssetAllocationChart";
 import { BalanceBoard } from "./BalanceBoard";
 import { ChainBreakdownCard, type ChainTotal } from "./ChainBreakdownCard";
@@ -195,7 +197,7 @@ export function Dashboard() {
           <DetectedPositionsCard positions={detectedPositions} />
         ) : (
           <p className="rounded-2xl border border-border-subtle bg-surface px-4 py-8 text-sm text-text-muted">
-            No DeFi positions in this view.
+            No Aave, Compound, or staking position showed up in this view. You can still track a pool by hand below.
           </p>
         );
       case "holdings":
@@ -253,6 +255,8 @@ export function Dashboard() {
             onChange={(dashboardLayout) => setPrefs((prev) => ({ ...prev, dashboardLayout }))}
             render={renderWidget}
           />
+          <DustCard holdings={holdings} />
+          <ApprovalsCard address={primary} holdings={holdings} />
           <DiversificationCard items={diversificationItems} totalUsd={walletUsd + defiUsd} />
           {pnl.configured || pnl.isLoading ? (
             <PnlCard pnl={pnl.pnl} isLoading={pnl.isLoading} />
@@ -260,9 +264,12 @@ export function Dashboard() {
           {tokenPnl.configured || tokenPnl.isLoading ? (
             <TokenPnlCard holdings={holdings} tokenPnl={tokenPnl.tokenPnl} isLoading={tokenPnl.isLoading} />
           ) : null}
-          {gasSpend.configured || gasSpend.isLoading ? (
-            <GasSpendCard gas={gasSpend.gas} isLoading={gasSpend.isLoading} />
-          ) : null}
+          <GasSpendCard
+            gas={gasSpend.gas}
+            isLoading={gasSpend.isLoading}
+            configured={gasSpend.configured}
+            isError={gasSpend.isError}
+          />
           {showActivity ? (
             <RecentActivityCard activity={activity.activity} isLoading={activity.isLoading} />
           ) : null}
