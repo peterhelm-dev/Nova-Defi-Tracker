@@ -10,10 +10,19 @@ import { useTrackedPositions } from "@/hooks/useTrackedPositions";
 import { useTokenPnl } from "@/hooks/useTokenPnl";
 import { useWalletBook } from "@/hooks/useWalletBook";
 import { useWalletPnl } from "@/hooks/useWalletPnl";
+import { useMemo, useState } from "react";
+import { usePreferences } from "@/hooks/usePreferences";
+import { allocationFromGroups, applyScope, groupBalances, isDust, type DefiSlice, type TaggedHolding } from "@/lib/balanceView";
+import { walletTitle } from "@/lib/experience";
+import { formatChainName, shortenAddress } from "@/lib/format";
 import { useIsClient } from "@/lib/useIsClient";
+import { playUiSound } from "@/lib/sounds";
+import type { WidgetId } from "@/lib/dashboardLayout";
 import { AlertsCard } from "./AlertsCard";
 import { AssetAllocationChart } from "./AssetAllocationChart";
+import { BalanceBoard } from "./BalanceBoard";
 import { ChainBreakdownCard, type ChainTotal } from "./ChainBreakdownCard";
+import { DashboardGrid } from "./DashboardGrid";
 import { DefiPoolsSection } from "./DefiPoolsSection";
 import { DetectedPositionsCard } from "./DetectedPositionsCard";
 import { DiversificationCard, type DiversificationItem } from "./DiversificationCard";
@@ -24,17 +33,32 @@ import { NetWorthSummary } from "./NetWorthSummary";
 import { RecentActivityCard } from "./nova/RecentActivityCard";
 import { PerformanceCard } from "./PerformanceCard";
 import { PnlCard } from "./PnlCard";
-import { TokenHoldingsTable } from "./TokenHoldingsTable";
 import { TokenPnlCard } from "./TokenPnlCard";
 import { TopMoversCard } from "./TopMoversCard";
 import { WalletBook } from "./WalletBook";
-import { playUiSound } from "@/lib/sounds";
+
+function walletLabels(wallets: { address: string; nickname?: string; label: string }[]): Map<string, string> {
+  const titled = wallets.map((wallet) => ({
+    address: wallet.address.toLowerCase(),
+    title: walletTitle(wallet) ?? shortenAddress(wallet.address),
+  }));
+  const counts = new Map<string, number>();
+  for (const entry of titled) counts.set(entry.title, (counts.get(entry.title) ?? 0) + 1);
+  return new Map(
+    titled.map((entry) => [
+      entry.address,
+      (counts.get(entry.title) ?? 0) > 1 ? `${entry.title} · ${shortenAddress(entry.address)}` : entry.title,
+    ]),
+  );
+}
 
 export function Dashboard() {
   const isClient = useIsClient();
+  const [editing, setEditing] = useState(false);
   const { address: rawConnected } = useAccount();
   const connected = isClient ? rawConnected : undefined;
   const { authedAddress } = useAuth();
+  const { prefs, setPrefs } = usePreferences();
   const book = useWalletBook(connected);
   const addresses = isClient ? book.wallets.map((wallet) => wallet.address) : [];
 
@@ -88,6 +112,108 @@ export function Dashboard() {
 
   const showActivity = activity.configured || activity.isLoading;
 
+  const labels = useMemo(() => walletLabels(book.wallets), [book.wallets]);
+  const tagged: TaggedHolding[] = useMemo(
+    () =>
+      auto.perWallet.flatMap((portfolio) => {
+        const wallet = labels.get(portfolio.address.toLowerCase()) ?? shortenAddress(portfolio.address);
+        return portfolio.tokens.map((token) => ({ ...token, wallet }));
+      }),
+    [auto.perWallet, labels],
+  );
+  const defiSlices: DefiSlice[] = useMemo(() => {
+    const detected = auto.perWallet.flatMap((portfolio) =>
+      portfolio.positions.map((position) => ({
+        id: `${portfolio.address}:${position.id}`,
+        label: position.protocol ? `${position.symbol} (${position.protocol})` : position.symbol,
+        valueUsd: position.valueUsd,
+        chain: position.chain,
+      })),
+    );
+    if (detected.length > 0) return detected;
+    if (manualDefiUsd > 0) {
+      return [{ id: "manual-defi", label: "Tracked positions", valueUsd: manualDefiUsd, chain: "defi" }];
+    }
+    return [];
+  }, [auto.perWallet, manualDefiUsd]);
+
+  const viewHoldings = useMemo(() => {
+    const scoped = applyScope(tagged, prefs.balanceView.scope);
+    return prefs.balanceView.hideDust ? scoped.filter((holding) => !isDust(holding)) : scoped;
+  }, [tagged, prefs.balanceView.scope, prefs.balanceView.hideDust]);
+
+  const allocationSlices = useMemo(() => {
+    const groups = groupBalances({
+      holdings: applyScope(tagged, prefs.balanceView.scope),
+      defi: defiSlices,
+      groupBy: prefs.balanceView.groupBy,
+      hideDust: prefs.balanceView.hideDust,
+      sort: prefs.balanceView.sort,
+    });
+    return allocationFromGroups(groups).map((slice) => ({
+      ...slice,
+      name: prefs.balanceView.groupBy === "chain" ? formatChainName(slice.name) : slice.name,
+    }));
+  }, [tagged, defiSlices, prefs.balanceView]);
+
+  function renderWidget(id: WidgetId) {
+    switch (id) {
+      case "net-worth":
+        return (
+          <NetWorthSummary
+            walletUsd={walletUsd}
+            defiUsd={defiUsd}
+            totalUsd={walletUsd + defiUsd}
+            holdings={holdings}
+            isLoading={isLoading}
+            pricesUnavailable={auto.isError}
+            pricesUpdatedAt={portfolio?.updatedAt}
+            onRefresh={async () => {
+              await auto.refetch();
+              playUiSound("refresh");
+            }}
+          />
+        );
+      case "performance":
+        return history.length < 2 ? (
+          <p className="rounded-2xl border border-border-subtle bg-surface px-4 py-8 text-sm text-text-muted">
+            Performance shows up after the next snapshot.
+          </p>
+        ) : (
+          <PerformanceCard history={history} />
+        );
+      case "history":
+        return <NetWorthChart history={history} />;
+      case "allocation":
+        return <AssetAllocationChart slices={allocationSlices} />;
+      case "chains":
+        return <ChainBreakdownCard totals={chainTotals} />;
+      case "movers":
+        return <TopMoversCard holdings={viewHoldings} />;
+      case "defi":
+        return detectedPositions.length > 0 ? (
+          <DetectedPositionsCard positions={detectedPositions} />
+        ) : (
+          <p className="rounded-2xl border border-border-subtle bg-surface px-4 py-8 text-sm text-text-muted">
+            No DeFi positions in this view.
+          </p>
+        );
+      case "holdings":
+        return (
+          <BalanceBoard
+            holdings={tagged}
+            defi={defiSlices}
+            view={prefs.balanceView}
+            isLoading={isLoading}
+            showAllocation={false}
+            onChange={(balanceView) => setPrefs((prev) => ({ ...prev, balanceView }))}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       {addresses.length === 0 ? (
@@ -120,46 +246,23 @@ export function Dashboard() {
             </p>
           ) : null}
 
-          <NetWorthSummary
-            walletUsd={walletUsd}
-            defiUsd={defiUsd}
-            totalUsd={walletUsd + defiUsd}
-            holdings={holdings}
-            isLoading={isLoading}
-            pricesUnavailable={auto.isError}
-            pricesUpdatedAt={portfolio?.updatedAt}
-            onRefresh={async () => {
-              await auto.refetch();
-              playUiSound("refresh");
-            }}
+          <DashboardGrid
+            layout={prefs.dashboardLayout}
+            editing={editing}
+            onEditingChange={setEditing}
+            onChange={(dashboardLayout) => setPrefs((prev) => ({ ...prev, dashboardLayout }))}
+            render={renderWidget}
           />
-          <PerformanceCard history={history} />
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <NetWorthChart history={history} />
-            </div>
-            <AssetAllocationChart holdings={holdings} defiUsd={defiUsd} />
-          </div>
-
-          {detectedPositions.length > 0 ? (
-            <DetectedPositionsCard positions={detectedPositions} />
-          ) : null}
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <ChainBreakdownCard totals={chainTotals} />
-            <DiversificationCard items={diversificationItems} totalUsd={walletUsd + defiUsd} />
-          </div>
+          <DiversificationCard items={diversificationItems} totalUsd={walletUsd + defiUsd} />
           {pnl.configured || pnl.isLoading ? (
             <PnlCard pnl={pnl.pnl} isLoading={pnl.isLoading} />
           ) : null}
           {tokenPnl.configured || tokenPnl.isLoading ? (
             <TokenPnlCard holdings={holdings} tokenPnl={tokenPnl.tokenPnl} isLoading={tokenPnl.isLoading} />
           ) : null}
-          <TopMoversCard holdings={holdings} />
           {gasSpend.configured || gasSpend.isLoading ? (
             <GasSpendCard gas={gasSpend.gas} isLoading={gasSpend.isLoading} />
           ) : null}
-          <TokenHoldingsTable holdings={holdings} isLoading={isLoading} />
           {showActivity ? (
             <RecentActivityCard activity={activity.activity} isLoading={activity.isLoading} />
           ) : null}

@@ -8,6 +8,8 @@ import { base } from "wagmi/chains";
 import { PRODUCT_NAME } from "@/lib/brand";
 import { wagmiConfig } from "@/lib/wagmi";
 import { SoundProvider } from "@/components/SoundProvider";
+import { PreferencesProvider } from "@/hooks/usePreferences";
+import { CurrencyProvider } from "@/lib/currency";
 import { PrivacyProvider } from "@/lib/privacy";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -32,7 +34,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
           }}
         >
           <PrivacyProvider>
-            <SoundProvider>{children}</SoundProvider>
+            <SoundProvider>
+              <PreferencesProvider>
+                <CurrencyProvider>{children}</CurrencyProvider>
+              </PreferencesProvider>
+            </SoundProvider>
           </PrivacyProvider>
         </OnchainKitProvider>
       </QueryClientProvider>

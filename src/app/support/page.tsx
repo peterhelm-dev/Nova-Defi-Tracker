@@ -32,7 +32,7 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "A price or APY looks wrong.",
-    a: "Prices come from CoinGecko, pool data from DeFiLlama, and Pro holdings from a portfolio indexer. All can lag or disagree with an exchange. Treat every number as an estimate, not an oracle.",
+    a: "Prices come from CoinGecko. Pool TVL and APY come from a yields source and hide with a short note when that source is down. Token pages keep working. Pro holdings come from a portfolio indexer. All can lag. Treat every number as an estimate, not an oracle.",
   },
   {
     q: "How do I delete my data?",

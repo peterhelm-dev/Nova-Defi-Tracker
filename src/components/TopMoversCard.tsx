@@ -27,7 +27,14 @@ export function TopMoversCard({ holdings }: TopMoversCardProps) {
     };
   }, [holdings]);
 
-  if (gainers.length === 0 && losers.length === 0) return null;
+  if (gainers.length === 0 && losers.length === 0) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-surface p-6">
+        <p className="text-sm font-medium text-white/50">Top movers (24h)</p>
+        <p className="mt-3 text-sm text-white/40">No priced moves in this view.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl border border-white/10 bg-surface p-6">
