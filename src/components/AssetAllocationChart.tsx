@@ -53,7 +53,7 @@ export function AssetAllocationChart({
     <div className="rounded-2xl border border-white/10 bg-surface p-6">
       <p className="text-sm font-medium text-white/50">Allocation</p>
       {slices.length === 0 ? (
-        <div className="flex h-64 items-center justify-center text-center text-sm text-white/40">
+        <div className="flex h-64 items-center justify-center text-center text-sm text-text-muted">
           No priced holdings yet.
         </div>
       ) : (

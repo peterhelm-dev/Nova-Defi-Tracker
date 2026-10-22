@@ -32,7 +32,7 @@ export function NetWorthChart({ history }: { history: NetWorthSnapshot[] }) {
         />
       </div>
       {history.length < 2 ? (
-        <div className="flex h-64 items-center justify-center text-center text-sm text-white/40">
+        <div className="flex h-64 items-center justify-center text-center text-sm text-text-muted">
           Come back tomorrow — history builds up one snapshot per day as you
           use the tracker.
         </div>

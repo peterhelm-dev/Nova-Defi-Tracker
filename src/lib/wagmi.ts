@@ -19,7 +19,10 @@ const connectors: CreateConnectorFn[] = [
     appName: PRODUCT_NAME,
     preference: "all",
   }),
-  metaMask(),
+  metaMask({
+    enableAnalytics: false,
+    dappMetadata: { name: PRODUCT_NAME, url: canonicalSiteUrl() },
+  }),
   injected({ target: "rabby" }),
 ];
 

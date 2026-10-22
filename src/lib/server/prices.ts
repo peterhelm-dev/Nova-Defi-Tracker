@@ -7,14 +7,15 @@ import type { PricePoint, PriceResponse } from "@/types";
  * Spot prices for the curated Base list and ETH.
  *
  * Alchemy's Prices API is the primary source and uses the same ALCHEMY_API_KEY
- * as portfolio detection. If that app has Allowlist Domains turned on, a
- * server fetch with no Origin is rejected ("Unspecified origin not on
- * whitelist") and the whole route used to 502. Calls send this site's origin
- * and, on that 403, try the other Novafolio origin and then no Origin.
+ * as portfolio detection. Calls send this site's origin, then the other
+ * Novafolio origin, and on a whitelist 403 they retry once with no Origin.
+ * An app whose Security tab allows every domain does not need that retry;
+ * the public docs-demo key does, because it is locked to www.alchemy.com.
  *
  * CoinGecko is the fallback. Its free token endpoint allows one contract
- * address per call (error 10012), and a 429 on the old all-in-one batch threw
- * away every token. Non-Pro keys request one address at a time and keep
+ * address per call (error 10012). The old route sent all nine at once and
+ * treated any other status, including a Vercel 429, as zero prices, so the
+ * whole handler 502'd. Non-Pro keys request one address at a time and keep
  * whatever comes back. The last payload that contained a price is reused when
  * a later refresh is empty.
  */
@@ -230,9 +231,9 @@ async function readAlchemy(url: string, init: RequestInit, headers: Headers): Pr
 }
 
 /**
- * Sends the site Origin so an Alchemy domain allowlist can accept a server
- * call. A whitelist 403 tries the other Novafolio origins, then one request
- * with no Origin. The URL is never logged — it contains the API key.
+ * Sends the site Origin first. A whitelist 403 tries the other Novafolio
+ * origins, then one request with no Origin, which is what an open Security
+ * tab accepts. The URL is never logged — it contains the API key.
  */
 async function alchemyFetch(url: string, init: RequestInit = {}): Promise<AlchemyHttpResult> {
   const baseHeaders = new Headers(init.headers);

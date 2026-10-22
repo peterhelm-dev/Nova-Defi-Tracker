@@ -49,12 +49,12 @@ export function WaitlistForm() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@email.com"
         aria-label="Email address"
-        className="flex-1 rounded-lg border border-white/15 bg-surface px-4 py-2.5 text-sm text-foreground placeholder:text-white/30 focus:border-accent focus:outline-none"
+        className="flex-1 rounded-lg border border-white/15 bg-surface px-4 py-2.5 text-sm text-foreground placeholder:text-text-muted focus:border-accent focus:outline-none"
       />
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent/90 disabled:opacity-60"
+        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-text-inverse hover:bg-accent/90 disabled:opacity-60"
       >
         {status === "submitting" ? "Joining…" : "Join waitlist"}
       </button>

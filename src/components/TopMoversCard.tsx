@@ -31,7 +31,7 @@ export function TopMoversCard({ holdings }: TopMoversCardProps) {
     return (
       <div className="rounded-2xl border border-white/10 bg-surface p-6">
         <p className="text-sm font-medium text-white/50">Top movers (24h)</p>
-        <p className="mt-3 text-sm text-white/40">No priced moves in this view.</p>
+        <p className="mt-3 text-sm text-text-muted">No priced moves in this view.</p>
       </div>
     );
   }
@@ -59,15 +59,15 @@ function MoverList({
   if (items.length === 0) {
     return (
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-white/40">{title}</p>
-        <p className="text-sm text-white/30">None</p>
+        <p className="mb-2 text-xs uppercase tracking-wide text-text-muted">{title}</p>
+        <p className="text-sm text-text-muted">None</p>
       </div>
     );
   }
 
   return (
     <div>
-      <p className="mb-2 text-xs uppercase tracking-wide text-white/40">{title}</p>
+      <p className="mb-2 text-xs uppercase tracking-wide text-text-muted">{title}</p>
       <ul className="flex flex-col gap-2">
         {items.map((holding) => (
           <li
@@ -88,7 +88,7 @@ function MoverList({
               <span className={tone === "emerald" ? "text-emerald-400" : "text-red-400"}>
                 {formatPercent(holding.change24h)}
               </span>
-              <span className="text-white/40">{formatUsd(holding.valueUsd)}</span>
+              <span className="text-text-muted">{formatUsd(holding.valueUsd)}</span>
             </span>
           </li>
         ))}

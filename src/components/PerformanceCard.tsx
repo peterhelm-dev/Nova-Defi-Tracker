@@ -36,7 +36,7 @@ export function PerformanceCard({ history }: { history: NetWorthSnapshot[] }) {
       <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {periods.map((period) => (
           <div key={period.label}>
-            <p className="text-xs uppercase tracking-wide text-white/40">
+            <p className="text-xs uppercase tracking-wide text-text-muted">
               {period.label}
             </p>
             <p className="mt-1 text-lg font-semibold tabular-nums text-white">
@@ -53,12 +53,12 @@ export function PerformanceCard({ history }: { history: NetWorthSnapshot[] }) {
                 {formatPercent(period.deltaPct)}
               </span>
             ) : (
-              <span className="mt-1 inline-block text-xs text-white/30">—</span>
+              <span className="mt-1 inline-block text-xs text-text-muted">—</span>
             )}
           </div>
         ))}
       </div>
-      <p className="mt-4 text-xs text-white/30">
+      <p className="mt-4 text-xs text-text-muted">
         Based on daily snapshots — periods appear as your history grows.
       </p>
     </div>

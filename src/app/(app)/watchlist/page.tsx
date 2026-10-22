@@ -4,7 +4,7 @@ export default function WatchlistPage() {
   return (
     <ComingSoonPage
       title="Watchlist"
-      description="Save tokens and protocols to track without holding them. Not wired up yet."
+      description="Tokens and pools you save live on the Research page, in this browser. This shortcut is not a second list."
     />
   );
 }

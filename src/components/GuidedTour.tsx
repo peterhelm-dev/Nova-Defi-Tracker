@@ -76,6 +76,7 @@ export function GuidedTour() {
       ) : null}
       <div
         role="dialog"
+        aria-modal="true"
         aria-labelledby="tour-title"
         className="absolute z-10 rounded-2xl border border-border-subtle bg-surface-raised p-4 shadow-card"
         style={cardStyle}
@@ -97,6 +98,7 @@ export function GuidedTour() {
           </button>
           <button
             type="button"
+            autoFocus
             onClick={() => (last ? finish() : setStep((value) => value + 1))}
             className="pressable rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-text-inverse"
           >

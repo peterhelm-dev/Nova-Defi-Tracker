@@ -114,12 +114,12 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
           onChange={(e) => setThreshold(e.target.value)}
           placeholder="USD price"
           aria-label="USD price threshold"
-          className="w-28 rounded-lg border border-white/15 bg-surface px-2 py-1.5 text-sm text-foreground placeholder:text-white/30 focus:border-accent focus:outline-none"
+          className="w-28 rounded-lg border border-white/15 bg-surface px-2 py-1.5 text-sm text-foreground placeholder:text-text-muted focus:border-accent focus:outline-none"
         />
         <button
           type="submit"
           disabled={busy}
-          className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white hover:bg-accent/90 disabled:opacity-60"
+          className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-text-inverse hover:bg-accent/90 disabled:opacity-60"
         >
           Add alert
         </button>
@@ -128,9 +128,9 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
 
       <div className="mt-4">
         {isLoading ? (
-          <p className="text-sm text-white/40">Loading alerts…</p>
+          <p className="text-sm text-text-muted">Loading alerts…</p>
         ) : rules.length === 0 ? (
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-text-muted">
             No alerts yet — on the free host they&apos;re checked once a day,
             so they still work while you&apos;re away.
           </p>
@@ -144,7 +144,7 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
                 <span className="text-white/80">
                   {rule.symbol} {rule.direction} {formatUsd(rule.thresholdUsd)}
                   {!rule.armed && (
-                    <span className="ml-2 text-xs text-white/40">
+                    <span className="ml-2 text-xs text-text-muted">
                       fired — re-arms when price crosses back
                     </span>
                   )}

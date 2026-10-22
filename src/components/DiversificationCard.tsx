@@ -57,7 +57,7 @@ export function DiversificationCard({ items, totalUsd }: DiversificationCardProp
         <span className="font-medium text-white">{topSharePct.toFixed(1)}%</span> of your net
         worth ({formatUsd(top.valueUsd)}).
       </p>
-      <p className="mt-1 text-xs text-white/40">
+      <p className="mt-1 text-xs text-text-muted">
         Spread across {assetCount} asset{assetCount === 1 ? "" : "s"} and positions.
       </p>
     </div>

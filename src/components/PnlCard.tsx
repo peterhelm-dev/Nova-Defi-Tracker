@@ -20,7 +20,7 @@ function GainStat({
   const tone = usd >= 0 ? "text-emerald-400" : "text-red-400";
   return (
     <div>
-      <p className="text-xs uppercase tracking-wide text-white/40">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-text-muted">{label}</p>
       <p className={`mt-1 text-lg font-semibold tabular-nums ${tone}`}>{formatUsd(usd)}</p>
       {pct !== null && (
         <p className={`text-xs tabular-nums ${tone}`}>{formatPercent(pct)}</p>
@@ -38,7 +38,7 @@ export function PnlCard({ pnl, isLoading }: PnlCardProps) {
     return (
       <div className="rounded-2xl border border-white/10 bg-surface p-6">
         <p className="text-sm font-medium text-white/50">Profit & loss</p>
-        <p className="mt-4 text-sm text-white/40">Loading…</p>
+        <p className="mt-4 text-sm text-text-muted">Loading…</p>
       </div>
     );
   }
@@ -53,7 +53,7 @@ export function PnlCard({ pnl, isLoading }: PnlCardProps) {
         <GainStat label="Realized" usd={pnl.realizedGainUsd} pct={pnl.realizedGainPct} />
         <GainStat label="Unrealized" usd={pnl.unrealizedGainUsd} pct={pnl.unrealizedGainPct} />
       </div>
-      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-white/5 pt-3 text-xs text-white/40">
+      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-white/5 pt-3 text-xs text-text-muted">
         <span>
           Total invested <span className="text-white/70">{formatUsd(pnl.totalInvestedUsd)}</span>
         </span>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <InfoPage title="Terms of Service" updated="June 30, 2026">
+    <InfoPage title="Terms of Service" updated="October 22, 2026">
       <p>
         These terms govern your use of Novafolio (the
         &ldquo;Service&rdquo;). By connecting a wallet, signing in, or
@@ -46,8 +46,10 @@ export default function TermsPage() {
           displays what you enter and does not verify it.
         </li>
         <li>
-          Automatic detection (Pro) relies on third-party indexers and may miss
-          or misprice positions.
+          Automatic detection of tokens, Aave, Compound, and common staking
+          tokens is part of the free service. It relies on third-party data and
+          onchain reads, and it can miss or misprice a position. A true-yield
+          figure is an estimate, not a quote.
         </li>
       </ul>
 

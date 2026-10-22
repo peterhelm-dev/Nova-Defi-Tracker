@@ -9,7 +9,7 @@ import { isAccountSyncAvailable, isDurableStoreAvailable } from "@/lib/server/pe
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Novafolio's tracker is free. Pro — automatic DeFi positions, synced history, and alerts — is not for sale yet.",
+    "Novafolio's tracker is free, including detected lending and staking. Pro is not for sale.",
 };
 
 export default function PricingPage() {
@@ -21,7 +21,9 @@ export default function PricingPage() {
     "Connect Coinbase, MetaMask, or Rabby — no account required",
     "Watch extra wallets by pasting an address or ENS name",
     "Token balances across Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Avalanche",
-    "DeFi pool explorer with manual position tracking",
+    "Aave v3, Compound v3, and common staking tokens read onchain, plus manual tracking for anything else",
+    "Research with a true-yield estimate and a before-you-deposit checklist",
+    "Open token approvals, dust, and recent gas when an Alchemy key is set",
     syncOn
       ? "Sign in to sync tracked positions across devices"
       : "Portfolio stays in this browser until a database is connected",
@@ -29,10 +31,9 @@ export default function PricingPage() {
   ];
 
   const proFeatures = [
-    "DeFi positions detected for you, not typed in",
-    "Daily server-side history while you're away",
-    "Price alerts",
-    "PnL and a fuller export",
+    "Daily server-side history while you're away, once a database is connected",
+    "Price alerts that keep running after you close the tab",
+    "Synced preferences across devices",
   ];
 
   return (
@@ -114,7 +115,7 @@ export default function PricingPage() {
           </div>
         </section>
 
-        <p className="text-center text-xs text-white/40">
+        <p className="text-center text-xs text-text-muted">
           {billingLive
             ? "Pro is billed by Stripe. Cancel any time from this page."
             : "Pro is not for sale on this deployment."}{" "}

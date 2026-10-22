@@ -34,7 +34,7 @@ export default function ErrorBoundary({
         <button
           type="button"
           onClick={reset}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent/90"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-text-inverse hover:bg-accent/90"
         >
           Try again
         </button>
@@ -46,7 +46,7 @@ export default function ErrorBoundary({
         </a>
       </div>
       {error.digest ? (
-        <p className="text-xs text-white/30">Error reference: {error.digest}</p>
+        <p className="text-xs text-text-muted">Error reference: {error.digest}</p>
       ) : null}
     </div>
   );
