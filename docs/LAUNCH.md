@@ -57,13 +57,11 @@ The dashboard says so. Nothing crashes.
 
 The same Alchemy key prices the curated token list (`/api/prices`) and fills
 in a chart when CoinGecko is rate-limited. You do not need a separate price
-key. Server price calls send an `Origin` header (`NEXT_PUBLIC_SITE_URL`, plus
-`https://novafolio.app` and `https://www.novafolio.app`). If the Alchemy app
-has **Allowlist Domains** turned on, add both of those domains — a request
-with no `Origin` is rejected with "Unspecified origin not on whitelist," which
-is what made `/api/prices` return 502. Leave **Allowlist IPs** empty; Vercel
-addresses change. CoinGecko's free token endpoint allows only one contract
-address per call, so the fallback asks for one token at a time.
+key. Leave the Alchemy app’s Security tab fully open, which is the right
+setup for server calls from Vercel. CoinGecko’s free token endpoint allows
+only one contract address per call, so the fallback asks for one token at a
+time and keeps whatever comes back. A batch of the whole list, or a 429 from
+Vercel’s shared IPs, used to wipe every quote and return 502.
 
 ## Optional keys
 
