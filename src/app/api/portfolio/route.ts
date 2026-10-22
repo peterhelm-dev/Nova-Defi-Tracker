@@ -1,6 +1,7 @@
 import { isAddress } from "viem";
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
+import { attachDetectedPositions } from "@/lib/server/defi/read";
 import { getPortfolioProvider, getPublicPortfolioProvider } from "@/lib/server/portfolio";
 
 export const runtime = "nodejs";
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
   const primary = getPortfolioProvider();
 
   try {
-    const portfolio = await primary.getPortfolio(address);
+    const portfolio = await attachDetectedPositions(await primary.getPortfolio(address));
     return NextResponse.json({
       configured: true,
       entitled: true,
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      const portfolio = await getPublicPortfolioProvider().getPortfolio(address);
+      const portfolio = await attachDetectedPositions(await getPublicPortfolioProvider().getPortfolio(address));
       return NextResponse.json({
         configured: true,
         entitled: true,

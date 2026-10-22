@@ -7,6 +7,8 @@ import { formatPercent, formatUsd } from "@/lib/format";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import { researchItemId, type PoolHit, type PoolPoint, type ResearchItem, type TokenHit, type TokenProfile } from "@/lib/research";
 import { POOL_DATA_UNAVAILABLE } from "@/lib/yields";
+import type { ProtocolFact } from "@/lib/depositChecklist";
+import { TrueYieldCalculator } from "./TrueYieldCalculator";
 import { ChainIcon } from "./ChainIcon";
 import { IconImg } from "./IconImg";
 
@@ -64,7 +66,12 @@ export function ResearchDesk({
     queryFn: async () => {
       const res = await fetch(`/api/research/pool?id=${encodeURIComponent(poolId!)}`);
       if (!res.ok) throw new Error("detail failed");
-      return (await res.json()) as { pool: PoolHit | null; history: PoolPoint[]; unavailable?: boolean };
+      return (await res.json()) as {
+        pool: PoolHit | null;
+        history: PoolPoint[];
+        protocol?: ProtocolFact | null;
+        unavailable?: boolean;
+      };
     },
   });
 
@@ -393,7 +400,7 @@ function PoolDetail({
   error,
   unavailable = false,
 }: {
-  detail?: { pool: PoolHit | null; history: PoolPoint[]; unavailable?: boolean };
+  detail?: { pool: PoolHit | null; history: PoolPoint[]; protocol?: ProtocolFact | null; unavailable?: boolean };
   loading: boolean;
   error: boolean;
   unavailable?: boolean;
@@ -443,6 +450,7 @@ function PoolDetail({
         </ResponsiveContainer>
       </div>
       <p className="mt-2 text-xs text-text-muted">Copper is total APY. Green is the base APY, without reward incentives.</p>
+      <TrueYieldCalculator pool={pool} protocol={detail.protocol ?? null} />
     </article>
   );
 }

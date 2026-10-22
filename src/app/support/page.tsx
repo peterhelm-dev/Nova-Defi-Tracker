@@ -14,7 +14,7 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "My balance or a token is missing.",
-    a: "With an Alchemy key, Novafolio lists the tokens that indexer returns on Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Avalanche. Without that key, only native coins and a short list of major tokens are read, so other balances stay hidden. DeFi positions are manual unless you track them yourself. Solana isn't included.",
+    a: "With an Alchemy key, Novafolio lists the tokens that indexer returns on Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Avalanche. Without that key, only native coins and a short list of major tokens are read, so other balances stay hidden. Aave v3 supply and borrow, Compound v3, and common staking tokens are read on-chain and shown as positions, so those receipt tokens are not also counted as cash. Anything else is still manual. Solana isn't included.",
   },
   {
     q: "Where is my history stored?",
