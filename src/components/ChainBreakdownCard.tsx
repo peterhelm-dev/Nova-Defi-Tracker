@@ -3,7 +3,7 @@
 import { formatChainName, formatUsd } from "@/lib/format";
 import { ChainIcon } from "./ChainIcon";
 
-const COLORS = ["#0052ff", "#33c9eb", "#7c5cff", "#22c55e", "#f59e0b", "#ec4899", "#14b8a6", "#a3a3a3"];
+const COLORS = ["#c4784a", "#8fbf98", "#e0a36a", "#7f9aa8", "#d4c4b2", "#a66b4a", "#6e8f84", "#a89888"];
 
 export type ChainTotal = { chain: string; valueUsd: number };
 

@@ -35,6 +35,10 @@ async function mockApiRoutes(page: Page) {
 
 test.describe("Dashboard", () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      if (localStorage.getItem("nova:e2e-tour") === "1") return;
+      localStorage.setItem("nova:tour-complete", "true");
+    });
     await mockApiRoutes(page);
   });
 
@@ -48,7 +52,7 @@ test.describe("Dashboard", () => {
         name: "Track all your crypto wallets in one place",
       }),
     ).toBeVisible();
-    await expect(page.getByText(/Read-only and non-custodial/)).toBeVisible();
+    await expect(page.getByText(/Read-only and non-custodial/).first()).toBeVisible();
   });
 
   test("loads, searches, and sorts the DeFi pools section", async ({
@@ -152,6 +156,11 @@ test.describe("Dashboard", () => {
     await page.getByRole("button", { name: "Add wallet" }).click();
     await expect(page.getByText("vitalik.eth")).toBeVisible();
     await expect(page.getByText("$3,000").first()).toBeVisible();
+
+    await page.getByRole("button", { name: "Customize" }).click();
+    await page.getByLabel("Nickname").fill("Cold storage");
+    await page.getByLabel("Nickname").blur();
+    await expect(page.getByText("Cold storage")).toBeVisible();
   });
 
   test("tracks a DeFi pool position", async ({ page }) => {
@@ -169,5 +178,25 @@ test.describe("Dashboard", () => {
     const trackedRow = page.locator("ul li", { hasText: "Aerodrome" });
     await expect(trackedRow).toBeVisible();
     await expect(trackedRow).toContainText("$500.00");
+  });
+
+  test("shows a skippable tour once and can replay it from settings", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("nova:e2e-tour", "1");
+      if (sessionStorage.getItem("nova:e2e-tour-started") === "1") return;
+      localStorage.removeItem("nova:tour-complete");
+      sessionStorage.setItem("nova:e2e-tour-started", "1");
+    });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "This is Novafolio" })).toBeVisible();
+    await page.getByRole("button", { name: "Skip", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "This is Novafolio" })).toHaveCount(0);
+
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "This is Novafolio" })).toHaveCount(0);
+
+    await page.goto("/settings");
+    await page.getByRole("button", { name: "Replay the tour" }).click();
+    await expect(page.getByRole("heading", { name: "This is Novafolio" })).toBeVisible();
   });
 });

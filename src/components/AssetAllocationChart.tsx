@@ -1,18 +1,18 @@
 "use client";
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { formatUsd } from "@/lib/format";
+import { formatChainName, formatUsd } from "@/lib/format";
 import type { TokenHolding } from "@/types";
 
 const COLORS = [
-  "#0052ff",
-  "#33c9eb",
-  "#7c5cff",
-  "#22c55e",
-  "#f59e0b",
-  "#ec4899",
-  "#14b8a6",
-  "#a3a3a3",
+  "#c4784a",
+  "#8fbf98",
+  "#e0a36a",
+  "#7f9aa8",
+  "#d4c4b2",
+  "#a66b4a",
+  "#6e8f84",
+  "#a89888",
 ];
 
 type AssetAllocationChartProps = {
@@ -24,11 +24,21 @@ export function AssetAllocationChart({
   holdings,
   defiUsd,
 }: AssetAllocationChartProps) {
+  const priced = holdings.filter((holding) => holding.valueUsd > 0);
+  const symbolCount = new Map<string, number>();
+  for (const holding of priced) {
+    symbolCount.set(holding.symbol, (symbolCount.get(holding.symbol) ?? 0) + 1);
+  }
   const slices = [
-    ...holdings
-      .filter((h) => h.valueUsd > 0)
-      .map((h) => ({ name: h.symbol, value: h.valueUsd })),
-    ...(defiUsd > 0 ? [{ name: "DeFi positions", value: defiUsd }] : []),
+    ...priced.map((holding) => ({
+      id: `${holding.chain}:${holding.address}:${holding.symbol}`,
+      name:
+        (symbolCount.get(holding.symbol) ?? 0) > 1
+          ? `${holding.symbol} · ${formatChainName(holding.chain)}`
+          : holding.symbol,
+      value: holding.valueUsd,
+    })),
+    ...(defiUsd > 0 ? [{ id: "defi", name: "DeFi positions", value: defiUsd }] : []),
   ].sort((a, b) => b.value - a.value);
 
   return (
@@ -53,12 +63,12 @@ export function AssetAllocationChart({
                   strokeWidth={0}
                 >
                   {slices.map((slice, index) => (
-                    <Cell key={slice.name} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={slice.id} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: "#0d0f17",
+                    background: "#2a211b",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 12,
                   }}
@@ -69,7 +79,7 @@ export function AssetAllocationChart({
           </div>
           <ul className="mt-2 flex flex-wrap gap-3 text-xs text-white/60">
             {slices.map((slice, index) => (
-              <li key={slice.name} className="flex items-center gap-1.5">
+              <li key={slice.id} className="flex items-center gap-1.5">
                 <span
                   className="h-2 w-2 rounded-full"
                   style={{ background: COLORS[index % COLORS.length] }}

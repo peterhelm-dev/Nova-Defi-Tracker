@@ -11,6 +11,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Primary"
+      data-tour="nav"
       className="fixed inset-x-0 bottom-0 z-20 flex min-[600px]:hidden border-t border-border-subtle bg-background-sidebar px-2 pb-[env(safe-area-inset-bottom)]"
     >
       {BOTTOM_NAV_ITEMS.map((item) => {

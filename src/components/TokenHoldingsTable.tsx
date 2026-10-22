@@ -188,6 +188,7 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
                       iconUrl={holding.iconUrl}
                       symbol={holding.symbol}
                       chain={holding.chain}
+                      address={holding.address}
                     />
                     <div>
                       <p className="font-medium text-white">{holding.symbol}</p>

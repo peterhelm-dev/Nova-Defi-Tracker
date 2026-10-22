@@ -42,8 +42,8 @@ export function NetWorthChart({ history }: { history: NetWorthSnapshot[] }) {
             <AreaChart data={history} margin={{ top: 16, right: 8, left: 8, bottom: 0 }}>
               <defs>
                 <linearGradient id="netWorthFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0052ff" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#0052ff" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#c4784a" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#c4784a" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
@@ -63,7 +63,7 @@ export function NetWorthChart({ history }: { history: NetWorthSnapshot[] }) {
               />
               <Tooltip
                 contentStyle={{
-                  background: "#0d0f17",
+                  background: "#2a211b",
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 12,
                 }}
@@ -73,7 +73,7 @@ export function NetWorthChart({ history }: { history: NetWorthSnapshot[] }) {
               <Area
                 type="monotone"
                 dataKey="totalUsd"
-                stroke="#0052ff"
+                stroke="#c4784a"
                 strokeWidth={2}
                 fill="url(#netWorthFill)"
               />

@@ -43,6 +43,8 @@ const CHAIN_LABELS: Record<string, string> = {
   polygon: "Polygon",
   avalanche: "Avalanche",
   "binance-smart-chain": "BNB Chain",
+  bsc: "BNB Chain",
+  binance: "BNB Chain",
   xdai: "Gnosis",
   fantom: "Fantom",
   "zksync-era": "zkSync Era",
@@ -54,7 +56,8 @@ const CHAIN_LABELS: Record<string, string> = {
 /** Human-readable label for a Zerion/DeFiLlama chain id, e.g. "base" -> "Base". */
 export function formatChainName(chainId: string): string {
   if (!chainId) return "Unknown";
-  if (CHAIN_LABELS[chainId]) return CHAIN_LABELS[chainId];
+  const key = chainId.trim().toLowerCase();
+  if (CHAIN_LABELS[key]) return CHAIN_LABELS[key];
   return chainId
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

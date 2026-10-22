@@ -28,7 +28,7 @@ import { TokenHoldingsTable } from "./TokenHoldingsTable";
 import { TokenPnlCard } from "./TokenPnlCard";
 import { TopMoversCard } from "./TopMoversCard";
 import { WalletBook } from "./WalletBook";
-import { WalletConnectButton } from "./WalletConnectButton";
+import { playUiSound } from "@/lib/sounds";
 
 export function Dashboard() {
   const isClient = useIsClient();
@@ -90,22 +90,19 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-      <WalletBook
-        connectedAddress={connected}
-        wallets={book.wallets}
-        saved={book.saved}
-        onAdd={book.addWatch}
-        onRemove={book.removeWallet}
-        onKeep={book.keepConnected}
-      />
-
       {addresses.length === 0 ? (
-        <div className="flex flex-col items-center gap-3">
-          <EmptyWalletState />
-          <WalletConnectButton />
-        </div>
+        <EmptyWalletState onAdd={book.addWatch} />
       ) : (
         <>
+          <WalletBook
+            connectedAddress={connected}
+            wallets={book.wallets}
+            saved={book.saved}
+            onAdd={book.addWatch}
+            onRemove={book.removeWallet}
+            onKeep={book.keepConnected}
+            onUpdateIdentity={book.updateIdentity}
+          />
           {portfolio?.coverage === "major-tokens" ? (
             <p className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-2.5 text-sm text-foreground">
               Showing major tokens from public data. An Alchemy API key detects
@@ -131,6 +128,10 @@ export function Dashboard() {
             isLoading={isLoading}
             pricesUnavailable={auto.isError}
             pricesUpdatedAt={portfolio?.updatedAt}
+            onRefresh={async () => {
+              await auto.refetch();
+              playUiSound("refresh");
+            }}
           />
           <PerformanceCard history={history} />
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

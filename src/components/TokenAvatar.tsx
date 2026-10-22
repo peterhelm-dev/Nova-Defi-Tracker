@@ -1,3 +1,4 @@
+import { tokenIconSources } from "@/lib/tokenIcons";
 import { IconImg } from "./IconImg";
 import { ChainIcon } from "./ChainIcon";
 
@@ -5,16 +6,23 @@ type TokenAvatarProps = {
   iconUrl: string | null;
   symbol: string;
   chain: string;
+  address?: string | null;
   size?: number;
 };
 
-/** Coin logo with a small chain-logo badge overlaid bottom-right, like most wallet UIs. */
-export function TokenAvatar({ iconUrl, symbol, chain, size = 24 }: TokenAvatarProps) {
+/** Coin logo with the chain's own mark overlaid bottom-right. */
+export function TokenAvatar({ iconUrl, symbol, chain, address, size = 24 }: TokenAvatarProps) {
+  const badge = Math.max(12, Math.round(size * 0.5));
   return (
     <span className="relative inline-flex shrink-0" style={{ width: size, height: size }}>
-      <IconImg src={iconUrl} alt={symbol} fallbackText={symbol} size={size} />
-      <span className="absolute -right-0.5 -bottom-0.5">
-        <ChainIcon chain={chain} size={Math.max(10, Math.round(size * 0.5))} />
+      <IconImg
+        sources={tokenIconSources({ iconUrl, chain, address })}
+        alt={symbol}
+        fallbackText={symbol}
+        size={size}
+      />
+      <span className="absolute -right-1 -bottom-1">
+        <ChainIcon chain={chain} size={badge} />
       </span>
     </span>
   );
