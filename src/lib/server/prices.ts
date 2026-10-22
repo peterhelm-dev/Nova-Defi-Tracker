@@ -6,21 +6,28 @@ import type { PricePoint, PriceResponse } from "@/types";
 /**
  * Spot prices for the curated Base list and ETH.
  *
- * CoinGecko's free `simple/token_price` endpoint now rejects more than one
- * contract address per call (error 10012). The old route sent the whole list
- * in one request, so any failure — including that 400 — became a 502 even
- * when the ETH price call succeeded. Vercel's shared IPs also get rate-limited
- * on the keyless host.
+ * Alchemy's Prices API is the primary source and uses the same ALCHEMY_API_KEY
+ * as portfolio detection. If that app has Allowlist Domains turned on, a
+ * server fetch with no Origin is rejected ("Unspecified origin not on
+ * whitelist") and the whole route used to 502. Calls send this site's origin
+ * and, on that 403, try the other Novafolio origin and then no Origin.
  *
- * Alchemy's Prices API uses the same ALCHEMY_API_KEY as portfolio detection
- * (40 compute units, well inside the free 30M/month) and is the primary
- * source. CoinGecko, with an optional Demo key, is the fallback.
+ * CoinGecko is the fallback. Its free token endpoint allows one contract
+ * address per call (error 10012), and a 429 on the old all-in-one batch threw
+ * away every token. Non-Pro keys request one address at a time and keep
+ * whatever comes back. The last payload that contained a price is reused when
+ * a later refresh is empty.
  */
 
 const PRICE_CACHE_SECONDS = 600;
 const CHART_CACHE_SECONDS = 900;
+/** Alchemy by-address accepts at most 25 contracts per call. */
+export const ALCHEMY_ADDRESS_LIMIT = 25;
 
 const ALCHEMY_PRICES = "https://api.g.alchemy.com/prices/v1";
+const NOVAFOLIO_ORIGINS = ["https://www.novafolio.app", "https://novafolio.app"];
+const COINGECKO_SINGLE_CONCURRENCY = 2;
+const COINGECKO_MAX_CONSECUTIVE_429 = 2;
 
 const ALCHEMY_NETWORK_BY_CHAIN: Record<string, string> = {
   ethereum: "eth-mainnet",
@@ -111,6 +118,63 @@ export function priceResponseHasData(prices: PriceResponse): boolean {
   return Object.values(prices.tokens).some((quote) => typeof quote.usd === "number");
 }
 
+export function chunkItems<T>(items: T[], size: number): T[][] {
+  if (items.length === 0) return [];
+  const width = Math.max(1, size);
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += width) chunks.push(items.slice(i, i + width));
+  return chunks;
+}
+
+/** Alchemy returns this when a key's domain allowlist is on and the request has no Origin. */
+export function shouldRetryAlchemyWithoutOrigin(status: number, body: string): boolean {
+  return status === 403 && /whitelist/i.test(body);
+}
+
+export function mergePriceResponses(parts: Array<PriceResponse | null | undefined>): PriceResponse {
+  const tokens: PriceResponse["tokens"] = {};
+  let eth: PriceResponse["eth"];
+  for (const part of parts) {
+    if (!part) continue;
+    mergeQuotes(tokens, part.tokens);
+    if (typeof part.eth?.usd === "number") {
+      eth = { usd: part.eth.usd, usd_24h_change: part.eth.usd_24h_change ?? eth?.usd_24h_change };
+    } else if (part.eth?.usd_24h_change !== undefined && eth) {
+      eth = { ...eth, usd_24h_change: part.eth.usd_24h_change };
+    }
+  }
+  return { tokens, eth };
+}
+
+/** A partial fresh payload wins. Otherwise keep the last payload that had any price. */
+export function chooseSpotPrices(fresh: PriceResponse | null, lastGood: PriceResponse | null): PriceResponse | null {
+  if (fresh && priceResponseHasData(fresh)) return fresh;
+  if (lastGood && priceResponseHasData(lastGood)) return lastGood;
+  return null;
+}
+
+/** Configured site origin, then both public Novafolio origins. */
+export function alchemyOriginsToTry(configured?: string): string[] {
+  const preferred = configured ?? siteOrigin();
+  const seen = new Set<string>();
+  const origins: string[] = [];
+  for (const origin of [preferred, ...NOVAFOLIO_ORIGINS]) {
+    if (!origin || seen.has(origin)) continue;
+    seen.add(origin);
+    origins.push(origin);
+  }
+  return origins;
+}
+
+export function siteOrigin(): string {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() || NOVAFOLIO_ORIGINS[0];
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return NOVAFOLIO_ORIGINS[0];
+  }
+}
+
 /** CoinGecko free tier: "Number of contract addresses ... exceeds the allowed limit of 1". */
 export function isCoinGeckoContractLimit(status: number, body: string): boolean {
   return status === 400 && /contract address/i.test(body);
@@ -146,31 +210,77 @@ function mergeQuotes(
   }
 }
 
+type AlchemyHttpResult =
+  | { ok: true; status: number; json: unknown }
+  | { ok: false; status: number; body: string };
+
+async function readAlchemy(url: string, init: RequestInit, headers: Headers): Promise<AlchemyHttpResult> {
+  try {
+    const res = await fetch(url, { ...init, headers, cache: "no-store" });
+    const body = await res.text();
+    if (!res.ok) return { ok: false, status: res.status, body };
+    try {
+      return { ok: true, status: res.status, json: body ? JSON.parse(body) : {} };
+    } catch {
+      return { ok: false, status: res.status, body };
+    }
+  } catch {
+    return { ok: false, status: 0, body: "" };
+  }
+}
+
+/**
+ * Sends the site Origin so an Alchemy domain allowlist can accept a server
+ * call. A whitelist 403 tries the other Novafolio origins, then one request
+ * with no Origin. The URL is never logged — it contains the API key.
+ */
+async function alchemyFetch(url: string, init: RequestInit = {}): Promise<AlchemyHttpResult> {
+  const baseHeaders = new Headers(init.headers);
+  if (!baseHeaders.has("accept")) baseHeaders.set("accept", "application/json");
+
+  let last: AlchemyHttpResult = { ok: false, status: 0, body: "" };
+  let sawWhitelist = false;
+
+  for (const origin of alchemyOriginsToTry()) {
+    const headers = new Headers(baseHeaders);
+    headers.set("origin", origin);
+    last = await readAlchemy(url, init, headers);
+    if (last.ok) return last;
+    if (!shouldRetryAlchemyWithoutOrigin(last.status, last.body)) break;
+    sawWhitelist = true;
+  }
+
+  if (sawWhitelist) {
+    const headers = new Headers(baseHeaders);
+    last = await readAlchemy(url, init, headers);
+  }
+
+  if (!last.ok) console.error(`Alchemy prices request failed (${last.status})`);
+  return last;
+}
+
 async function alchemySpotPrices(apiKey: string): Promise<PriceResponse | null> {
-  const [symbolRes, addressRes] = await Promise.all([
-    fetch(`${ALCHEMY_PRICES}/${apiKey}/tokens/by-symbol?symbols=ETH`, { cache: "no-store" }),
-    fetch(`${ALCHEMY_PRICES}/${apiKey}/tokens/by-address`, {
-      method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json" },
-      body: JSON.stringify({
-        addresses: BASE_TOKENS.map((token) => ({
-          network: "base-mainnet",
-          address: token.address,
-        })),
+  const chunks = chunkItems(BASE_TOKENS, ALCHEMY_ADDRESS_LIMIT);
+  const [symbolRes, ...addressResults] = await Promise.all([
+    alchemyFetch(`${ALCHEMY_PRICES}/${apiKey}/tokens/by-symbol?symbols=ETH`),
+    ...chunks.map((chunk) =>
+      alchemyFetch(`${ALCHEMY_PRICES}/${apiKey}/tokens/by-address`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          addresses: chunk.map((token) => ({
+            network: "base-mainnet",
+            address: token.address,
+          })),
+        }),
       }),
-      cache: "no-store",
-    }),
+    ),
   ]);
 
-  if (!symbolRes.ok && !addressRes.ok) return null;
-
-  const symbols = symbolRes.ok
-    ? ((await symbolRes.json()) as { data?: AlchemySymbolItem[] }).data
-    : [];
-  const addresses = addressRes.ok
-    ? ((await addressRes.json()) as { data?: AlchemyAddressItem[] }).data
-    : [];
-
+  const symbols = symbolRes.ok ? (symbolRes.json as { data?: AlchemySymbolItem[] }).data : [];
+  const addresses = addressResults.flatMap((result) =>
+    result.ok ? ((result.json as { data?: AlchemyAddressItem[] }).data ?? []) : [],
+  );
   const mapped = mapAlchemySpotPrices(symbols, addresses);
   return priceResponseHasData(mapped) ? mapped : null;
 }
@@ -188,26 +298,50 @@ async function coinGeckoJson<T>(path: string): Promise<{ ok: true; json: T } | {
 }
 
 async function coinGeckoTokenPrices(addresses: string[]): Promise<Record<string, Quote>> {
-  const query = addresses.join(",");
-  const batch = await coinGeckoJson<Record<string, Quote>>(
-    `/simple/token_price/base?contract_addresses=${query}&vs_currencies=usd&include_24hr_change=true`,
-  );
-  if (batch.ok) return batch.json;
-  if (!isCoinGeckoContractLimit(batch.status, batch.body)) return {};
+  // Free and Demo plans reject more than one address (error 10012). Skipping
+  // that batch avoids burning a rate-limit slot on a call that cannot succeed.
+  // A Pro key may batch, then fall through to singles on any non-200.
+  if (process.env.COINGECKO_PLAN === "pro" && addresses.length > 1) {
+    const batch = await coinGeckoJson<Record<string, Quote>>(
+      `/simple/token_price/base?contract_addresses=${addresses.join(",")}&vs_currencies=usd&include_24hr_change=true`,
+    );
+    if (batch.ok) return batch.json;
+  }
+  return fetchCoinGeckoAddresses(addresses);
+}
 
+async function fetchCoinGeckoAddresses(addresses: string[]): Promise<Record<string, Quote>> {
   const merged: Record<string, Quote> = {};
   const queue = [...addresses];
-  const workers = Array.from({ length: Math.min(3, queue.length) }, async () => {
-    while (queue.length > 0) {
+  const state = { consecutive429: 0, stop: false };
+
+  async function worker() {
+    while (!state.stop) {
       const address = queue.shift();
       if (!address) return;
-      const single = await coinGeckoJson<Record<string, Quote>>(
-        `/simple/token_price/base?contract_addresses=${address}&vs_currencies=usd&include_24hr_change=true`,
-      );
-      if (single.ok) mergeQuotes(merged, single.json);
+      try {
+        const single = await coinGeckoJson<Record<string, Quote>>(
+          `/simple/token_price/base?contract_addresses=${address}&vs_currencies=usd&include_24hr_change=true`,
+        );
+        if (single.ok) {
+          state.consecutive429 = 0;
+          mergeQuotes(merged, single.json);
+          continue;
+        }
+        if (single.status === 429) {
+          state.consecutive429 += 1;
+          if (state.consecutive429 >= COINGECKO_MAX_CONSECUTIVE_429) state.stop = true;
+        } else {
+          state.consecutive429 = 0;
+        }
+      } catch {
+        // One network error should not drop prices already collected.
+      }
     }
-  });
-  await Promise.all(workers);
+  }
+
+  const workers = Math.min(COINGECKO_SINGLE_CONCURRENCY, queue.length);
+  await Promise.all(Array.from({ length: workers }, () => worker()));
   return merged;
 }
 
@@ -229,35 +363,57 @@ async function coinGeckoSpotPrices(): Promise<PriceResponse | null> {
   return priceResponseHasData(payload) ? payload : null;
 }
 
+function coversCuratedList(prices: PriceResponse): boolean {
+  if (typeof prices.eth?.usd !== "number") return false;
+  return BASE_TOKENS.every(
+    (token) => typeof prices.tokens[token.address.toLowerCase()]?.usd === "number",
+  );
+}
+
 async function loadSpotPrices(): Promise<PriceResponse> {
   const apiKey = process.env.ALCHEMY_API_KEY?.trim();
+  let alchemy: PriceResponse | null = null;
   if (apiKey) {
     try {
-      const alchemy = await alchemySpotPrices(apiKey);
-      if (alchemy) return alchemy;
-    } catch {
-      // Fall through to CoinGecko.
+      alchemy = await alchemySpotPrices(apiKey);
+    } catch (error) {
+      console.error("Alchemy spot prices failed", error instanceof Error ? error.message : "unknown");
     }
   }
 
-  const fallback = await coinGeckoSpotPrices();
-  if (!fallback) throw new Error("Price provider unavailable");
-  return fallback;
+  let coinGecko: PriceResponse | null = null;
+  if (!alchemy || !coversCuratedList(alchemy)) {
+    try {
+      coinGecko = await coinGeckoSpotPrices();
+    } catch (error) {
+      console.error("CoinGecko spot prices failed", error instanceof Error ? error.message : "unknown");
+    }
+  }
+
+  const merged = mergePriceResponses([coinGecko, alchemy]);
+  if (!priceResponseHasData(merged)) throw new Error("Price provider unavailable");
+  return merged;
 }
 
-const cachedSpotPrices = unstable_cache(loadSpotPrices, ["spot-prices-v2"], {
+const cachedSpotPrices = unstable_cache(loadSpotPrices, ["spot-prices-v4"], {
   revalidate: PRICE_CACHE_SECONDS,
 });
 
+let lastGoodPrices: PriceResponse | null = null;
+
 /**
- * USD prices for ETH and the curated Base tokens. Cached for 10 minutes.
- * Returns null only when both Alchemy and CoinGecko fail.
+ * USD prices for ETH and the curated Base tokens. A successful payload is
+ * cached for 10 minutes. A later empty refresh reuses the last payload that
+ * had a price. Returns null only when nothing usable was ever fetched.
  */
 export async function fetchPrices(): Promise<PriceResponse | null> {
   try {
-    return await cachedSpotPrices();
+    const fresh = await cachedSpotPrices();
+    const chosen = chooseSpotPrices(fresh, lastGoodPrices);
+    if (chosen) lastGoodPrices = chosen;
+    return chosen;
   } catch {
-    return null;
+    return chooseSpotPrices(null, lastGoodPrices);
   }
 }
 
@@ -304,14 +460,13 @@ async function alchemyHistory(chain: string, address: string, days: number): Pro
     body.address = address;
   }
 
-  const res = await fetch(`${ALCHEMY_PRICES}/${apiKey}/tokens/historical`, {
+  const res = await alchemyFetch(`${ALCHEMY_PRICES}/${apiKey}/tokens/historical`, {
     method: "POST",
-    headers: { "content-type": "application/json", accept: "application/json" },
+    headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
-    cache: "no-store",
   });
   if (!res.ok) return null;
-  const json = (await res.json()) as { data?: { prices?: HistoricalPriceItem[] } };
+  const json = res.json as { data?: { prices?: HistoricalPriceItem[] } };
   const points = mapHistoricalPrices(json.data?.prices);
   return points.length > 0 ? points : null;
 }
