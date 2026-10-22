@@ -246,6 +246,27 @@ export class PostgresStore implements UserDataStore {
     return rows.map((r) => ({ ...r, triggeredAt: Number(r.triggeredAt) })) as AlertEvent[];
   }
 
+  async getPreferences(address: string): Promise<Record<string, unknown>> {
+    const pool = await this.pool();
+    const { rows } = await pool.query(`SELECT payload FROM user_preferences WHERE address = $1`, [
+      address.toLowerCase(),
+    ]);
+    const payload = rows[0]?.payload;
+    return payload && typeof payload === "object" ? (payload as Record<string, unknown>) : {};
+  }
+
+  async putPreferences(address: string, preferences: Record<string, unknown>): Promise<void> {
+    const key = address.toLowerCase();
+    await this.ensureUser(key);
+    const pool = await this.pool();
+    await pool.query(
+      `INSERT INTO user_preferences (address, payload)
+       VALUES ($1, $2::jsonb)
+       ON CONFLICT (address) DO UPDATE SET payload = EXCLUDED.payload`,
+      [key, JSON.stringify(preferences)],
+    );
+  }
+
   async putAlertEvents(address: string, events: AlertEvent[]): Promise<void> {
     const key = address.toLowerCase();
     await this.ensureUser(key);

@@ -1,6 +1,7 @@
 "use client";
 
 import { formatPercent, formatUpdatedAt, formatUsd } from "@/lib/format";
+import { useDisplayMoney } from "@/lib/currency";
 import { maskValue, usePrivacyMode } from "@/lib/privacy";
 import type { TokenHolding } from "@/types";
 
@@ -35,6 +36,7 @@ export function NetWorthSummary({
     0,
   );
   const { privacyMode } = usePrivacyMode();
+  const { formatValue } = useDisplayMoney();
 
   return (
     <div className="rounded-2xl border border-border-subtle bg-surface p-6">
@@ -55,9 +57,9 @@ export function NetWorthSummary({
         <span
           key={isLoading ? "loading" : formatUsd(totalUsd)}
           className="figure-settle font-display text-4xl font-semibold tracking-tight text-foreground"
-          aria-label={isLoading ? undefined : `Total net worth ${formatUsd(totalUsd)}`}
+          aria-label={isLoading ? undefined : `Total net worth ${formatValue(totalUsd)}`}
         >
-          {isLoading ? "—" : maskValue(formatUsd(totalUsd), privacyMode)}
+          {isLoading ? "—" : maskValue(formatValue(totalUsd), privacyMode)}
         </span>
         {!isLoading && pricedValue > 0 && (
           <span
@@ -75,13 +77,13 @@ export function NetWorthSummary({
         <span>
           Wallet:{" "}
           <span className="font-medium text-white">
-            {maskValue(formatUsd(walletUsd), privacyMode)}
+            {maskValue(formatValue(walletUsd), privacyMode)}
           </span>
         </span>
         <span>
           DeFi positions:{" "}
           <span className="font-medium text-white">
-            {maskValue(formatUsd(defiUsd), privacyMode)}
+            {maskValue(formatValue(defiUsd), privacyMode)}
           </span>
         </span>
       </div>

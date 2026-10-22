@@ -1,7 +1,8 @@
 "use client";
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { formatChainName, formatUsd } from "@/lib/format";
+import { formatChainName } from "@/lib/format";
+import { useDisplayMoney } from "@/lib/currency";
 import type { TokenHolding } from "@/types";
 
 const COLORS = [
@@ -15,21 +16,26 @@ const COLORS = [
   "#a89888",
 ];
 
+type Slice = { id: string; name: string; value: number };
+
 type AssetAllocationChartProps = {
-  holdings: TokenHolding[];
-  defiUsd: number;
+  holdings?: TokenHolding[];
+  defiUsd?: number;
+  /** When set, the chart follows the balance grouping instead of raw holdings. */
+  slices?: Slice[];
 };
 
 export function AssetAllocationChart({
-  holdings,
-  defiUsd,
+  holdings = [],
+  defiUsd = 0,
+  slices: providedSlices,
 }: AssetAllocationChartProps) {
   const priced = holdings.filter((holding) => holding.valueUsd > 0);
   const symbolCount = new Map<string, number>();
   for (const holding of priced) {
     symbolCount.set(holding.symbol, (symbolCount.get(holding.symbol) ?? 0) + 1);
   }
-  const slices = [
+  const builtSlices = [
     ...priced.map((holding) => ({
       id: `${holding.chain}:${holding.address}:${holding.symbol}`,
       name:
@@ -40,6 +46,8 @@ export function AssetAllocationChart({
     })),
     ...(defiUsd > 0 ? [{ id: "defi", name: "DeFi positions", value: defiUsd }] : []),
   ].sort((a, b) => b.value - a.value);
+  const slices = providedSlices ?? builtSlices;
+  const { formatValue } = useDisplayMoney();
 
   return (
     <div className="rounded-2xl border border-white/10 bg-surface p-6">
@@ -72,7 +80,7 @@ export function AssetAllocationChart({
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 12,
                   }}
-                  formatter={(value) => formatUsd(Number(value))}
+                  formatter={(value) => formatValue(Number(value))}
                 />
               </PieChart>
             </ResponsiveContainer>

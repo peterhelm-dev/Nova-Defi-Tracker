@@ -18,6 +18,8 @@ export type AutoPortfolioState = {
   isLoading: boolean;
   isError: boolean;
   refetch: () => Promise<unknown>;
+  /** One portfolio per wallet, before they are merged. */
+  perWallet: AutoPortfolio[];
 };
 
 function mergeTokens(tokens: TokenHolding[]): TokenHolding[] {
@@ -90,5 +92,6 @@ export function useAutoPortfolio(addresses: string[]): AutoPortfolioState {
     isLoading: unique.length > 0 && queries.some((query) => query.isLoading),
     isError: unique.length > 0 && queries.every((query) => query.isError),
     refetch: () => Promise.all(queries.map((query) => query.refetch())),
+    perWallet: portfolios,
   };
 }

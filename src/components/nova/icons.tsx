@@ -80,6 +80,17 @@ export function ActivityIcon({ className = base }: IconProps) {
   );
 }
 
+export function ResearchIcon({ className = base }: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M5 5.5h9.2A2.3 2.3 0 0 1 16.5 7.8V19" />
+      <path d="M5 5.5A2.3 2.3 0 0 1 7.3 3.2H16.5" />
+      <path d="M5 5.5V18.7A2.3 2.3 0 0 0 7.3 21H16.5" />
+      <path d="M8.2 8.2h5.2M8.2 11.4h5.2" />
+    </Svg>
+  );
+}
+
 export function WatchlistIcon({ className = base }: IconProps) {
   return (
     <Svg className={className}>

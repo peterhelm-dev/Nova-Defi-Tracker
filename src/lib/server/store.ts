@@ -40,6 +40,9 @@ export interface UserDataStore {
   putAlertRules(address: string, rules: AlertRule[]): Promise<void>;
   getAlertEvents(address: string): Promise<AlertEvent[]>;
   putAlertEvents(address: string, events: AlertEvent[]): Promise<void>;
+  /** JSON preferences: dashboard layout, balance view, research watchlist. */
+  getPreferences(address: string): Promise<Record<string, unknown>>;
+  putPreferences(address: string, preferences: Record<string, unknown>): Promise<void>;
 }
 
 type Persisted = {
@@ -50,6 +53,7 @@ type Persisted = {
   customerAddress: Record<string, string>;
   alertRules: Record<string, AlertRule[]>;
   alertEvents: Record<string, AlertEvent[]>;
+  preferences: Record<string, Record<string, unknown>>;
 };
 
 const EMPTY: Persisted = {
@@ -60,6 +64,7 @@ const EMPTY: Persisted = {
   customerAddress: {},
   alertRules: {},
   alertEvents: {},
+  preferences: {},
 };
 
 function key(address: string): string {
@@ -187,6 +192,17 @@ class FileStore implements UserDataStore {
   async putAlertEvents(address: string, events: AlertEvent[]): Promise<void> {
     await this.load();
     this.data.alertEvents[key(address)] = events;
+    await this.flush();
+  }
+
+  async getPreferences(address: string): Promise<Record<string, unknown>> {
+    await this.load();
+    return this.data.preferences[key(address)] ?? {};
+  }
+
+  async putPreferences(address: string, preferences: Record<string, unknown>): Promise<void> {
+    await this.load();
+    this.data.preferences[key(address)] = preferences;
     await this.flush();
   }
 }

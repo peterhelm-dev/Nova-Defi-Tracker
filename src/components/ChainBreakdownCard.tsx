@@ -1,6 +1,8 @@
 "use client";
 
-import { formatChainName, formatUsd } from "@/lib/format";
+import { formatChainName } from "@/lib/format";
+import { useDisplayMoney } from "@/lib/currency";
+import { maskValue, usePrivacyMode } from "@/lib/privacy";
 import { ChainIcon } from "./ChainIcon";
 
 const COLORS = ["#c4784a", "#8fbf98", "#e0a36a", "#7f9aa8", "#d4c4b2", "#a66b4a", "#6e8f84", "#a89888"];
@@ -13,6 +15,8 @@ type ChainBreakdownCardProps = {
 
 /** Shows how net worth is distributed across chains. */
 export function ChainBreakdownCard({ totals }: ChainBreakdownCardProps) {
+  const { formatValue } = useDisplayMoney();
+  const { privacyMode } = usePrivacyMode();
   const positive = totals.filter((t) => t.valueUsd > 0).sort((a, b) => b.valueUsd - a.valueUsd);
   const grandTotal = positive.reduce((sum, t) => sum + t.valueUsd, 0);
 
@@ -43,7 +47,7 @@ export function ChainBreakdownCard({ totals }: ChainBreakdownCardProps) {
               </span>
               <span className="flex items-center gap-2 tabular-nums text-white/60">
                 <span>{pct.toFixed(1)}%</span>
-                <span className="font-medium text-white">{formatUsd(t.valueUsd)}</span>
+                <span className="font-medium text-white">{maskValue(formatValue(t.valueUsd), privacyMode)}</span>
               </span>
             </li>
           );

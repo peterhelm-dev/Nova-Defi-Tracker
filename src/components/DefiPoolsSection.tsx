@@ -5,6 +5,7 @@ import { useDefiPools } from "@/hooks/useDefiPools";
 import { toCsv } from "@/lib/csv";
 import { formatPercent, formatUsd } from "@/lib/format";
 import { protocolIconUrl } from "@/lib/chainIcons";
+import { POOL_DATA_UNAVAILABLE } from "@/lib/yields";
 import { ChainIcon } from "./ChainIcon";
 import { ExportCsvButton } from "./ExportCsvButton";
 import { IconImg } from "./IconImg";
@@ -24,6 +25,7 @@ export function DefiPoolsSection({
   onRemove,
 }: DefiPoolsSectionProps) {
   const { data, isLoading, isError } = useDefiPools();
+  const unavailable = isError || data?.unavailable === true;
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("tvl");
   const [trackingPoolId, setTrackingPoolId] = useState<string | null>(null);
@@ -73,29 +75,35 @@ export function DefiPoolsSection({
         <div>
           <p className="text-sm font-medium text-white/50">DeFi pools</p>
           <p className="text-xs text-white/40">
-            Live TVL and APY from DeFiLlama. Track a position to fold it into
-            your net worth. This does not move funds.
+            {unavailable
+              ? "Tracked positions below stay saved in this browser. Nothing here moves funds."
+              : "Live TVL and APY from the yields source. Track a position to fold it into your net worth. This does not move funds."}
           </p>
         </div>
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search project or pair…"
-            className="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-accent"
-          />
-          <select
-            value={sortKey}
-            onChange={(e) => setSortKey(e.target.value as SortKey)}
-            aria-label="Sort pools"
-            className="rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent"
-          >
-            <option value="tvl">Sort by TVL</option>
-            <option value="apy">Sort by APY</option>
-          </select>
-        </div>
+        {unavailable ? null : (
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search project or pair…"
+              className="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-accent"
+            />
+            <select
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value as SortKey)}
+              aria-label="Sort pools"
+              className="rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent"
+            >
+              <option value="tvl">Sort by TVL</option>
+              <option value="apy">Sort by APY</option>
+            </select>
+          </div>
+        )}
       </div>
 
+      {unavailable ? (
+        <p className="mt-4 text-sm text-text-muted">{POOL_DATA_UNAVAILABLE}</p>
+      ) : (
       <div className="mt-4 max-w-full overflow-x-auto">
         <table className="w-full min-w-[36rem] text-left text-sm">
           <thead>
@@ -114,14 +122,7 @@ export function DefiPoolsSection({
                 </td>
               </tr>
             )}
-            {isError && (
-              <tr>
-                <td colSpan={4} className="py-6 text-center text-amber-400">
-                  DeFi pool data is temporarily unavailable.
-                </td>
-              </tr>
-            )}
-            {!isLoading && !isError && pools.length === 0 && (
+            {!isLoading && pools.length === 0 && (
               <tr>
                 <td colSpan={4} className="py-6 text-center text-white/40">
                   No pools match your search.
@@ -208,6 +209,7 @@ export function DefiPoolsSection({
           </tbody>
         </table>
       </div>
+      )}
 
       <div className="mt-6 border-t border-white/10 pt-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
