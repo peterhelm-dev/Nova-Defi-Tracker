@@ -109,12 +109,14 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search token…"
-            className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white placeholder:text-white/30 focus:border-accent/50 focus:outline-none"
+            aria-label="Search tokens"
+            className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white placeholder:text-text-muted focus:border-accent/50 focus:outline-none"
           />
           {chains.length > 1 && (
             <select
               value={chainFilter}
               onChange={(e) => setChainFilter(e.target.value)}
+              aria-label="Filter by chain"
               className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white focus:border-accent/50 focus:outline-none"
             >
               <option value="all">All chains</option>
@@ -135,7 +137,7 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="text-xs uppercase tracking-wide text-white/40">
+            <tr className="text-xs uppercase tracking-wide text-text-muted">
               {COLUMNS.map((col) => (
                 <th
                   key={col.key}
@@ -156,21 +158,21 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
           <tbody className="divide-y divide-white/5">
             {isLoading && holdings.length === 0 && (
               <tr>
-                <td colSpan={COLUMNS.length} className="py-6 text-center text-white/40">
+                <td colSpan={COLUMNS.length} className="py-6 text-center text-text-muted">
                   Loading balances…
                 </td>
               </tr>
             )}
             {!isLoading && holdings.length === 0 && (
               <tr>
-                <td colSpan={COLUMNS.length} className="py-6 text-center text-white/40">
+                <td colSpan={COLUMNS.length} className="py-6 text-center text-text-muted">
                   No balances found for this wallet.
                 </td>
               </tr>
             )}
             {!isLoading && holdings.length > 0 && visible.length === 0 && (
               <tr>
-                <td colSpan={COLUMNS.length} className="py-6 text-center text-white/40">
+                <td colSpan={COLUMNS.length} className="py-6 text-center text-text-muted">
                   No holdings match your filters.
                 </td>
               </tr>
@@ -192,7 +194,7 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
                     />
                     <div>
                       <p className="font-medium text-white">{holding.symbol}</p>
-                      <p className="text-xs text-white/40">{holding.name}</p>
+                      <p className="text-xs text-text-muted">{holding.name}</p>
                     </div>
                   </div>
                 </td>
@@ -205,7 +207,7 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
                 <td
                   className={
                     holding.change24h === null
-                      ? "py-3 whitespace-nowrap text-white/40"
+                      ? "py-3 whitespace-nowrap text-text-muted"
                       : holding.change24h >= 0
                         ? "py-3 whitespace-nowrap text-emerald-400"
                         : "py-3 whitespace-nowrap text-red-400"

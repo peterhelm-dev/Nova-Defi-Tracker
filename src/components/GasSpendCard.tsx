@@ -39,7 +39,7 @@ export function GasSpendCard({ gas, isLoading, configured, isError }: GasSpendCa
       ) : null}
       {!isLoading && configured && gas && gas.txCount === 0 ? (
         <p className="mt-4 text-sm text-text-muted">
-          No outgoing transactions showed up in the last {gas.windowDays ?? 30} days. Each chain is capped at 20 recent transfers.
+          No outgoing transactions showed up in the last {gas.windowDays ?? 30} days. Each chain is capped at 6 recent transfers.
         </p>
       ) : null}
       {!isLoading && gas && gas.txCount > 0 ? (
@@ -95,7 +95,7 @@ export function GasSpendCard({ gas, isLoading, configured, isError }: GasSpendCa
             ) : null}
           </div>
           <p className="mt-3 text-xs text-text-muted">
-            Up to 20 recent outgoing transfers per chain{gas.windowDays ? `, inside ${gas.windowDays} days` : ""}. Cached so this doesn&apos;t rescan on every refresh.
+            Up to 6 recent outgoing transfers per chain{gas.windowDays ? `, inside ${gas.windowDays} days` : ""}. Cached so this doesn&apos;t rescan on every refresh.
           </p>
         </>
       ) : null}

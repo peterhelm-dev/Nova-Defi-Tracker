@@ -51,6 +51,7 @@ export default function SettingsPage() {
             type="button"
             role="switch"
             aria-checked={privacyMode}
+            aria-label="Privacy mode"
             onClick={togglePrivacyMode}
             className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ${
               privacyMode ? "bg-accent" : "bg-white/10"

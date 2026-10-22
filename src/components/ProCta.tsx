@@ -98,7 +98,7 @@ export function ProCta({
         type="button"
         onClick={() => run(billing.startCheckout)}
         disabled={busy}
-        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent/90 disabled:opacity-60"
+        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-text-inverse hover:bg-accent/90 disabled:opacity-60"
       >
         {busy ? "Redirecting…" : "Upgrade to Pro"}
       </button>

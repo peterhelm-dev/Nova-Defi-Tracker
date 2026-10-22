@@ -35,7 +35,7 @@ export function AutoDetectionBanner({
           {portfolio.tokens.length} assets and {portfolio.positions.length} DeFi
           positions across {chainCount} chain{chainCount === 1 ? "" : "s"}
         </span>
-        <span className="ml-auto text-xs text-white/40">
+        <span className="ml-auto text-xs text-text-muted">
           via {portfolio.provider} · updated {formatUpdatedAt(portfolio.updatedAt)}
         </span>
       </div>

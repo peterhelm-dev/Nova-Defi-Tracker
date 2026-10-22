@@ -7,12 +7,12 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Realized/unrealized PnL for the connected wallet. Zerion-only (see
- * ZerionProvider.getPnl) — degrades to `{ configured: false }` when no
- * indexer is set up, same contract as /api/portfolio.
+ * Cost-basis profit and loss. Novafolio does not estimate this from public
+ * transfers — that would invent a buy price. The cards stay hidden unless a
+ * Zerion key is present and actually returns a figure.
  *
  * With an `ids` query param (comma-separated fungible ids), returns a
- * per-token breakdown instead (see ZerionProvider.getTokenPnl).
+ * per-token breakdown when that key exists.
  */
 export async function GET(request: Request) {
   const sessionAddress = await getSessionAddress();
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
   const provider = getZerionProvider();
   if (!provider) {
-    return NextResponse.json({ configured: false });
+    return NextResponse.json({ configured: false, reason: "cost-basis" });
   }
 
   const idsParam = url.searchParams.get("ids");

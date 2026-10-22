@@ -100,7 +100,7 @@ export function TokenPriceChartModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-white/40 hover:text-white"
+            className="text-text-muted hover:text-white"
           >
             ✕
           </button>
@@ -114,7 +114,7 @@ export function TokenPriceChartModal({
               onClick={() => setDays(r.days)}
               className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                 days === r.days
-                  ? "bg-accent text-white"
+                  ? "bg-accent text-text-inverse"
                   : "bg-white/5 text-white/50 hover:text-white/80"
               }`}
             >
@@ -125,11 +125,11 @@ export function TokenPriceChartModal({
 
         <div className="mt-4 h-64 w-full">
           {isLoading ? (
-            <div className="flex h-full items-center justify-center text-sm text-white/40">
+            <div className="flex h-full items-center justify-center text-sm text-text-muted">
               Loading…
             </div>
           ) : !available || chartData.length === 0 ? (
-            <div className="flex h-full items-center justify-center text-center text-sm text-white/40">
+            <div className="flex h-full items-center justify-center text-center text-sm text-text-muted">
               Price history isn&apos;t available for this token.
             </div>
           ) : (
@@ -180,7 +180,7 @@ export function TokenPriceChartModal({
             </ResponsiveContainer>
           )}
         </div>
-        <p className="mt-3 text-xs text-white/30">
+        <p className="mt-3 text-xs text-text-muted">
           Token market price over time — not the historical USD value of your specific holding.
         </p>
       </div>

@@ -28,7 +28,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
               theme: "default",
             },
             wallet: {
-              display: "classic",
+              display: "modal",
+              termsUrl: "/terms",
+              privacyUrl: "/privacy",
               supportedWallets: { rabby: true, trust: false, frame: false },
             },
           }}

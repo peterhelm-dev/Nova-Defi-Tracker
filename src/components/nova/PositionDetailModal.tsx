@@ -73,9 +73,8 @@ export function PositionDetailModal({ onClose }: { onClose: () => void }) {
         </dl>
 
         <p className="mt-4 text-xs text-text-muted">
-          Estimated APY is variable, not guaranteed. Health factor and liquidation price are
-          illustrative sample values — connect a lending-position indexer to show these for real
-          positions.
+          Sample only. These figures are not a wallet you watch. Detected lending on the
+          portfolio page shows the health factor that was read onchain.
         </p>
       </div>
     </div>

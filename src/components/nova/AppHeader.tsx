@@ -37,7 +37,7 @@ export function AppHeader() {
           <SyncControl />
         </div>
         <Wallet>
-          <ConnectWallet className="bg-accent hover:bg-accent/90">
+          <ConnectWallet className="bg-accent text-text-inverse hover:bg-accent/90">
             <Avatar className="h-6 w-6" />
             <Name />
           </ConnectWallet>

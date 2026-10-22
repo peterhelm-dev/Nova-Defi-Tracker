@@ -10,6 +10,7 @@ import { useTrackedPositions } from "@/hooks/useTrackedPositions";
 import { useTokenPnl } from "@/hooks/useTokenPnl";
 import { useWalletBook } from "@/hooks/useWalletBook";
 import { useWalletPnl } from "@/hooks/useWalletPnl";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { usePreferences } from "@/hooks/usePreferences";
 import { allocationFromGroups, applyScope, groupBalances, isDust, type DefiSlice, type TaggedHolding } from "@/lib/balanceView";
@@ -21,8 +22,6 @@ import type { WidgetId } from "@/lib/dashboardLayout";
 import { AlertsCard } from "./AlertsCard";
 import { ApprovalsCard } from "./ApprovalsCard";
 import { DustCard } from "./DustCard";
-import { AssetAllocationChart } from "./AssetAllocationChart";
-import { BalanceBoard } from "./BalanceBoard";
 import { ChainBreakdownCard, type ChainTotal } from "./ChainBreakdownCard";
 import { DashboardGrid } from "./DashboardGrid";
 import { DefiPoolsSection } from "./DefiPoolsSection";
@@ -30,7 +29,6 @@ import { DetectedPositionsCard } from "./DetectedPositionsCard";
 import { DiversificationCard, type DiversificationItem } from "./DiversificationCard";
 import { EmptyWalletState } from "./EmptyWalletState";
 import { GasSpendCard } from "./GasSpendCard";
-import { NetWorthChart } from "./NetWorthChart";
 import { NetWorthSummary } from "./NetWorthSummary";
 import { RecentActivityCard } from "./nova/RecentActivityCard";
 import { PerformanceCard } from "./PerformanceCard";
@@ -38,6 +36,12 @@ import { PnlCard } from "./PnlCard";
 import { TokenPnlCard } from "./TokenPnlCard";
 import { TopMoversCard } from "./TopMoversCard";
 import { WalletBook } from "./WalletBook";
+
+const AssetAllocationChart = dynamic(() =>
+  import("./AssetAllocationChart").then((mod) => mod.AssetAllocationChart),
+);
+const BalanceBoard = dynamic(() => import("./BalanceBoard").then((mod) => mod.BalanceBoard));
+const NetWorthChart = dynamic(() => import("./NetWorthChart").then((mod) => mod.NetWorthChart));
 
 function walletLabels(wallets: { address: string; nickname?: string; label: string }[]): Map<string, string> {
   const titled = wallets.map((wallet) => ({
@@ -239,7 +243,7 @@ export function Dashboard() {
           ) : null}
           {auto.degraded && portfolio?.coverage !== "major-tokens" ? (
             <p className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-2.5 text-sm text-foreground">
-              The token indexer didn&apos;t respond, so this view fell back to major tokens.
+              Balances didn&apos;t fully load, so this view fell back to major tokens.
             </p>
           ) : null}
           {auto.isError ? (

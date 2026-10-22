@@ -11,7 +11,7 @@ export function useTokenPrices() {
       if (!res.ok) throw new Error("Failed to load token prices");
       return res.json();
     },
-    staleTime: 25_000,
-    refetchInterval: 60_000,
+    staleTime: 5 * 60_000,
+    refetchInterval: 5 * 60_000,
   });
 }

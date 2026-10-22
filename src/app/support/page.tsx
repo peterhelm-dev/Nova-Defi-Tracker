@@ -14,11 +14,11 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "My balance or a token is missing.",
-    a: "With an Alchemy key, Novafolio lists the tokens that indexer returns on Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Avalanche. Without that key, only native coins and a short list of major tokens are read, so other balances stay hidden. Aave v3 supply and borrow, Compound v3, and common staking tokens are read on-chain and shown as positions, so those receipt tokens are not also counted as cash. Anything else is still manual. Solana isn't included.",
+    a: "With an Alchemy key, Novafolio lists the tokens Alchemy returns on Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Avalanche. Without that key, only native coins and a short list of major tokens are read, so other balances stay hidden. Aave v3 supply and borrow, Compound v3, and common staking tokens are read on-chain and shown as positions, so those receipt tokens are not also counted as cash. Anything else is still manual. Solana isn't included.",
   },
   {
     q: "Where is my history stored?",
-    a: "Not signed in: in your browser only (localStorage), so clearing storage erases it. Signed in: on our servers keyed to your wallet address, synced across devices, with a daily server-side snapshot even when you don't visit.",
+    a: "Until you sign in, history stays in this browser (localStorage). Clearing storage erases it, and Novafolio does not receive it. Sign-in sync, including a daily snapshot, only happens on a deployment that has a database. Without one, sign-in is refused and nothing is written on the server.",
   },
   {
     q: "How do I cancel Pro?",
@@ -32,7 +32,7 @@ const FAQ: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "A price or APY looks wrong.",
-    a: "Prices come from CoinGecko. Pool TVL and APY come from a yields source and hide with a short note when that source is down. Token pages keep working. Pro holdings come from a portfolio indexer. All can lag. Treat every number as an estimate, not an oracle.",
+    a: "Spot prices come from Alchemy when that key is set, and from CoinGecko otherwise. Pool TVL and APY come from a yields source and hide with a short note when that source is down. Detected lending and staking are onchain reads priced with those same feeds. Novafolio does not estimate profit and loss, because that would invent a cost basis. Treat every number as an estimate, not an oracle.",
   },
   {
     q: "How do I delete my data?",

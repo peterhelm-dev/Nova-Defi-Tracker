@@ -94,7 +94,7 @@ export function NetWorthSummary({
         </p>
       )}
       {!pricesUnavailable && !!pricesUpdatedAt && (
-        <p className="mt-3 text-xs text-white/30">
+        <p className="mt-3 text-xs text-text-muted">
           Prices updated {formatUpdatedAt(pricesUpdatedAt)}
         </p>
       )}

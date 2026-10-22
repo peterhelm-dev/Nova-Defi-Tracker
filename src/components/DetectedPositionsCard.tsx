@@ -112,12 +112,14 @@ export function DetectedPositionsCard({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search…"
-            className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white placeholder:text-white/30 focus:border-accent/50 focus:outline-none"
+            aria-label="Search positions"
+            className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white placeholder:text-text-muted focus:border-accent/50 focus:outline-none"
           />
           {protocols.length > 1 && (
             <select
               value={protocolFilter}
               onChange={(e) => setProtocolFilter(e.target.value)}
+              aria-label="Filter by protocol"
               className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white focus:border-accent/50 focus:outline-none"
             >
               <option value="all">All protocols</option>
@@ -132,6 +134,7 @@ export function DetectedPositionsCard({
             <select
               value={chainFilter}
               onChange={(e) => setChainFilter(e.target.value)}
+              aria-label="Filter by chain"
               className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white focus:border-accent/50 focus:outline-none"
             >
               <option value="all">All chains</option>
@@ -145,7 +148,7 @@ export function DetectedPositionsCard({
         </div>
       </div>
       {groups.length === 0 ? (
-        <p className="py-4 text-center text-sm text-white/40">
+        <p className="py-4 text-center text-sm text-text-muted">
           No positions match your filters.
         </p>
       ) : (
@@ -178,7 +181,7 @@ export function DetectedPositionsCard({
                         />
                         <div className="min-w-0">
                           <p className="truncate text-sm text-white/90">{row.position.name}</p>
-                          <p className="truncate text-xs text-white/40 capitalize">
+                          <p className="truncate text-xs text-text-muted capitalize">
                             {formatChainName(row.position.chain)}
                             {typeof row.position.amount === "number"
                               ? ` · ${row.position.amount.toLocaleString("en-US", { maximumFractionDigits: 4 })}`
@@ -210,7 +213,7 @@ export function DetectedPositionsCard({
                             <p className="truncate text-sm text-white/90">
                               {row.legs.map((l) => l.symbol).join(" / ")}
                             </p>
-                            <p className="truncate text-xs text-white/40 capitalize">
+                            <p className="truncate text-xs text-text-muted capitalize">
                               {row.legs[0].kind} · liquidity pool
                             </p>
                           </div>
@@ -233,7 +236,7 @@ export function DetectedPositionsCard({
                           />
                         ))}
                       </div>
-                      <div className="mt-1 flex justify-between text-[11px] text-white/40">
+                      <div className="mt-1 flex justify-between text-[11px] text-text-muted">
                         {row.legs.map((leg) => (
                           <span key={leg.id}>
                             {leg.symbol}{" "}

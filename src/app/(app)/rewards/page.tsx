@@ -4,7 +4,7 @@ export default function RewardsPage() {
   return (
     <ComingSoonPage
       title="Rewards"
-      description="Staking and reward tracking will live here once a protocol data source is connected."
+      description="Common staking tokens already show on the portfolio as staking positions. This page does not claim or compound rewards."
     />
   );
 }

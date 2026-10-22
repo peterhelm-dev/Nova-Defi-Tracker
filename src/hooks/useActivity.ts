@@ -12,10 +12,8 @@ export type ActivityState = {
 };
 
 /**
- * Fetches recent onchain activity. No polling interval and a long
- * staleTime — same rate-limit reasoning as useWalletPnl/useGasSpend, and it
- * shares a query key (and therefore the Zerion fetch cache) with the gas
- * summary since both read the same transactions page.
+ * Recent transfers. Cached on the server for 10 minutes. No polling, so an
+ * open tab does not keep asking Alchemy.
  */
 export function useActivity(address: string | undefined, limit = 20): ActivityState {
   const enabled = !!address;

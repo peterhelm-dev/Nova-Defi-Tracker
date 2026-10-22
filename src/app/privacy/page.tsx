@@ -9,66 +9,81 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <InfoPage title="Privacy Policy" updated="June 30, 2026">
+    <InfoPage title="Privacy Policy" updated="October 22, 2026">
       <p>
         Novafolio is built to need as little of your data as
         possible. No email or password is required to use it, and there is no
-        advertising or cross-site tracking. This page describes exactly what is
-        stored, where, and why.
+        advertising or cross-site tracking. This page describes what is
+        stored, where, and why. Wallet addresses are already public onchain.
       </p>
 
-      <h2>Guest mode (not signed in)</h2>
+      <h2>In this browser</h2>
       <p>
-        Everything stays in your browser. Net-worth history and manually
-        tracked positions live in <code>localStorage</code> on your device; we
-        store nothing about you on our servers. Clearing browser storage erases
-        this data.
+        Until you sign in, and on any deployment without an account database,
+        Novafolio keeps your choices in <code>localStorage</code> on your device:
       </p>
+      <ul>
+        <li>wallet addresses you paste, plus any nickname you give them,</li>
+        <li>dashboard layout, balance view, and currency display,</li>
+        <li>tokens and pools you save in Research,</li>
+        <li>DeFi positions you track by hand,</li>
+        <li>net-worth snapshots taken while this browser has the app open,</li>
+        <li>whether sound, the tour, and privacy mode are on.</li>
+      </ul>
+      <p>Clearing browser storage erases that. We do not receive it.</p>
 
       <h2>When you sign in</h2>
       <p>
-        Signing in with your wallet (Sign-In With Ethereum) creates an account
-        keyed to your <strong>wallet address</strong> — that address is the
-        only identifier we hold. We then store, associated with it:
+        Signing in is optional. It uses a signed message (Sign-In With Ethereum)
+        and, only when this deployment has a database, creates an account keyed
+        to your <strong>wallet address</strong>. That address is the identifier.
+        Associated with it, the server can store:
       </p>
       <ul>
         <li>daily net-worth snapshots (dates and USD totals),</li>
         <li>DeFi positions you track manually,</li>
+        <li>dashboard and Research preferences,</li>
+        <li>price-alert rules you create, and alerts that have fired,</li>
         <li>
-          subscription state if you buy Pro (plan, status, and Stripe
-          customer/subscription IDs — never card details).
+          subscription state if a paid plan is ever offered (plan, status, and
+          Stripe customer/subscription IDs — never card details).
         </li>
       </ul>
       <p>
-        Sessions use a signed, http-only cookie containing your wallet address
-        and an expiry. We never see or store your private keys.
+        Without a database, sign-in is refused and nothing above is written on
+        the server. Sessions use a signed, http-only cookie containing your
+        wallet address and an expiry. We never see or store your private keys,
+        and the app never asks you to sign a transaction.
       </p>
 
       <h2>Third parties</h2>
       <ul>
         <li>
-          <strong>Blockchain RPC</strong> — reading balances sends your wallet
-          address to a Base RPC endpoint (Coinbase&apos;s or a public one).
+          <strong>Chain reads</strong> — balances, Aave and Compound positions,
+          staking tokens, allowances, and gas prices send the wallet address to
+          Alchemy when that key is set, otherwise to public RPC endpoints, on
+          Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Avalanche.
         </li>
         <li>
-          <strong>Price &amp; pool data</strong> — CoinGecko and DeFiLlama are
-          queried by our server for market-wide data; your address is not sent
-          to them.
+          <strong>Transfers</strong> — recent activity and the gas report send
+          the address to Alchemy. They are not requested when that key is absent.
         </li>
         <li>
-          <strong>Token detection</strong> — your wallet address is sent to
-          Alchemy when an API key is configured, so tokens can be listed across
-          chains. Without that key, Novafolio reads a short list of major tokens from
-          public RPCs instead. Wallet addresses are already public onchain.
+          <strong>Prices and pools</strong> — Alchemy Prices, CoinGecko, and
+          DeFiLlama are queried for market-wide data. Your address is not sent
+          to CoinGecko or DeFiLlama.
         </li>
         <li>
-          <strong>Payments</strong> — Stripe processes payments and holds your
-          payment details under its own privacy policy.
+          <strong>revoke.cash</strong> — approval links open that site with the
+          address and chain in the URL. Novafolio does not call revoke.cash itself.
         </li>
         <li>
-          <strong>Analytics</strong> — if enabled, we use cookie-less,
-          privacy-respecting analytics (Plausible) that counts aggregate page
-          views only; it does not identify you or follow you across sites.
+          <strong>Payments</strong> — Stripe is unused unless a paid plan is
+          turned on. If it is, Stripe holds payment details under its own policy.
+        </li>
+        <li>
+          <strong>Analytics</strong> — if enabled, we use cookie-less Plausible,
+          which counts aggregate page views and does not identify you.
         </li>
       </ul>
 

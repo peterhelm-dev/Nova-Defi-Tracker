@@ -4,7 +4,8 @@ import { siteOrigin } from "@/lib/server/prices";
 import { ALCHEMY_NETWORKS } from "@/lib/server/portfolio/alchemy";
 import { getNetworkCosts } from "@/lib/server/networkCosts";
 
-const MAX_PER_CHAIN = 20;
+/** Kept small on purpose: each hash needs a receipt, and the free plan is 30M compute units a month. */
+const MAX_PER_CHAIN = 6;
 
 type TransferRow = {
   hash?: string;

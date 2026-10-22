@@ -1,4 +1,5 @@
 import { Footer } from "@/components/Footer";
+import { RouteTitle } from "@/components/RouteTitle";
 import { GuidedTour } from "@/components/GuidedTour";
 import { PageTransition } from "@/components/PageTransition";
 import { AppHeader } from "./AppHeader";
@@ -18,7 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-text-inverse"
       >
         Skip to content
       </a>
@@ -27,13 +28,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <AppHeader />
         <main
           id="main-content"
-          className="relative mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 min-[1200px]:px-8"
+          tabIndex={-1}
+          className="relative mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 outline-none min-[1200px]:px-8"
         >
           <PageTransition>{children}</PageTransition>
         </main>
         <Footer className="pb-24 min-[600px]:pb-6" />
       </div>
       <BottomNav />
+      <RouteTitle />
       <GuidedTour />
     </div>
   );

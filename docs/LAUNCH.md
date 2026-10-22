@@ -20,6 +20,14 @@ host only for image URLs.
   wallets, stored in the browser.
 - Token balances on Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and
   Avalanche.
+- Aave v3 supply and borrow, Compound v3, and common liquid staking tokens,
+  read onchain. Receipt tokens are not also counted as cash. Anything else
+  stays on manual “Track”.
+- Research: token and pool pages, a true-yield estimate, and a before-you-deposit
+  checklist. Compare and saved items stay in the browser.
+- Open ERC-20 approvals (with revoke.cash links), dust versus gas, and a short
+  gas and transfer history. Those three need the Alchemy key. Profit and loss
+  is not estimated.
 - DeFi pool list for those chains, with manual “Track” and CSV export.
 - Pro is labeled **coming soon**. There is no checkout unless Stripe and a
   database are both configured later.
@@ -57,13 +65,29 @@ The dashboard says so. Nothing crashes.
 
 The same Alchemy key prices the curated token list (`/api/prices`) and fills
 in a chart when CoinGecko is rate-limited. You do not need a separate price
-key. Server price calls send an `Origin` header (`NEXT_PUBLIC_SITE_URL`, plus
-`https://novafolio.app` and `https://www.novafolio.app`). If the Alchemy app
-has **Allowlist Domains** turned on, add both of those domains — a request
-with no `Origin` is rejected with "Unspecified origin not on whitelist," which
-is what made `/api/prices` return 502. Leave **Allowlist IPs** empty; Vercel
-addresses change. CoinGecko's free token endpoint allows only one contract
-address per call, so the fallback asks for one token at a time.
+key. Leave the Alchemy app’s Security tab fully open, which is the right
+setup for server calls from Vercel. CoinGecko’s free token endpoint allows
+only one contract address per call, so the fallback asks for one token at a
+time and keeps whatever comes back. A batch of the whole list, or a 429 from
+Vercel’s shared IPs, used to wipe every quote and return 502.
+
+### Rough Alchemy use on the free plan
+
+30 million compute units per month. A cold look at one wallet is on the order of:
+
+| Read | Cache | About |
+| --- | --- | --- |
+| Token balances | 5 minutes | 2 portfolio calls, 720 CU |
+| Aave, Compound, staking | 5 minutes | a few multicalls per chain, a few hundred CU |
+| Prices and gas prices | 5–10 minutes, shared by everyone | not per wallet |
+| Approvals | 30 minutes | one log query per chain |
+| Gas and recent transfers | 10 minutes | a handful of transfer calls, then at most 6 receipts per chain |
+
+The browser asks again every 5 minutes while a dashboard tab is open, and the
+server cache absorbs that. A few dozen people checking a wallet a couple of
+times a day stays far under 30M. A bot refreshing unique addresses all day
+would not. Profit and loss is not requested, because Novafolio does not invent
+a cost basis.
 
 ## Optional keys
 

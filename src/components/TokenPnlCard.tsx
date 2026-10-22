@@ -20,7 +20,7 @@ export function TokenPnlCard({ holdings, tokenPnl, isLoading }: TokenPnlCardProp
     return (
       <div className="rounded-2xl border border-white/10 bg-surface p-6">
         <p className="text-sm font-medium text-white/50">Profit & loss by holding</p>
-        <p className="mt-4 text-sm text-white/40">Loading…</p>
+        <p className="mt-4 text-sm text-text-muted">Loading…</p>
       </div>
     );
   }
@@ -59,7 +59,7 @@ export function TokenPnlCard({ holdings, tokenPnl, isLoading }: TokenPnlCardProp
                     {holding?.symbol ?? row.fungibleId}
                   </p>
                   {row.averageBuyPriceUsd !== null && (
-                    <p className="truncate text-xs text-white/40">
+                    <p className="truncate text-xs text-text-muted">
                       Avg buy {formatUsd(row.averageBuyPriceUsd, { decimals: 2 })}
                     </p>
                   )}

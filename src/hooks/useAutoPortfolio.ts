@@ -71,8 +71,8 @@ export function useAutoPortfolio(addresses: string[]): AutoPortfolioState {
     queries: unique.map((address) => ({
       queryKey: ["auto-portfolio", address],
       enabled: unique.length > 0,
-      staleTime: 60_000,
-      refetchInterval: 120_000,
+      staleTime: 5 * 60_000,
+      refetchInterval: 5 * 60_000,
       queryFn: async (): Promise<PortfolioResponse> => {
         const res = await fetch(`/api/portfolio?address=${address}`);
         if (!res.ok) throw new Error("Failed to load portfolio");
