@@ -41,7 +41,7 @@ export function TokenPnlCard({ holdings, tokenPnl, isLoading }: TokenPnlCardProp
   return (
     <div className="rounded-2xl border border-border-subtle bg-surface p-6">
       <p className="text-sm font-medium text-text-muted">Profit & loss by holding</p>
-      <ul className="mt-4 flex flex-col divide-y divide-white/5">
+      <ul className="mt-4 flex flex-col divide-y divide-border-subtle">
         {rows.map((row) => {
           const holding = holdingByFungibleId.get(row.fungibleId);
           const tone = row.totalGainUsd >= 0 ? "text-positive" : "text-negative";

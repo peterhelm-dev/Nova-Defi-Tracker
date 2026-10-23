@@ -155,7 +155,7 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-border-subtle">
             {isLoading && holdings.length === 0 && (
               <tr>
                 <td colSpan={COLUMNS.length} className="py-6 text-center text-text-muted">

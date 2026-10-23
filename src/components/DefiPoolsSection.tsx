@@ -115,7 +115,7 @@ export function DefiPoolsSection({
               <th className="pb-3 text-right font-medium">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-border-subtle">
             {isLoading && (
               <tr>
                 <td colSpan={4} className="py-6 text-center text-text-muted">
@@ -245,7 +245,7 @@ export function DefiPoolsSection({
             your net worth.
           </p>
         ) : (
-          <ul className="mt-2 divide-y divide-white/5">
+          <ul className="mt-2 divide-y divide-border-subtle">
             {positions.map((position) => (
               <li
                 key={position.id}

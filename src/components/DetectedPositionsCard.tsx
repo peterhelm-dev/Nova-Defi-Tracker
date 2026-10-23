@@ -166,7 +166,7 @@ export function DetectedPositionsCard({
                   {formatUsd(group.totalUsd)}
                 </span>
               </div>
-              <ul className="flex flex-col divide-y divide-white/5">
+              <ul className="flex flex-col divide-y divide-border-subtle">
                 {group.rows.map((row) =>
                   row.kind === "single" ? (
                     <li

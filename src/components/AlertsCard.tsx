@@ -135,7 +135,7 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
             so they still work while you&apos;re away.
           </p>
         ) : (
-          <ul className="flex flex-col divide-y divide-white/5">
+          <ul className="flex flex-col divide-y divide-border-subtle">
             {rules.map((rule) => (
               <li
                 key={rule.id}
