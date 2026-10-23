@@ -51,7 +51,7 @@ export const COMPOUND_MARKETS: CometMarket[] = [
   { chain: "base", comet: "0x2c776041CCFe903071AF44aa147368a9c8EEA518", symbol: "USDS", underlying: "0x820C137fa70C8691f0e44Dc420a5e53c168921Dc", decimals: 18 },
   { chain: "base", comet: "0x784efeB622244d2348d4F2522f8860B96fbEcE89", symbol: "AERO", underlying: "0x940181a94A35A4569E4529A3CDfB74e38FD98631", decimals: 18 },
   { chain: "arbitrum", comet: "0x9c4ec768c28520B50860ea7a15bd7213a9fF58bf", symbol: "USDC", underlying: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", decimals: 6 },
-  { chain: "arbitrum", comet: "0xd98Be00b5D27fc98112BdE293e487f8D4cA57d07", symbol: "USDT", underlying: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", decimals: 6 },
+  { chain: "arbitrum", comet: "0xd98Be00b5D27fc98112BdE293e487f8D4cA57d07", symbol: "USD₮0", underlying: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", decimals: 6 },
   { chain: "arbitrum", comet: "0x6f7D514bbD4aFf3BcD1140B7344b32f063dEe486", symbol: "WETH", underlying: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", decimals: 18 },
   { chain: "optimism", comet: "0x2e44e174f7D53F0212823acC11C01A11d58c5bCB", symbol: "USDC", underlying: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", decimals: 6 },
   { chain: "optimism", comet: "0x995E394b8B2437aC8Ce61Ee0bC610D617962B214", symbol: "USDT", underlying: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", decimals: 6 },
@@ -88,6 +88,8 @@ export const STABLE_SYMBOLS = new Set([
   "PYUSD",
   "CRVUSD",
   "USDE",
+  "USDT0",
+  "USD₮0",
 ]);
 
 export function positionLabel(protocol: string, symbol: string, kind: "supplied" | "borrowed" | "staked"): string {

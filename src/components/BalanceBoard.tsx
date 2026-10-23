@@ -78,6 +78,9 @@ export function BalanceBoard({
         <p className="text-xs text-warning">Live conversion rates are unavailable, so amounts stay in USD.</p>
       ) : null}
       {showAllocation ? <AssetAllocationChart slices={slices} /> : null}
+      {groups.some((group) => group.items.some((item) => item.priceUsd === null)) ? (
+        <p className="text-xs text-text-muted">Some tokens have no price, so they are left out of the dollar total.</p>
+      ) : null}
       {groups.length === 0 ? (
         <p className="rounded-2xl border border-border-subtle bg-surface px-4 py-8 text-center text-sm text-text-muted">
           {isLoading ? "Loading balances…" : "Nothing to show with these filters."}
@@ -103,7 +106,7 @@ export function BalanceBoard({
                         </p>
                       </div>
                     </div>
-                    <p className="mt-2 text-sm text-foreground">{maskValue(formatValue(item.valueUsd), privacyMode)}</p>
+                    <p className="mt-2 text-sm text-foreground">{maskValue(item.priceUsd === null ? "Price unavailable" : formatValue(item.valueUsd), privacyMode)}</p>
                     <p className="text-xs text-text-muted">{formatTokenAmount(item.balance)} · {formatPercent(item.change24h)}</p>
                   </li>
                 ))}
@@ -170,7 +173,7 @@ function GroupRows({
           </td>
           <td className="px-4 py-3 text-text-secondary">{formatTokenAmount(item.balance)}</td>
           <td className={`px-4 py-3 ${ (item.change24h ?? 0) >= 0 ? "text-positive" : "text-negative" }`}>{formatPercent(item.change24h)}</td>
-          <td className="px-4 py-3 text-right text-foreground">{maskValue(formatValue(item.valueUsd), privacyMode)}</td>
+          <td className="px-4 py-3 text-right text-foreground">{maskValue(item.priceUsd === null ? "Price unavailable" : formatValue(item.valueUsd), privacyMode)}</td>
         </tr>
       ))}
     </>
