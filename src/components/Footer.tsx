@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CoinGeckoAttribution } from "./CoinGeckoAttribution";
 
 export function Footer({ className = "" }: { className?: string }) {
   return (
@@ -6,7 +7,7 @@ export function Footer({ className = "" }: { className?: string }) {
       <p>
         Read-only and non-custodial — this app never has access to your keys
         or funds. Balances come from public chain data; prices and pool data
-        come from CoinGecko, Alchemy, and DeFiLlama and may be delayed or
+        come from <CoinGeckoAttribution />, Alchemy, and DeFiLlama and may be delayed or
         unavailable. Nothing here is investment advice.
       </p>
       <nav className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">

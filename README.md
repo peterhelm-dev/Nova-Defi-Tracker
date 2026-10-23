@@ -5,7 +5,7 @@ address or ENS name, or connect Coinbase, MetaMask, or Rabby, and see token
 balances across Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and
 Avalanche.
 
-Production site: [https://novafolio.app](https://novafolio.app).
+Production site: [https://www.novafolio.app](https://www.novafolio.app). The apex domain redirects there.
 
 Deploy steps, which free API keys to create, and the Vercel Hobby limits are
 in [docs/LAUNCH.md](docs/LAUNCH.md).

@@ -4,6 +4,7 @@ import { formatPercent, formatUpdatedAt, formatUsd } from "@/lib/format";
 import { useDisplayMoney } from "@/lib/currency";
 import { maskValue, usePrivacyMode } from "@/lib/privacy";
 import type { TokenHolding } from "@/types";
+import { CoinGeckoAttribution } from "./CoinGeckoAttribution";
 
 type NetWorthSummaryProps = {
   walletUsd: number;
@@ -98,6 +99,9 @@ export function NetWorthSummary({
           Prices updated {formatUpdatedAt(pricesUpdatedAt)}
         </p>
       )}
+      <p className="mt-3 text-xs text-text-muted">
+        Prices by <CoinGeckoAttribution />
+      </p>
     </div>
   );
 }

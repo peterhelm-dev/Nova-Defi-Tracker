@@ -2,6 +2,7 @@ import { isAddress } from "viem";
 import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
 import { getWalletApprovals } from "@/lib/server/approvals/read";
+import { rateLimit } from "@/lib/server/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +12,9 @@ export const dynamic = "force-dynamic";
  * current allowance. Nothing is signed here. Revoking happens on revoke.cash.
  */
 export async function GET(request: Request) {
+  const limited = await rateLimit(request, "approvals");
+  if (limited) return limited;
+
   const sessionAddress = await getSessionAddress();
   const queryAddress = new URL(request.url).searchParams.get("address");
   const address = sessionAddress ?? queryAddress;

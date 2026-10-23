@@ -1,6 +1,6 @@
 # Novafolio — Executive Summary
 
-The free public launch is **Novafolio** at [https://novafolio.app](https://novafolio.app):
+The free public launch is **Novafolio** at [https://www.novafolio.app](https://www.novafolio.app) (the apex domain redirects there):
 multi-chain, several wallets, no payment. The checklist that matches the code
 is [LAUNCH.md](./LAUNCH.md). The steps below this note describe a later Pro
 launch (Stripe, Zerion) and are not the free deploy.

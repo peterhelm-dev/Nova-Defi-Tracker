@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatPercent, formatUsd } from "@/lib/format";
+import { chartTooltipStyle } from "@/lib/themes";
+import { CoinGeckoAttribution } from "./CoinGeckoAttribution";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import { researchItemId, type PoolHit, type PoolPoint, type ResearchItem, type TokenHit, type TokenProfile } from "@/lib/research";
 import { POOL_DATA_UNAVAILABLE } from "@/lib/yields";
@@ -13,13 +15,6 @@ import { ChainIcon } from "./ChainIcon";
 import { IconImg } from "./IconImg";
 
 type DeskTab = "token" | "pool" | "compare" | "saved";
-
-const chartStyle = {
-  background: "var(--surface-raised)",
-  border: "1px solid var(--border-subtle)",
-  borderRadius: 12,
-  color: "var(--foreground)",
-};
 
 export function ResearchDesk({
   saved,
@@ -92,7 +87,7 @@ export function ResearchDesk({
     <div className="flex flex-col gap-6">
       <div>
         <p className="max-w-2xl text-sm text-text-secondary">
-          A quiet desk for public market and pool data. Figures come from CoinGecko and DeFiLlama,
+          A quiet desk for public market and pool data. Figures come from <CoinGeckoAttribution /> and DeFiLlama,
           can be delayed, and are not financial advice.
         </p>
       </div>
@@ -371,7 +366,7 @@ function TokenDetail({
           <AreaChart data={points}>
             <XAxis dataKey="t" hide />
             <YAxis hide domain={["auto", "auto"]} />
-            <Tooltip contentStyle={chartStyle} formatter={(value) => formatUsd(Number(value))} labelFormatter={(value) => new Date(Number(value)).toLocaleDateString()} />
+            <Tooltip contentStyle={chartTooltipStyle} formatter={(value) => formatUsd(Number(value))} labelFormatter={(value) => new Date(Number(value)).toLocaleDateString()} />
             <Area dataKey="priceUsd" stroke="var(--accent)" fill="var(--chart-fill)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
@@ -444,9 +439,9 @@ function PoolDetail({
           <AreaChart data={history}>
             <XAxis dataKey="t" hide />
             <YAxis hide domain={["auto", "auto"]} />
-            <Tooltip contentStyle={chartStyle} />
+            <Tooltip contentStyle={chartTooltipStyle} />
             <Area dataKey="apy" name="APY" stroke="var(--accent)" fill="var(--chart-fill)" strokeWidth={2} />
-            <Area dataKey="apyBase" name="Base APY" stroke="#8fbf98" fill="transparent" strokeWidth={1.5} />
+            <Area dataKey="apyBase" name="Base APY" stroke="var(--positive)" fill="transparent" strokeWidth={1.5} />
           </AreaChart>
         </ResponsiveContainer>
       </div>

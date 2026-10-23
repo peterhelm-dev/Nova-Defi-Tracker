@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchTokenPriceHistory } from "@/lib/server/prices";
+import { rateLimit } from "@/lib/server/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,6 +13,9 @@ const ALLOWED_DAYS = new Set([1, 7, 30, 90, 365]);
  * `address=native` for a chain's native asset (ETH, MATIC, etc.).
  */
 export async function GET(request: Request) {
+  const limited = await rateLimit(request, "token-chart");
+  if (limited) return limited;
+
   const url = new URL(request.url);
   const chain = url.searchParams.get("chain");
   const address = url.searchParams.get("address");

@@ -12,6 +12,7 @@ import {
 import { useTokenPriceHistory } from "@/hooks/useTokenPriceHistory";
 import { formatUsd } from "@/lib/format";
 import { chartTooltipStyle } from "@/lib/themes";
+import { CoinGeckoAttribution } from "./CoinGeckoAttribution";
 import { TokenAvatar } from "./TokenAvatar";
 
 const RANGES: { label: string; days: number }[] = [
@@ -179,6 +180,7 @@ export function TokenPriceChartModal({
         </div>
         <p className="mt-3 text-xs text-text-muted">
           Token market price over time — not the historical USD value of your specific holding.
+          Prices by <CoinGeckoAttribution />.
         </p>
       </div>
     </div>
