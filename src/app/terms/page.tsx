@@ -29,13 +29,24 @@ export default function TermsPage() {
         transfers value. Sign-in uses a signed message only.
       </p>
 
-      <h2>Not financial advice</h2>
+      <h2>No financial advice</h2>
       <p>
-        Nothing in the Service is investment, financial, legal, or tax advice.
-        Prices, yields (APY), TVL, and portfolio valuations are estimates
-        sourced from third parties, can be delayed, incomplete, or wrong, and
-        must not be relied on for trading decisions. Crypto assets are
-        volatile; you alone are responsible for your decisions.
+        Information in the Service is for informational purposes only. Nothing
+        in the Service is financial, investment, legal, or tax advice, and
+        using it does not create a fiduciary relationship, an advisory
+        relationship, or any duty to you. Novafolio does not tell you to buy,
+        sell, deposit, borrow, or hold any asset.
+      </p>
+      <p>
+        Prices, yields (APY), TVL, health factors, true-yield sketches, and
+        portfolio valuations are estimates. They come from third parties,
+        including Alchemy, CoinGecko, and DeFiLlama, and from public chain
+        reads. There is no warranty that this data is accurate, complete, or
+        current. It can be delayed, missing, or wrong.
+      </p>
+      <p>
+        You are responsible for your own decisions. DeFi carries a risk of
+        loss, including loss of the entire amount you deposit. Past APY does not guarantee future returns.
       </p>
 
       <h2>Accounts and accuracy</h2>

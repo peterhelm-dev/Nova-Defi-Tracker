@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SITE_DISCLAIMER } from "@/lib/disclaimers";
 import { CoinGeckoAttribution } from "./CoinGeckoAttribution";
 
 export function Footer({ className = "" }: { className?: string }) {
@@ -8,8 +9,9 @@ export function Footer({ className = "" }: { className?: string }) {
         Read-only and non-custodial — this app never has access to your keys
         or funds. Balances come from public chain data; prices and pool data
         come from <CoinGeckoAttribution />, Alchemy, and DeFiLlama and may be delayed or
-        unavailable. Nothing here is investment advice.
+        unavailable.
       </p>
+      <p className="mt-2">{SITE_DISCLAIMER}</p>
       <nav className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
         <Link href="/pricing" className="hover:text-foreground">
           Pricing

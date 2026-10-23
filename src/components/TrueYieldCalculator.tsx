@@ -15,6 +15,7 @@ import {
   YIELD_GAS_UNITS,
 } from "@/lib/trueYield";
 import type { PoolHit } from "@/lib/research";
+import { EstimateNote } from "./EstimateNote";
 
 function money(value: number | null): string {
   if (value === null || !Number.isFinite(value)) return "—";
@@ -85,6 +86,7 @@ export function TrueYieldCalculator({
 
       <section className="rounded-2xl border border-border-subtle bg-background/40 p-4">
         <h3 className="text-sm font-semibold text-foreground">True yield</h3>
+        <EstimateNote className="mt-1 block" />
         <p className="mt-1 text-sm text-text-secondary">
           Headline APY counts rewards at full price and ignores gas. This subtracts a reward haircut you choose,
           an impermanent-loss estimate for volatile pairs, and gas for one deposit, one withdraw

@@ -5,6 +5,7 @@ import { formatChainName, formatUsd } from "@/lib/format";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import type { DetectedPosition } from "@/types";
 import { Badge } from "./Badge";
+import { EstimateNote } from "./EstimateNote";
 import { TokenAvatar } from "./TokenAvatar";
 
 type PositionRow =
@@ -105,7 +106,10 @@ export function DetectedPositionsCard({
   return (
     <section className="rounded-2xl border border-border-subtle bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-foreground">Detected DeFi positions</h2>
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Detected DeFi positions</h2>
+          <EstimateNote className="mt-1 block" />
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="text"

@@ -28,7 +28,7 @@ export const TOUR_STEPS = [
   {
     id: "welcome",
     title: "This is Novafolio",
-    body: "A calm, read-only view of the wallets you care about. Nothing here can move funds or tell you what to buy.",
+    body: "A calm, read-only view of the wallets you care about. Nothing here can move funds, and it doesn't suggest buying or selling.",
     target: null,
   },
   {

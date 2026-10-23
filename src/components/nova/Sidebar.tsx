@@ -61,7 +61,7 @@ export function Sidebar() {
         <NoriCoachCard
           state="neutral"
           title="Not financial advice"
-          message="Novafolio reads public chain data. It can't move funds."
+          message="Novafolio shows public chain data. It doesn't suggest buying or selling, and it can't move funds."
           size="coach"
           onDismiss={() => setNoriHidden(true)}
         />
