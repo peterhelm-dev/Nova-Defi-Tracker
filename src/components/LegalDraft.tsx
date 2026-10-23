@@ -6,7 +6,7 @@
 
 export function PendingLegalReview() {
   return (
-    <p className="rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-amber-100">
+    <p className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-warning">
       Pending legal review. This page is a working draft for the operator to
       finish with counsel. A lawyer has not approved it, and it is not legal
       advice.

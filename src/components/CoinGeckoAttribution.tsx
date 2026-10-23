@@ -4,7 +4,7 @@ export function CoinGeckoAttribution({ className = "" }: { className?: string })
       href="https://www.coingecko.com/"
       target="_blank"
       rel="noreferrer"
-      className={`underline hover:text-foreground ${className}`}
+      className={`text-accent underline hover:text-foreground ${className}`}
     >
       CoinGecko
     </a>

@@ -1,5 +1,8 @@
 import type { MetadataRoute } from "next";
 import { PRODUCT_DESCRIPTION, PRODUCT_NAME } from "@/lib/brand";
+import { DEFAULT_THEME, THEMES } from "@/lib/themes";
+
+const defaultTheme = THEMES.find((theme) => theme.id === DEFAULT_THEME) ?? THEMES[0];
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -9,8 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#1a1511",
-    theme_color: "#1a1511",
+    background_color: defaultTheme.colors.background,
+    theme_color: defaultTheme.colors.background,
     icons: [
       {
         src: "/favicon.ico",

@@ -32,7 +32,7 @@ export function PositionDetailModal({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-label="Position detail"
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-background-overlay p-4"
       onClick={onClose}
     >
       <div

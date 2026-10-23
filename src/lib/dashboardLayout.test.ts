@@ -87,5 +87,6 @@ describe("preference merge", () => {
     expect(merged.dashboardLayout.items.find((item) => item.id === "chains")?.visible).toBe(false);
     expect(merged.researchWatchlist.map((item) => item.id).sort()).toEqual(["pool:a", "token:eth"]);
     expect(merged.displayCurrency).toBe("EUR");
+    expect(merged.theme).toBe("violet");
   });
 });

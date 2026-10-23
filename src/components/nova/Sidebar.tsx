@@ -40,7 +40,7 @@ export function Sidebar() {
                 {item.label}
               </span>
               {item.comingSoon && (
-                <span className="rounded-full bg-white/5 px-1.5 py-0.5 text-[9px] font-medium text-text-muted">
+                <span className="rounded-full bg-surface-hover px-1.5 py-0.5 text-[9px] font-medium text-text-muted">
                   Soon
                 </span>
               )}

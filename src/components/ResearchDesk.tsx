@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatPercent, formatUsd } from "@/lib/format";
+import { chartTooltipStyle } from "@/lib/themes";
 import { CoinGeckoAttribution } from "./CoinGeckoAttribution";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import { researchItemId, type PoolHit, type PoolPoint, type ResearchItem, type TokenHit, type TokenProfile } from "@/lib/research";
@@ -14,12 +15,6 @@ import { ChainIcon } from "./ChainIcon";
 import { IconImg } from "./IconImg";
 
 type DeskTab = "token" | "pool" | "compare" | "saved";
-
-const chartStyle = {
-  background: "#2a211b",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 12,
-};
 
 export function ResearchDesk({
   saved,
@@ -371,8 +366,8 @@ function TokenDetail({
           <AreaChart data={points}>
             <XAxis dataKey="t" hide />
             <YAxis hide domain={["auto", "auto"]} />
-            <Tooltip contentStyle={chartStyle} formatter={(value) => formatUsd(Number(value))} labelFormatter={(value) => new Date(Number(value)).toLocaleDateString()} />
-            <Area dataKey="priceUsd" stroke="#c4784a" fill="rgba(196,120,74,0.25)" strokeWidth={2} />
+            <Tooltip contentStyle={chartTooltipStyle} formatter={(value) => formatUsd(Number(value))} labelFormatter={(value) => new Date(Number(value)).toLocaleDateString()} />
+            <Area dataKey="priceUsd" stroke="var(--accent)" fill="var(--chart-fill)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -444,9 +439,9 @@ function PoolDetail({
           <AreaChart data={history}>
             <XAxis dataKey="t" hide />
             <YAxis hide domain={["auto", "auto"]} />
-            <Tooltip contentStyle={chartStyle} />
-            <Area dataKey="apy" name="APY" stroke="#c4784a" fill="rgba(196,120,74,0.2)" strokeWidth={2} />
-            <Area dataKey="apyBase" name="Base APY" stroke="#8fbf98" fill="transparent" strokeWidth={1.5} />
+            <Tooltip contentStyle={chartTooltipStyle} />
+            <Area dataKey="apy" name="APY" stroke="var(--accent)" fill="var(--chart-fill)" strokeWidth={2} />
+            <Area dataKey="apyBase" name="Base APY" stroke="var(--positive)" fill="transparent" strokeWidth={1.5} />
           </AreaChart>
         </ResponsiveContainer>
       </div>

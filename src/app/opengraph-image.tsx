@@ -14,8 +14,8 @@ export default async function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#1a1511",
-          color: "#f6efe6",
+          background: "#060816",
+          color: "#f6f7ff",
           fontFamily: "Georgia, serif",
           padding: 72,
         }}
@@ -29,8 +29,8 @@ export default async function Image() {
               width: 84,
               height: 84,
               borderRadius: 22,
-              background: "#c4784a",
-              color: "#1c1612",
+              background: "#7c4dff",
+              color: "#f6f7ff",
               fontSize: 48,
               fontWeight: 700,
             }}
@@ -41,7 +41,7 @@ export default async function Image() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 900 }}>
           <div style={{ fontSize: 48, lineHeight: 1.15 }}>A read-only view of the wallets you watch.</div>
-          <div style={{ fontSize: 28, color: "#d4c4b2" }}>
+          <div style={{ fontSize: 28, color: "#aeb7d2" }}>
             Tokens, lending, staking, and the costs around them. Nothing is signed here.
           </div>
         </div>

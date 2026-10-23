@@ -3,18 +3,10 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { formatChainName } from "@/lib/format";
 import { useDisplayMoney } from "@/lib/currency";
+import { CHART_SERIES, chartTooltipStyle } from "@/lib/themes";
 import type { TokenHolding } from "@/types";
 
-const COLORS = [
-  "#c4784a",
-  "#8fbf98",
-  "#e0a36a",
-  "#7f9aa8",
-  "#d4c4b2",
-  "#a66b4a",
-  "#6e8f84",
-  "#a89888",
-];
+const COLORS = [...CHART_SERIES];
 
 type Slice = { id: string; name: string; value: number };
 
@@ -50,8 +42,8 @@ export function AssetAllocationChart({
   const { formatValue } = useDisplayMoney();
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="text-sm font-medium text-white/50">Allocation</p>
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+      <p className="text-sm font-medium text-text-muted">Allocation</p>
       {slices.length === 0 ? (
         <div className="flex h-64 items-center justify-center text-center text-sm text-text-muted">
           No priced holdings yet.
@@ -75,17 +67,13 @@ export function AssetAllocationChart({
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{
-                    background: "#2a211b",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 12,
-                  }}
+                  contentStyle={chartTooltipStyle}
                   formatter={(value) => formatValue(Number(value))}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <ul className="mt-2 flex flex-wrap gap-3 text-xs text-white/60">
+          <ul className="mt-2 flex flex-wrap gap-3 text-xs text-text-secondary">
             {slices.map((slice, index) => (
               <li key={slice.id} className="flex items-center gap-1.5">
                 <span

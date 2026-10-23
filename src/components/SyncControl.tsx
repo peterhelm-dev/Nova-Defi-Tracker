@@ -40,15 +40,15 @@ export function SyncControl() {
   if (isAuthed) {
     return (
       <div className="flex items-center gap-2">
-        <span className="flex items-center gap-1.5 text-xs text-emerald-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+        <span className="flex items-center gap-1.5 text-xs text-positive">
+          <span className="h-1.5 w-1.5 rounded-full bg-positive" />
           Synced
         </span>
         <button
           type="button"
           onClick={() => run(signOut)}
           disabled={busy}
-          className="text-xs text-white/50 hover:text-white/80 disabled:opacity-50"
+          className="text-xs text-text-muted hover:text-foreground disabled:opacity-50"
         >
           Sign out
         </button>
@@ -62,11 +62,11 @@ export function SyncControl() {
         type="button"
         onClick={() => run(signIn)}
         disabled={busy}
-        className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-medium text-white/80 hover:border-white/30 hover:text-white disabled:opacity-50"
+        className="rounded-lg border border-border-subtle px-3 py-1.5 text-xs font-medium text-foreground hover:border-border-strong hover:text-foreground disabled:opacity-50"
       >
         {busy ? "Check wallet…" : "Sign in to sync"}
       </button>
-      {error ? <span className="mt-1 text-[11px] text-red-400">{error}</span> : null}
+      {error ? <span className="mt-1 text-[11px] text-negative">{error}</span> : null}
     </div>
   );
 }

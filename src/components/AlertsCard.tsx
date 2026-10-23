@@ -55,25 +55,25 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
   }
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="text-sm font-medium text-white/50">Price alerts</p>
+    <section className="rounded-2xl border border-border-subtle bg-surface p-6">
+      <p className="text-sm font-medium text-text-muted">Price alerts</p>
 
       {events.length > 0 && (
         <ul className="mt-4 flex flex-col gap-2">
           {events.map((e) => (
             <li
               key={e.id}
-              className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm"
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-warning/30 bg-amber-500/10 px-4 py-2.5 text-sm"
             >
               <span aria-hidden>🔔</span>
-              <span className="text-white/90">
+              <span className="text-foreground">
                 {e.symbol} went {e.direction} {formatUsd(e.thresholdUsd)} —
                 hit {formatUsd(e.priceUsd)}
               </span>
               <button
                 type="button"
                 onClick={() => dismissEvent(e.id)}
-                className="ml-auto text-xs text-white/50 hover:text-white/80"
+                className="ml-auto text-xs text-text-muted hover:text-foreground"
               >
                 Dismiss
               </button>
@@ -83,12 +83,12 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
       )}
 
       <form onSubmit={onAdd} className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-sm text-white/60">Alert me when</span>
+        <span className="text-sm text-text-secondary">Alert me when</span>
         <select
           value={tokenAddress}
           onChange={(e) => setTokenAddress(e.target.value)}
           aria-label="Token"
-          className="rounded-lg border border-white/15 bg-surface px-2 py-1.5 text-sm text-foreground focus:border-accent focus:outline-none"
+          className="rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-sm text-foreground focus:border-accent focus:outline-none"
         >
           {TOKEN_OPTIONS.map((t) => (
             <option key={t.address} value={t.address}>
@@ -100,7 +100,7 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
           value={direction}
           onChange={(e) => setDirection(e.target.value as AlertDirection)}
           aria-label="Direction"
-          className="rounded-lg border border-white/15 bg-surface px-2 py-1.5 text-sm text-foreground focus:border-accent focus:outline-none"
+          className="rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-sm text-foreground focus:border-accent focus:outline-none"
         >
           <option value="above">goes above</option>
           <option value="below">goes below</option>
@@ -114,7 +114,7 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
           onChange={(e) => setThreshold(e.target.value)}
           placeholder="USD price"
           aria-label="USD price threshold"
-          className="w-28 rounded-lg border border-white/15 bg-surface px-2 py-1.5 text-sm text-foreground placeholder:text-text-muted focus:border-accent focus:outline-none"
+          className="w-28 rounded-lg border border-border-subtle bg-surface px-2 py-1.5 text-sm text-foreground placeholder:text-text-muted focus:border-accent focus:outline-none"
         />
         <button
           type="submit"
@@ -123,7 +123,7 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
         >
           Add alert
         </button>
-        {error ? <span className="text-xs text-red-400">{error}</span> : null}
+        {error ? <span className="text-xs text-negative">{error}</span> : null}
       </form>
 
       <div className="mt-4">
@@ -135,13 +135,13 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
             so they still work while you&apos;re away.
           </p>
         ) : (
-          <ul className="flex flex-col divide-y divide-white/5">
+          <ul className="flex flex-col divide-y divide-border-subtle">
             {rules.map((rule) => (
               <li
                 key={rule.id}
                 className="flex items-center justify-between gap-3 py-2.5 text-sm"
               >
-                <span className="text-white/80">
+                <span className="text-foreground">
                   {rule.symbol} {rule.direction} {formatUsd(rule.thresholdUsd)}
                   {!rule.armed && (
                     <span className="ml-2 text-xs text-text-muted">
@@ -152,7 +152,7 @@ export function AlertsCard({ authedAddress }: { authedAddress: string | null }) 
                 <button
                   type="button"
                   onClick={() => removeRule(rule.id)}
-                  className="text-xs text-white/50 hover:text-red-400"
+                  className="text-xs text-text-muted hover:text-negative"
                 >
                   Remove
                 </button>
