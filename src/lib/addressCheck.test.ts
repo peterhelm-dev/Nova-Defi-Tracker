@@ -31,6 +31,6 @@ describe("approval catalog", () => {
 
   it("uses Base's own Uniswap router and a short log window", () => {
     expect(approvalSpenders("base").some((spender) => spender.address.toLowerCase() === "0x2626664c2603336e57b271c5c0b26f421741e481")).toBe(true);
-    expect(RECENT_APPROVAL_BLOCKS).toBeLessThanOrEqual(10_000n);
+    expect(RECENT_APPROVAL_BLOCKS <= BigInt(10000)).toBe(true);
   });
 });

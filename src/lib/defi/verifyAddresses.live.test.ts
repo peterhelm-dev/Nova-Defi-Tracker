@@ -43,7 +43,10 @@ function clientFor(chain: string): PublicClient {
 async function callBatch(client: PublicClient, contracts: Parameters<PublicClient["multicall"]>[0]["contracts"]) {
   const out: { status: string; result?: unknown }[] = [];
   for (let index = 0; index < contracts.length; index += 60) {
-    const batch = await client.multicall({ allowFailure: true, contracts: contracts.slice(index, index + 60) });
+    const batch = (await client.multicall({
+      allowFailure: true,
+      contracts: contracts.slice(index, index + 60) as never,
+    })) as { status: string; result?: unknown }[];
     out.push(...batch);
   }
   return out;

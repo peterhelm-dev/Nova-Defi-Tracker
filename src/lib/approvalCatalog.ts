@@ -14,7 +14,7 @@ const UNI_UNIVERSAL = "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD";
 const UNI_BASE = "0x2626664c2603336E57B271c5C0b26F421741e481";
 
 /** How far back a non-archive RPC will still answer eth_getLogs. */
-export const RECENT_APPROVAL_BLOCKS = 8_000n;
+export const RECENT_APPROVAL_BLOCKS = BigInt(8000);
 
 export type CatalogToken = { address: string; symbol: string; decimals: number };
 export type CatalogSpender = { address: string; label: string };

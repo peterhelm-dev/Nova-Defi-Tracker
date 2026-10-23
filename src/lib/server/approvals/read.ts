@@ -99,17 +99,17 @@ async function readChain(
   try {
     const latest = await client.getBlockNumber();
     const from = latest > RECENT_APPROVAL_BLOCKS ? latest - RECENT_APPROVAL_BLOCKS : BigInt(1);
-    const ownerTopic = `0x${owner.slice(2).toLowerCase().padStart(64, "0")}`;
+    const ownerTopic = `0x${owner.slice(2).toLowerCase().padStart(64, "0")}` as `0x${string}`;
     for (const token of held) {
       let logs: { topics?: string[]; data?: string; address?: string }[] = [];
       try {
         logs = (await client.request({
           method: "eth_getLogs",
           params: [{
-            address: token.address,
+            address: token.address as Address,
             fromBlock: `0x${from.toString(16)}`,
             toBlock: `0x${latest.toString(16)}`,
-            topics: [APPROVAL_TOPIC, ownerTopic],
+            topics: [APPROVAL_TOPIC as `0x${string}`, ownerTopic],
           }],
         })) as { topics?: string[]; data?: string; address?: string }[];
       } catch {
@@ -180,7 +180,10 @@ async function batched(
 ) {
   const results: { status: string; result?: unknown }[] = [];
   for (let index = 0; index < contracts.length; index += 80) {
-    const batch = await client.multicall({ allowFailure: true, contracts: contracts.slice(index, index + 80) });
+    const batch = (await client.multicall({
+      allowFailure: true,
+      contracts: contracts.slice(index, index + 80) as never,
+    })) as { status: string; result?: unknown }[];
     results.push(...batch);
   }
   return results;

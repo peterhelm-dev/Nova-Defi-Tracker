@@ -16,7 +16,7 @@ import {
   optimism,
   polygon,
 } from "viem/chains";
-import { MAJOR_TOKENS } from "@/lib/majorTokens";
+import { MAJOR_TOKENS, type MajorToken } from "@/lib/majorTokens";
 import type { AutoPortfolio, TokenHolding } from "@/types";
 import type { PortfolioProvider } from "./provider";
 
