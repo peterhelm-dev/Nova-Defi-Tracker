@@ -103,9 +103,9 @@ export function DetectedPositionsCard({
   if (positions.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-surface p-5">
+    <section className="rounded-2xl border border-border-subtle bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-white">Detected DeFi positions</h2>
+        <h2 className="text-sm font-semibold text-foreground">Detected DeFi positions</h2>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="text"
@@ -113,14 +113,14 @@ export function DetectedPositionsCard({
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search…"
             aria-label="Search positions"
-            className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white placeholder:text-text-muted focus:border-accent/50 focus:outline-none"
+            className="rounded-lg border border-border-subtle bg-background px-2.5 py-1.5 text-xs text-foreground placeholder:text-text-muted focus:border-accent/50 focus:outline-none"
           />
           {protocols.length > 1 && (
             <select
               value={protocolFilter}
               onChange={(e) => setProtocolFilter(e.target.value)}
               aria-label="Filter by protocol"
-              className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white focus:border-accent/50 focus:outline-none"
+              className="rounded-lg border border-border-subtle bg-background px-2.5 py-1.5 text-xs text-foreground focus:border-accent/50 focus:outline-none"
             >
               <option value="all">All protocols</option>
               {protocols.map((protocol) => (
@@ -135,7 +135,7 @@ export function DetectedPositionsCard({
               value={chainFilter}
               onChange={(e) => setChainFilter(e.target.value)}
               aria-label="Filter by chain"
-              className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white focus:border-accent/50 focus:outline-none"
+              className="rounded-lg border border-border-subtle bg-background px-2.5 py-1.5 text-xs text-foreground focus:border-accent/50 focus:outline-none"
             >
               <option value="all">All chains</option>
               {chains.map((chain) => (
@@ -157,9 +157,9 @@ export function DetectedPositionsCard({
             <div key={group.protocol}>
               <div className="mb-1.5 flex items-center justify-between">
                 <Badge label={group.protocol} iconUrl={group.protocolIconUrl} />
-                <span className="text-right text-xs font-medium tabular-nums text-white/50">
+                <span className="text-right text-xs font-medium tabular-nums text-text-muted">
                   {typeof group.healthFactor === "number" ? (
-                    <span className={group.healthFactor < 1.2 ? "text-negative" : "text-white/70"}>
+                    <span className={group.healthFactor < 1.2 ? "text-negative" : "text-text-secondary"}>
                       Health {group.healthFactor.toFixed(2)}
                     </span>
                   ) : null}{" "}
@@ -180,7 +180,7 @@ export function DetectedPositionsCard({
                           chain={row.position.chain}
                         />
                         <div className="min-w-0">
-                          <p className="truncate text-sm text-white/90">{row.position.name}</p>
+                          <p className="truncate text-sm text-foreground">{row.position.name}</p>
                           <p className="truncate text-xs text-text-muted capitalize">
                             {formatChainName(row.position.chain)}
                             {typeof row.position.amount === "number"
@@ -190,7 +190,7 @@ export function DetectedPositionsCard({
                         </div>
                       </div>
                       <span
-                        className={`shrink-0 text-sm tabular-nums ${row.position.valueUsd < 0 ? "text-red-400" : "text-white/80"}`}
+                        className={`shrink-0 text-sm tabular-nums ${row.position.valueUsd < 0 ? "text-negative" : "text-foreground"}`}
                       >
                         {formatUsd(row.position.valueUsd)}
                       </span>
@@ -210,7 +210,7 @@ export function DetectedPositionsCard({
                             ))}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate text-sm text-white/90">
+                            <p className="truncate text-sm text-foreground">
                               {row.legs.map((l) => l.symbol).join(" / ")}
                             </p>
                             <p className="truncate text-xs text-text-muted capitalize">
@@ -219,13 +219,13 @@ export function DetectedPositionsCard({
                           </div>
                         </div>
                         <span
-                          className={`shrink-0 text-sm tabular-nums ${row.totalUsd < 0 ? "text-red-400" : "text-white/80"}`}
+                          className={`shrink-0 text-sm tabular-nums ${row.totalUsd < 0 ? "text-negative" : "text-foreground"}`}
                         >
                           {formatUsd(row.totalUsd)}
                         </span>
                       </div>
                       {/* Pair weight bar — how the position's value splits between the two legs. */}
-                      <div className="mt-2 flex h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+                      <div className="mt-2 flex h-1.5 w-full overflow-hidden rounded-full bg-surface-hover">
                         {row.legs.map((leg, i) => (
                           <span
                             key={leg.id}

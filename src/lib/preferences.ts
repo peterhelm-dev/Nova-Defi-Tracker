@@ -11,12 +11,14 @@ import {
   type DisplayCurrency,
 } from "./balanceView";
 import { normalizeWatchlist, type ResearchItem } from "./research";
+import { DEFAULT_THEME, normalizeTheme, type ThemeId } from "./themes";
 
 export type Preferences = {
   dashboardLayout: DashboardLayout;
   balanceView: BalanceViewOptions;
   displayCurrency: DisplayCurrency;
   researchWatchlist: ResearchItem[];
+  theme: ThemeId;
 };
 
 export function defaultPreferences(): Preferences {
@@ -25,6 +27,7 @@ export function defaultPreferences(): Preferences {
     balanceView: normalizeBalanceView({}),
     displayCurrency: "USD",
     researchWatchlist: [],
+    theme: DEFAULT_THEME,
   };
 }
 
@@ -35,6 +38,7 @@ export function normalizePreferences(raw: unknown): Preferences {
     balanceView: normalizeBalanceView(source.balanceView),
     displayCurrency: normalizeCurrency(source.displayCurrency),
     researchWatchlist: normalizeWatchlist(source.researchWatchlist),
+    theme: normalizeTheme(source.theme),
   };
 }
 
@@ -62,5 +66,6 @@ export function mergePreferences(local: Preferences, remote: Preferences | null 
     balanceView: right.balanceView,
     displayCurrency: right.displayCurrency === "USD" ? left.displayCurrency : right.displayCurrency,
     researchWatchlist: [...byId.values()].sort((a, b) => b.savedAt - a.savedAt).slice(0, 40),
+    theme: right.theme === DEFAULT_THEME ? left.theme : right.theme,
   };
 }

@@ -18,8 +18,8 @@ type TokenPnlCardProps = {
 export function TokenPnlCard({ holdings, tokenPnl, isLoading }: TokenPnlCardProps) {
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-surface p-6">
-        <p className="text-sm font-medium text-white/50">Profit & loss by holding</p>
+      <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+        <p className="text-sm font-medium text-text-muted">Profit & loss by holding</p>
         <p className="mt-4 text-sm text-text-muted">Loading…</p>
       </div>
     );
@@ -39,12 +39,12 @@ export function TokenPnlCard({ holdings, tokenPnl, isLoading }: TokenPnlCardProp
   const rows = [...tokenPnl].sort((a, b) => b.totalGainUsd - a.totalGainUsd);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="text-sm font-medium text-white/50">Profit & loss by holding</p>
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+      <p className="text-sm font-medium text-text-muted">Profit & loss by holding</p>
       <ul className="mt-4 flex flex-col divide-y divide-white/5">
         {rows.map((row) => {
           const holding = holdingByFungibleId.get(row.fungibleId);
-          const tone = row.totalGainUsd >= 0 ? "text-emerald-400" : "text-red-400";
+          const tone = row.totalGainUsd >= 0 ? "text-positive" : "text-negative";
           return (
             <li key={row.fungibleId} className="flex items-center justify-between gap-3 py-3">
               <div className="flex min-w-0 items-center gap-2.5">
@@ -55,7 +55,7 @@ export function TokenPnlCard({ holdings, tokenPnl, isLoading }: TokenPnlCardProp
                   address={holding?.address}
                 />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate text-sm font-medium text-foreground">
                     {holding?.symbol ?? row.fungibleId}
                   </p>
                   {row.averageBuyPriceUsd !== null && (

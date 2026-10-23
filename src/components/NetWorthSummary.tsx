@@ -65,30 +65,30 @@ export function NetWorthSummary({
           <span
             className={`rounded-full px-2 py-0.5 text-sm font-medium ${
               weightedChange >= 0
-                ? "bg-emerald-500/15 text-emerald-400"
-                : "bg-red-500/15 text-red-400"
+                ? "bg-positive/15 text-positive"
+                : "bg-negative/15 text-negative"
             }`}
           >
             {formatPercent(weightedChange)} 24h
           </span>
         )}
       </div>
-      <div className="mt-4 flex flex-wrap gap-4 text-sm text-white/60">
+      <div className="mt-4 flex flex-wrap gap-4 text-sm text-text-secondary">
         <span>
           Wallet:{" "}
-          <span className="font-medium text-white">
+          <span className="font-medium text-foreground">
             {maskValue(formatValue(walletUsd), privacyMode)}
           </span>
         </span>
         <span>
           DeFi positions:{" "}
-          <span className="font-medium text-white">
+          <span className="font-medium text-foreground">
             {maskValue(formatValue(defiUsd), privacyMode)}
           </span>
         </span>
       </div>
       {pricesUnavailable && (
-        <p className="mt-3 text-xs text-amber-400">
+        <p className="mt-3 text-xs text-warning">
           Live prices are temporarily unavailable — balances are shown without
           USD values.
         </p>

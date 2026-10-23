@@ -26,12 +26,12 @@ export function AutoDetectionBanner({
   if (portfolio) {
     const chainCount = portfolio.chains.length;
     return (
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-4 py-2.5 text-sm">
-        <span className="flex items-center gap-1.5 font-medium text-emerald-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-positive/30 bg-positive/10 px-4 py-2.5 text-sm">
+        <span className="flex items-center gap-1.5 font-medium text-positive">
+          <span className="h-1.5 w-1.5 rounded-full bg-positive" />
           Auto-detected
         </span>
-        <span className="text-white/60">
+        <span className="text-text-secondary">
           {portfolio.tokens.length} assets and {portfolio.positions.length} DeFi
           positions across {chainCount} chain{chainCount === 1 ? "" : "s"}
         </span>
@@ -44,7 +44,7 @@ export function AutoDetectionBanner({
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-white/10 bg-surface px-4 py-2.5 text-sm text-white/50">
+      <div className="rounded-xl border border-border-subtle bg-surface px-4 py-2.5 text-sm text-text-muted">
         Detecting your full portfolio…
       </div>
     );
@@ -57,7 +57,7 @@ export function AutoDetectionBanner({
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl border border-accent/30 bg-accent/5 px-4 py-2.5 text-sm">
-      <span className="text-white/70">{message}</span>
+      <span className="text-text-secondary">{message}</span>
       <Link
         href="/pricing"
         className="ml-auto font-medium text-accent hover:underline"

@@ -35,14 +35,14 @@ export function ProCta({
   if (!billingLive) {
     return (
       <div className="flex flex-col gap-3">
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-text-secondary">
           Pro is coming soon. It is not for sale, and Novafolio will not take a payment.
           Join the waitlist if you want a note when that changes.
         </p>
         {waitlistOpen ? (
           <WaitlistForm />
         ) : (
-          <p className="text-sm text-white/50">
+          <p className="text-sm text-text-muted">
             The waitlist is closed on this deployment because there is no database
             to store emails. Novafolio will not pretend to collect them.
           </p>
@@ -54,7 +54,7 @@ export function ProCta({
   if (!billing.isSignedIn) {
     return (
       <div className="flex flex-col gap-3">
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-text-muted">
           Connect your wallet and{" "}
           <Link href="/" className="text-accent hover:underline">
             sign in
@@ -66,14 +66,14 @@ export function ProCta({
   }
 
   if (billing.isLoading) {
-    return <p className="text-sm text-white/50">Checking your plan…</p>;
+    return <p className="text-sm text-text-muted">Checking your plan…</p>;
   }
 
   if (billing.entitled) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+        <p className="flex items-center gap-1.5 text-sm font-medium text-positive">
+          <span className="h-1.5 w-1.5 rounded-full bg-positive" />
           Pro is active
           {billing.cancelAtPeriodEnd ? " — cancels at period end" : ""}
         </p>
@@ -82,12 +82,12 @@ export function ProCta({
             type="button"
             onClick={() => run(billing.openPortal)}
             disabled={busy}
-            className="rounded-lg border border-white/15 px-4 py-2.5 text-sm font-medium text-white/80 hover:border-white/30 hover:text-white disabled:opacity-60"
+            className="rounded-lg border border-border-subtle px-4 py-2.5 text-sm font-medium text-foreground hover:border-border-strong hover:text-foreground disabled:opacity-60"
           >
             {busy ? "Opening…" : "Manage subscription"}
           </button>
         ) : null}
-        {error ? <p className="text-sm text-red-400">{error}</p> : null}
+        {error ? <p className="text-sm text-negative">{error}</p> : null}
       </div>
     );
   }
@@ -102,7 +102,7 @@ export function ProCta({
       >
         {busy ? "Redirecting…" : "Upgrade to Pro"}
       </button>
-      {error ? <p className="text-sm text-red-400">{error}</p> : null}
+      {error ? <p className="text-sm text-negative">{error}</p> : null}
     </div>
   );
 }

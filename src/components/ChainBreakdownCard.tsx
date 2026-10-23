@@ -3,9 +3,10 @@
 import { formatChainName } from "@/lib/format";
 import { useDisplayMoney } from "@/lib/currency";
 import { maskValue, usePrivacyMode } from "@/lib/privacy";
+import { CHART_SERIES } from "@/lib/themes";
 import { ChainIcon } from "./ChainIcon";
 
-const COLORS = ["#c4784a", "#8fbf98", "#e0a36a", "#7f9aa8", "#d4c4b2", "#a66b4a", "#6e8f84", "#a89888"];
+const COLORS = [...CHART_SERIES];
 
 export type ChainTotal = { chain: string; valueUsd: number };
 
@@ -23,9 +24,9 @@ export function ChainBreakdownCard({ totals }: ChainBreakdownCardProps) {
   if (positive.length === 0 || grandTotal <= 0) return null;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="mb-4 text-sm font-medium text-white/50">By chain</p>
-      <div className="flex h-2 w-full overflow-hidden rounded-full bg-white/5">
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+      <p className="mb-4 text-sm font-medium text-text-muted">By chain</p>
+      <div className="flex h-2 w-full overflow-hidden rounded-full bg-surface-hover">
         {positive.map((t, index) => (
           <span
             key={t.chain}
@@ -41,13 +42,13 @@ export function ChainBreakdownCard({ totals }: ChainBreakdownCardProps) {
           const pct = (t.valueUsd / grandTotal) * 100;
           return (
             <li key={t.chain} className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-2 text-white/80">
+              <span className="flex items-center gap-2 text-foreground">
                 <ChainIcon chain={t.chain} size={16} />
                 {formatChainName(t.chain)}
               </span>
-              <span className="flex items-center gap-2 tabular-nums text-white/60">
+              <span className="flex items-center gap-2 tabular-nums text-text-secondary">
                 <span>{pct.toFixed(1)}%</span>
-                <span className="font-medium text-white">{maskValue(formatValue(t.valueUsd), privacyMode)}</span>
+                <span className="font-medium text-foreground">{maskValue(formatValue(t.valueUsd), privacyMode)}</span>
               </span>
             </li>
           );

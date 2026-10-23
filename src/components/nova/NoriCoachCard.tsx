@@ -52,7 +52,7 @@ export function NoriCoachCard({
 
   return (
     <div
-      className={`relative flex gap-3 rounded-xl border bg-surface-raised p-3 ${ACCENT_BY_STATE[state]} ${
+      className={`relative flex gap-3 rounded-xl border bg-surface-raised p-3 shadow-[var(--shadow-glow)] ${ACCENT_BY_STATE[state]} ${
         isCenter ? "flex-col items-center text-center" : "items-center text-left"
       } ${className}`}
     >

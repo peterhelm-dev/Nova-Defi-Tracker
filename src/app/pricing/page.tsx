@@ -38,9 +38,9 @@ export default function PricingPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-6">
+      <header className="flex items-center justify-between gap-3 border-b border-border-subtle px-4 py-4 sm:px-6">
         <BrandMark />
-        <Link href="/" className="text-sm text-white/60 hover:text-white">
+        <Link href="/" className="text-sm text-text-secondary hover:text-foreground">
           ← Back
         </Link>
       </header>
@@ -48,32 +48,32 @@ export default function PricingPage() {
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 py-12 sm:px-6">
         <section className="flex flex-col items-center gap-3 text-center">
           <h1 className="text-3xl font-bold sm:text-4xl">Free to use. Pro is not for sale.</h1>
-          <p className="max-w-2xl text-white/60">
+          <p className="max-w-2xl text-text-secondary">
             The tracker runs on free public data and a free Alchemy key. Pro stays in the
             code until there is a reason to charge for it. Nothing here is financial advice.
           </p>
         </section>
 
         <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-surface p-6">
+          <div className="flex flex-col gap-5 rounded-2xl border border-border-subtle bg-surface p-6">
             <div className="flex items-baseline justify-between">
               <h2 className="text-lg font-semibold">Free</h2>
               <p className="text-2xl font-bold">$0</p>
             </div>
-            <p className="text-sm text-white/60">What you can use today.</p>
+            <p className="text-sm text-text-secondary">What you can use today.</p>
             <ul className="flex flex-1 flex-col gap-2.5 text-sm">
               {freeFeatures.map((feature) => (
                 <li key={feature} className="flex gap-2.5">
-                  <span aria-hidden className="text-emerald-400">
+                  <span aria-hidden className="text-positive">
                     ✓
                   </span>
-                  <span className="text-white/80">{feature}</span>
+                  <span className="text-foreground">{feature}</span>
                 </li>
               ))}
             </ul>
             <Link
               href="/"
-              className="rounded-lg border border-white/15 px-4 py-2.5 text-center text-sm font-medium text-white/80 hover:border-white/30 hover:text-white"
+              className="rounded-lg border border-border-subtle px-4 py-2.5 text-center text-sm font-medium text-foreground hover:border-border-strong hover:text-foreground"
             >
               Open the app
             </Link>
@@ -85,18 +85,18 @@ export default function PricingPage() {
               {billingLive ? (
                 <p className="text-2xl font-bold">
                   $12
-                  <span className="text-sm font-normal text-white/50">/mo</span>
+                  <span className="text-sm font-normal text-text-muted">/mo</span>
                 </p>
               ) : (
                 <p className="text-right text-sm font-semibold text-accent">
                   Coming soon
-                  <span className="mt-1 block text-xs font-normal text-white/50">
+                  <span className="mt-1 block text-xs font-normal text-text-muted">
                     Planned around $12/mo · not for sale
                   </span>
                 </p>
               )}
             </div>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-text-secondary">
               {billingLive
                 ? "The complete picture, when you choose to pay."
                 : "Listed so you can see the plan. There is no checkout."}
@@ -107,7 +107,7 @@ export default function PricingPage() {
                   <span aria-hidden className="text-accent">
                     ✓
                   </span>
-                  <span className="text-white/80">{feature}</span>
+                  <span className="text-foreground">{feature}</span>
                 </li>
               ))}
             </ul>

@@ -100,9 +100,9 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm font-medium text-white/50">Token holdings</p>
+        <p className="text-sm font-medium text-text-muted">Token holdings</p>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="text"
@@ -110,14 +110,14 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search token…"
             aria-label="Search tokens"
-            className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white placeholder:text-text-muted focus:border-accent/50 focus:outline-none"
+            className="rounded-lg border border-border-subtle bg-background px-2.5 py-1.5 text-xs text-foreground placeholder:text-text-muted focus:border-accent/50 focus:outline-none"
           />
           {chains.length > 1 && (
             <select
               value={chainFilter}
               onChange={(e) => setChainFilter(e.target.value)}
               aria-label="Filter by chain"
-              className="rounded-lg border border-white/10 bg-background px-2.5 py-1.5 text-xs text-white focus:border-accent/50 focus:outline-none"
+              className="rounded-lg border border-border-subtle bg-background px-2.5 py-1.5 text-xs text-foreground focus:border-accent/50 focus:outline-none"
             >
               <option value="all">All chains</option>
               {chains.map((chain) => (
@@ -146,7 +146,7 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
                   <button
                     type="button"
                     onClick={() => toggleSort(col.key)}
-                    className={`inline-flex items-center gap-1 hover:text-white/70 ${sort.key === col.key ? "text-white/70" : ""}`}
+                    className={`inline-flex items-center gap-1 hover:text-foreground ${sort.key === col.key ? "text-text-secondary" : ""}`}
                   >
                     {col.label}
                     {sort.key === col.key ? (sort.direction === "asc" ? "↑" : "↓") : ""}
@@ -181,7 +181,7 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
               <tr
                 key={`${holding.chain}-${holding.address}`}
                 onClick={() => setChartHolding(holding)}
-                className="cursor-pointer hover:bg-white/[0.03]"
+                className="cursor-pointer hover:bg-surface-hover"
                 title={`View ${holding.symbol} price chart`}
               >
                 <td className="py-3">
@@ -193,15 +193,15 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
                       address={holding.address}
                     />
                     <div>
-                      <p className="font-medium text-white">{holding.symbol}</p>
+                      <p className="font-medium text-foreground">{holding.symbol}</p>
                       <p className="text-xs text-text-muted">{holding.name}</p>
                     </div>
                   </div>
                 </td>
-                <td className="py-3 whitespace-nowrap text-white/80">
+                <td className="py-3 whitespace-nowrap text-foreground">
                   {formatTokenAmount(holding.balance)}
                 </td>
-                <td className="py-3 whitespace-nowrap text-white/80">
+                <td className="py-3 whitespace-nowrap text-foreground">
                   {holding.priceUsd !== null ? formatUsd(holding.priceUsd, { decimals: 2 }) : "—"}
                 </td>
                 <td
@@ -209,13 +209,13 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
                     holding.change24h === null
                       ? "py-3 whitespace-nowrap text-text-muted"
                       : holding.change24h >= 0
-                        ? "py-3 whitespace-nowrap text-emerald-400"
-                        : "py-3 whitespace-nowrap text-red-400"
+                        ? "py-3 whitespace-nowrap text-positive"
+                        : "py-3 whitespace-nowrap text-negative"
                   }
                 >
                   {formatPercent(holding.change24h)}
                 </td>
-                <td className="py-3 whitespace-nowrap text-right font-medium text-white">
+                <td className="py-3 whitespace-nowrap text-right font-medium text-foreground">
                   {formatUsd(holding.valueUsd)}
                 </td>
               </tr>
