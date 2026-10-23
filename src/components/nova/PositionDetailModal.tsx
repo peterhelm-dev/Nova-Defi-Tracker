@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { getSamplePositionDetail } from "@/lib/sampleData";
 import { formatUsd } from "@/lib/format";
+import { EstimateNote } from "@/components/EstimateNote";
 import { SampleDataBadge } from "./SampleDataBadge";
 
 const HEALTH_FACTOR_WARNING_THRESHOLD = 1.5;
@@ -57,7 +58,7 @@ export function PositionDetailModal({ onClose }: { onClose: () => void }) {
         <dl className="mt-4 flex flex-col divide-y divide-border-subtle text-sm">
           <Row label="Health Factor">
             <span className={healthy ? "text-positive" : "text-negative"}>
-              {detail.healthFactor.toFixed(2)} · {healthy ? "Healthy" : "Review"}
+              {detail.healthFactor.toFixed(2)}
             </span>
           </Row>
           <Row label="Net Estimated APY">{formatPercentValue(detail.estimatedNetApy)}</Row>
@@ -72,7 +73,8 @@ export function PositionDetailModal({ onClose }: { onClose: () => void }) {
           <Row label="Liquidation Price">{formatUsd(detail.liquidationPrice)}</Row>
         </dl>
 
-        <p className="mt-4 text-xs text-text-muted">
+        <EstimateNote className="mt-4 block" />
+        <p className="mt-2 text-xs text-text-muted">
           Sample only. These figures are not a wallet you watch. Detected lending on the
           portfolio page shows the health factor that was read onchain.
         </p>

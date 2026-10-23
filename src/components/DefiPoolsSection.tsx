@@ -7,6 +7,7 @@ import { formatPercent, formatUsd } from "@/lib/format";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import { POOL_DATA_UNAVAILABLE } from "@/lib/yields";
 import { ChainIcon } from "./ChainIcon";
+import { EstimateNote } from "./EstimateNote";
 import { ExportCsvButton } from "./ExportCsvButton";
 import { IconImg } from "./IconImg";
 import type { DefiPool, TrackedPosition } from "@/types";
@@ -77,7 +78,8 @@ export function DefiPoolsSection({
           <p className="text-xs text-text-muted">
             {unavailable
               ? "Tracked positions below stay saved in this browser. Nothing here moves funds."
-              : "Live TVL and APY from the yields source. Track a position to fold it into your net worth. This does not move funds."}
+              : "Live TVL and APY from the yields source. Track a position to fold it into your net worth. This does not move funds."}{" "}
+            <EstimateNote className="mt-1 block" />
           </p>
         </div>
         {unavailable ? null : (

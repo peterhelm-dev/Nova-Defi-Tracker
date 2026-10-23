@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { NoriCoachCard } from "./NoriCoachCard";
 
 /**
@@ -7,17 +8,28 @@ import { NoriCoachCard } from "./NoriCoachCard";
  * already has a safe integration and I explicitly request it" — so these
  * stay honest placeholders rather than faked functionality.
  */
-export function ComingSoonPage({ title, description }: { title: string; description: string }) {
+export function ComingSoonPage({
+  title,
+  description,
+  note,
+}: {
+  title: string;
+  description: string;
+  note?: ReactNode;
+}) {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <NoriCoachCard
-        state="thinking"
-        title={`${title} is on the way`}
-        message={description}
-        size="hero"
-        layout="center"
-        className="max-w-md"
-      />
+      <div className="flex max-w-md flex-col items-center gap-3">
+        <NoriCoachCard
+          state="thinking"
+          title={`${title} is on the way`}
+          message={description}
+          size="hero"
+          layout="center"
+          className="max-w-md"
+        />
+        {note}
+      </div>
     </div>
   );
 }

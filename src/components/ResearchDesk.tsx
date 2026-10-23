@@ -6,6 +6,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { formatPercent, formatUsd } from "@/lib/format";
 import { chartTooltipStyle } from "@/lib/themes";
 import { CoinGeckoAttribution } from "./CoinGeckoAttribution";
+import { EstimateNote } from "./EstimateNote";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import { researchItemId, type PoolHit, type PoolPoint, type ResearchItem, type TokenHit, type TokenProfile } from "@/lib/research";
 import { POOL_DATA_UNAVAILABLE } from "@/lib/yields";
@@ -434,6 +435,7 @@ function PoolDetail({
         <Stat label="Base APY" value={pool.apyBase === null ? "—" : `${pool.apyBase.toFixed(2)}%`} />
         <Stat label="Reward APY" value={pool.apyReward === null ? "—" : `${pool.apyReward.toFixed(2)}%`} />
       </div>
+      <EstimateNote className="mt-2 block" />
       <div className="mt-4 h-40">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={history}>
@@ -499,12 +501,15 @@ function ComparePane({ items, onRemove }: { items: ResearchItem[]; onRemove: (id
               <Row k="Volume" v={column.profile.volume24h === null ? "—" : formatUsd(column.profile.volume24h)} />
             </dl>
           ) : column.pool ? (
-            <dl className="mt-3 space-y-2 text-sm">
-              <Row k="TVL" v={formatUsd(column.pool.tvlUsd)} />
-              <Row k="APY" v={column.pool.apy === null ? "—" : `${column.pool.apy.toFixed(2)}%`} />
-              <Row k="Base APY" v={column.pool.apyBase === null ? "—" : `${column.pool.apyBase.toFixed(2)}%`} />
-              <Row k="Reward APY" v={column.pool.apyReward === null ? "—" : `${column.pool.apyReward.toFixed(2)}%`} />
-            </dl>
+            <>
+              <dl className="mt-3 space-y-2 text-sm">
+                <Row k="TVL" v={formatUsd(column.pool.tvlUsd)} />
+                <Row k="APY" v={column.pool.apy === null ? "—" : `${column.pool.apy.toFixed(2)}%`} />
+                <Row k="Base APY" v={column.pool.apyBase === null ? "—" : `${column.pool.apyBase.toFixed(2)}%`} />
+                <Row k="Reward APY" v={column.pool.apyReward === null ? "—" : `${column.pool.apyReward.toFixed(2)}%`} />
+              </dl>
+              <EstimateNote className="mt-3 block" />
+            </>
           ) : (
             <p className="mt-3 text-sm text-text-muted">
               {details.isFetching ? "Loading…" : column.item.kind === "pool" || column.unavailable ? POOL_DATA_UNAVAILABLE : "Details unavailable."}

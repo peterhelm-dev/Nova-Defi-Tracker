@@ -14,7 +14,7 @@ export function StakingRewardsCard() {
       <NoriCoachCard
         state="neutral"
         title="No staking integration yet"
-        message="This section will show staked balances, estimated APY, and claimable rewards once a staking data source is connected."
+        message="Once a data source is connected, this section will list staked balances and published APY. Those figures would be estimates, not a prompt to stake, claim, or sell."
         className="mt-4"
       />
     </div>
