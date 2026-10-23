@@ -7,7 +7,9 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # ubuntu-latest moved to Ubuntu 26, which Playwright 1.56 cannot install
+    # browser dependencies for. Pin the image that --with-deps supports.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
