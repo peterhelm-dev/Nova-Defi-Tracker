@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { InfoPage } from "@/components/InfoPage";
+import { OperatorContact, PendingLegalReview } from "@/components/LegalDraft";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -9,12 +10,14 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <InfoPage title="Terms of Service" updated="October 22, 2026">
+    <InfoPage title="Terms of Service" updated="October 23, 2026">
+      <PendingLegalReview />
+      <OperatorContact />
       <p>
         These terms govern your use of Novafolio (the
-        &ldquo;Service&rdquo;). By connecting a wallet, signing in, or
-        subscribing, you agree to them. If you don&apos;t agree, don&apos;t use
-        the Service.
+        &ldquo;Service&rdquo;), operated by Peter H. By connecting a wallet,
+        signing in, or subscribing, you agree to them. If you don&apos;t agree,
+        don&apos;t use the Service.
       </p>
 
       <h2>What the Service is — and isn&apos;t</h2>
@@ -66,7 +69,8 @@ export default function TermsPage() {
       <p>
         Don&apos;t abuse the Service: no scraping at scale, probing other
         users&apos; data, attempting to bypass entitlement checks, or using the
-        Service for unlawful activity.
+        Service for unlawful activity. Automated requests to the portfolio and
+        price routes are rate limited.
       </p>
 
       <h2>Disclaimers and liability</h2>
@@ -78,6 +82,13 @@ export default function TermsPage() {
         displayed information.
       </p>
 
+      <h2>Governing law</h2>
+      <p>
+        Governing law and venue have not been chosen. This paragraph is a
+        placeholder pending legal review. It does not select a country, state,
+        or court.
+      </p>
+
       <h2>Changes</h2>
       <p>
         We may update these terms or the Service itself. Material changes will
@@ -87,7 +98,7 @@ export default function TermsPage() {
 
       <h2>Contact</h2>
       <p>
-        Questions about these terms? See the{" "}
+        Questions about these terms? Use the contact above, or see the{" "}
         <Link href="/support">support page</Link>.
       </p>
     </InfoPage>

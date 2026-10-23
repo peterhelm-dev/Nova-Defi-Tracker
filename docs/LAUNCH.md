@@ -1,15 +1,20 @@
 # Launch Novafolio on Vercel Hobby
 
-Production URL: **https://novafolio.app**
+Production URL: **https://www.novafolio.app**
+
+`https://novafolio.app` redirects to www. Canonical links, the sitemap, and
+`robots.txt` follow www unless you set another origin. To make the apex the
+primary host instead, change that redirect in Vercel and set
+`NEXT_PUBLIC_SITE_URL` to the apex.
 
 Set this on the Vercel project:
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://novafolio.app
+NEXT_PUBLIC_SITE_URL=https://www.novafolio.app
 ```
 
 That value is the canonical URL in page metadata. If it is missing, production
-still falls back to `https://novafolio.app`, and a Vercel preview uses its own
+still falls back to `https://www.novafolio.app`, and a Vercel preview uses its own
 host only for image URLs.
 
 ## What ships on the free tier
@@ -89,6 +94,25 @@ times a day stays far under 30M. A bot refreshing unique addresses all day
 would not. Profit and loss is not requested, because Novafolio does not invent
 a cost basis.
 
+### Per-IP limits on Alchemy routes
+
+`/api/portfolio`, `/api/activity`, `/api/gas`, `/api/approvals`, `/api/prices`,
+`/api/token-chart`, and `/api/network-costs` are limited per IP. No new
+variable is required. On Vercel Hobby the window is in memory on whichever
+function instance handled the request, so a burst can still be split across
+instances.
+
+To share one counter, set both of these from the Upstash free tier (leave both
+unset otherwise):
+
+```bash
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+```
+
+A visitor who crosses the window gets HTTP 429 and a `Retry-After` header.
+The wallet address is not part of the counter.
+
 ## Optional keys
 
 | Variable | Where | Why |
@@ -97,10 +121,10 @@ a cost basis.
 | `NEXT_PUBLIC_ONCHAINKIT_API_KEY` | [portal.cdp.coinbase.com](https://portal.cdp.coinbase.com) (free) | Coinbase’s Base RPC. Public RPCs are used otherwise. |
 | `COINGECKO_API_KEY` | CoinGecko demo dashboard | Optional fallback. Leave unset while `ALCHEMY_API_KEY` is set. If you add a Demo key, leave `COINGECKO_PLAN` empty. Set `COINGECKO_PLAN=pro` only for a paid Pro key. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | A mailbox you read | Shown on `/support`. If unset, the page does not invent an address. |
-| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Plausible | Set to `novafolio.app` if you want cookie-less analytics. Unset = none. |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Plausible | Optional second counter. Unset = Plausible stays off. Vercel Web Analytics is separate and cookieless. |
 | `DATABASE_URL` | Neon or Supabase free Postgres | Turns on sign-in sync, the waitlist, and daily snapshots. |
 | `SESSION_SECRET` | `openssl rand -base64 32` | Required before anyone can sign in. |
-| `CRON_SECRET` | `openssl rand -base64 32` | Vercel sends this to the daily jobs. |
+| `CRON_SECRET` | `openssl rand -base64 32` | Vercel Cron sends this as `Authorization: Bearer`. A `?secret=` query param is rejected. |
 
 Do **not** set `STRIPE_SECRET_KEY`, `STRIPE_PRO_PRICE_ID`, or
 `STRIPE_WEBHOOK_SECRET` until you intend to charge. Pro stays “coming soon”.
@@ -135,17 +159,19 @@ not instant. Both jobs no-op without `DATABASE_URL`.
 1. Push this repo to GitHub.
 2. In Vercel, **Add New → Project**, import the repo, framework Next.js.
 3. Environment variables for Production:
-   - `NEXT_PUBLIC_SITE_URL` = `https://novafolio.app`
+   - `NEXT_PUBLIC_SITE_URL` = `https://www.novafolio.app`
    - `ALCHEMY_API_KEY` = the free key
-   - `CRON_SECRET` = a random string (so the cron URLs are not public)
+   - `CRON_SECRET` = a random string (Vercel sends it as a Bearer token; do not put it in the cron URL)
 4. Deploy.
-5. Project → Settings → Domains → add `novafolio.app` and follow the DNS
-   records Vercel shows (usually an A record or CNAME at the registrar).
-6. Open `https://novafolio.app`. You should see the empty state, the wallet
+5. Project → Settings → Domains → add `www.novafolio.app` as the primary host
+   and `novafolio.app` as a redirect to www. Follow the DNS records Vercel shows.
+6. Project → Analytics → enable Web Analytics. The app already includes the
+   cookieless `@vercel/analytics` component. It does not set a cookie.
+7. Open `https://www.novafolio.app`. You should see the empty state, the wallet
    box, and the pool table. Paste your own address and confirm the tokens you
    expect. The banner should **not** say “major tokens only” once the Alchemy
    key is set.
-7. Open `/pricing`. It must say Pro is coming soon and must not show a card form.
+8. Open `/pricing`. It must say Pro is coming soon and must not show a card form.
 
 Add `DATABASE_URL` and `SESSION_SECRET` later if you want sign-in. Apply
 `migrations/001_init.sql` (and `002_subscriptions.sql` before any future
@@ -153,8 +179,9 @@ billing) to that database first.
 
 ## Pre-launch checklist
 
-- [ ] `https://novafolio.app` loads and the padlock is valid
-- [ ] `NEXT_PUBLIC_SITE_URL=https://novafolio.app` is set in Production
+- [ ] `https://www.novafolio.app` loads, the apex redirects there, and the padlock is valid
+- [ ] `NEXT_PUBLIC_SITE_URL=https://www.novafolio.app` is set in Production
+- [ ] Web Analytics is enabled for the project
 - [ ] `ALCHEMY_API_KEY` is set, and a wallet you control shows more than just ETH/USDC
 - [ ] Pasting an ENS name resolves, and pasting a second address adds it
 - [ ] Coinbase, MetaMask, and Rabby appear in the connect dialog

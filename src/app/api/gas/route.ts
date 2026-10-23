@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
 import { readAlchemyGasSpend } from "@/lib/server/gas/read";
 import { getZerionProvider } from "@/lib/server/portfolio";
+import { rateLimit } from "@/lib/server/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,6 +14,9 @@ export const dynamic = "force-dynamic";
  * when that key exists and Alchemy does not.
  */
 export async function GET(request: Request) {
+  const limited = await rateLimit(request, "gas");
+  if (limited) return limited;
+
   const sessionAddress = await getSessionAddress();
   const queryAddress = new URL(request.url).searchParams.get("address");
   const address = sessionAddress ?? queryAddress;

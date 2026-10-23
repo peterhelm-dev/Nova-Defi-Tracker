@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { InfoPage } from "@/components/InfoPage";
+import { OperatorContact, PendingLegalReview } from "@/components/LegalDraft";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <InfoPage title="Privacy Policy" updated="October 22, 2026">
+    <InfoPage title="Privacy Policy" updated="October 23, 2026">
+      <PendingLegalReview />
+      <OperatorContact />
       <p>
         Novafolio is built to need as little of your data as
         possible. No email or password is required to use it, and there is no
@@ -82,11 +85,27 @@ export default function PrivacyPage() {
           turned on. If it is, Stripe holds payment details under its own policy.
         </li>
         <li>
-          <strong>Analytics</strong> — wallet-connect telemetry to Coinbase is
-          turned off. If a Plausible domain is set, we use cookie-less page
-          counts that do not identify you. Otherwise no analytics script loads.
+          <strong>Analytics</strong> — Vercel Web Analytics counts page views
+          without cookies and without advertising. It does not receive your
+          wallet address. Wallet-connect telemetry to Coinbase is turned off.
+          If a Plausible domain is set, that cookie-less counter loads as well.
         </li>
       </ul>
+
+      <h2>Host and logs</h2>
+      <p>
+        Novafolio is hosted on Vercel. The host and this app may keep
+        short-lived request logs: time, path, status, and IP address. Those
+        logs operate the service, apply rate limits, and investigate abuse.
+        They are not sold and are not used for advertising. Vercel keeps its
+        own logs under its policy.
+      </p>
+      <p>
+        Alchemy-backed routes count requests per IP address for about one
+        minute. That counter lives in the memory of the server handling the
+        request, or in Upstash Redis when that optional store is configured.
+        The wallet address is not part of the counter.
+      </p>
 
       <h2>Waitlist</h2>
       <p>
@@ -94,10 +113,27 @@ export default function PrivacyPage() {
         contact you about Pro. Ask us to delete it at any time.
       </p>
 
-      <h2>Retention and deletion</h2>
+      <h2>Retention</h2>
       <p>
-        Account data is kept while the account is active. To have your
-        server-side data deleted, contact us via the{" "}
+        Data in this browser stays until you clear it. Server account data, when
+        sign-in is enabled, is kept while the account exists. A waitlist email
+        is kept until you ask for it to be deleted. Rate-limit counters expire
+        after about a minute. Request logs last only as long as the host retains
+        them.
+      </p>
+
+      <h2>Your rights</h2>
+      <p>
+        You can see, correct, or delete account data tied to your wallet, and
+        you can stop using Novafolio at any time. Data stored only in this
+        browser is under your control. To ask about server-side data, contact
+        the operator with a message signed by the wallet in question. Novafolio
+        is not directed at children.
+      </p>
+
+      <h2>Deletion</h2>
+      <p>
+        To have your server-side data deleted, use the contact above or the{" "}
         <Link href="/support">support page</Link> with a message signed by the
         wallet in question, and we&apos;ll remove it.
       </p>

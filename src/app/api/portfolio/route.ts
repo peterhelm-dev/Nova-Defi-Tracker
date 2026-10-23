@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionAddress } from "@/lib/server/auth";
 import { attachDetectedPositions } from "@/lib/server/defi/read";
 import { getPortfolioProvider, getPublicPortfolioProvider } from "@/lib/server/portfolio";
+import { rateLimit } from "@/lib/server/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +18,9 @@ export const dynamic = "force-dynamic";
  * public RPC reads of major tokens (`coverage: "major-tokens"`).
  */
 export async function GET(request: Request) {
+  const limited = await rateLimit(request, "portfolio");
+  if (limited) return limited;
+
   const sessionAddress = await getSessionAddress();
   const queryAddress = new URL(request.url).searchParams.get("address");
   const address = sessionAddress ?? queryAddress;

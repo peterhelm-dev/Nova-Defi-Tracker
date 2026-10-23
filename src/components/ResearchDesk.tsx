@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatPercent, formatUsd } from "@/lib/format";
+import { CoinGeckoAttribution } from "./CoinGeckoAttribution";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import { researchItemId, type PoolHit, type PoolPoint, type ResearchItem, type TokenHit, type TokenProfile } from "@/lib/research";
 import { POOL_DATA_UNAVAILABLE } from "@/lib/yields";
@@ -91,7 +92,7 @@ export function ResearchDesk({
     <div className="flex flex-col gap-6">
       <div>
         <p className="max-w-2xl text-sm text-text-secondary">
-          A quiet desk for public market and pool data. Figures come from CoinGecko and DeFiLlama,
+          A quiet desk for public market and pool data. Figures come from <CoinGeckoAttribution /> and DeFiLlama,
           can be delayed, and are not financial advice.
         </p>
       </div>

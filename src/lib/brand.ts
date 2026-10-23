@@ -6,7 +6,11 @@
 export const PRODUCT_NAME = "Novafolio";
 export const PRODUCT_TAGLINE = "track all your crypto wallets in one place";
 export const PRODUCT_TITLE = `${PRODUCT_NAME} — ${PRODUCT_TAGLINE}`;
-export const PRODUCTION_SITE_URL = "https://novafolio.app";
+/**
+ * Public origin. novafolio.app redirects to www, so canonical URLs, the
+ * sitemap, and robots.txt use www unless NEXT_PUBLIC_SITE_URL sets another origin.
+ */
+export const PRODUCTION_SITE_URL = "https://www.novafolio.app";
 
 export const PRODUCT_DESCRIPTION =
   "Novafolio is a read-only tracker for wallets you connect or watch. See tokens across Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Avalanche. Not financial advice.";
