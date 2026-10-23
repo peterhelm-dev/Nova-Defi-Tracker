@@ -16,6 +16,7 @@ import {
   optimism,
   polygon,
 } from "viem/chains";
+import { MAJOR_TOKENS } from "@/lib/majorTokens";
 import type { AutoPortfolio, TokenHolding } from "@/types";
 import type { PortfolioProvider } from "./provider";
 
@@ -28,8 +29,6 @@ import type { PortfolioProvider } from "./provider";
 
 const CACHE_SECONDS = 300;
 const RPC_TIMEOUT = 8_000;
-
-type MajorToken = { symbol: string; name: string; address: Address; decimals: number };
 
 type ChainSpec = {
   id: string;
@@ -45,76 +44,49 @@ const CHAINS: ChainSpec[] = [
     chain: mainnet,
     rpc: "https://ethereum.publicnode.com",
     native: { symbol: "ETH", name: "Ethereum", coinId: "ethereum" },
-    tokens: [
-      { symbol: "WETH", name: "Wrapped Ether", address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", decimals: 18 },
-      { symbol: "USDC", name: "USD Coin", address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", decimals: 6 },
-      { symbol: "USDT", name: "Tether", address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", decimals: 6 },
-      { symbol: "DAI", name: "Dai", address: "0x6B175474E89094C44Da98b954EedeAC495271d0F", decimals: 18 },
-      { symbol: "WBTC", name: "Wrapped Bitcoin", address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", decimals: 8 },
-    ],
+    tokens: MAJOR_TOKENS.ethereum,
   },
   {
     id: "base",
     chain: base,
     rpc: "https://base.publicnode.com",
     native: { symbol: "ETH", name: "Ethereum", coinId: "ethereum" },
-    tokens: [
-      { symbol: "WETH", name: "Wrapped Ether", address: "0x4200000000000000000000000000000000000006", decimals: 18 },
-      { symbol: "USDC", name: "USD Coin", address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", decimals: 6 },
-    ],
+    tokens: MAJOR_TOKENS.base,
   },
   {
     id: "arbitrum",
     chain: arbitrum,
     rpc: "https://arbitrum-one.publicnode.com",
     native: { symbol: "ETH", name: "Ethereum", coinId: "ethereum" },
-    tokens: [
-      { symbol: "WETH", name: "Wrapped Ether", address: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", decimals: 18 },
-      { symbol: "USDC", name: "USD Coin", address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", decimals: 6 },
-      { symbol: "ARB", name: "Arbitrum", address: "0x912CE59144191C1204E64559FE8253a0e49E6548", decimals: 18 },
-    ],
+    tokens: MAJOR_TOKENS.arbitrum,
   },
   {
     id: "optimism",
     chain: optimism,
     rpc: "https://optimism.publicnode.com",
     native: { symbol: "ETH", name: "Ethereum", coinId: "ethereum" },
-    tokens: [
-      { symbol: "WETH", name: "Wrapped Ether", address: "0x4200000000000000000000000000000000000006", decimals: 18 },
-      { symbol: "USDC", name: "USD Coin", address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", decimals: 6 },
-      { symbol: "OP", name: "Optimism", address: "0x4200000000000000000000000000000000000042", decimals: 18 },
-    ],
+    tokens: MAJOR_TOKENS.optimism,
   },
   {
     id: "polygon",
     chain: polygon,
     rpc: "https://polygon-bor.publicnode.com",
     native: { symbol: "POL", name: "Polygon", coinId: "matic-network" },
-    tokens: [
-      { symbol: "WETH", name: "Wrapped Ether", address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", decimals: 18 },
-      { symbol: "USDC", name: "USD Coin", address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", decimals: 6 },
-    ],
+    tokens: MAJOR_TOKENS.polygon,
   },
   {
     id: "binance-smart-chain",
     chain: bsc,
     rpc: "https://bsc.publicnode.com",
     native: { symbol: "BNB", name: "BNB", coinId: "binancecoin" },
-    tokens: [
-      { symbol: "WBNB", name: "Wrapped BNB", address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", decimals: 18 },
-      { symbol: "USDC", name: "USD Coin", address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", decimals: 18 },
-      { symbol: "USDT", name: "Tether", address: "0x55d398326f99059fF775485246999027B3197955", decimals: 18 },
-    ],
+    tokens: MAJOR_TOKENS["binance-smart-chain"],
   },
   {
     id: "avalanche",
     chain: avalanche,
     rpc: "https://avalanche-c-chain.publicnode.com",
     native: { symbol: "AVAX", name: "Avalanche", coinId: "avalanche-2" },
-    tokens: [
-      { symbol: "WAVAX", name: "Wrapped AVAX", address: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7", decimals: 18 },
-      { symbol: "USDC", name: "USD Coin", address: "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E", decimals: 6 },
-    ],
+    tokens: MAJOR_TOKENS.avalanche,
   },
 ];
 
@@ -149,7 +121,7 @@ async function fetchCoinPrices(): Promise<Record<string, CoinPrice>> {
 }
 
 function priceFor(symbol: string, coinId: string | undefined, prices: Record<string, CoinPrice>) {
-  if (symbol === "USDC" || symbol === "USDT" || symbol === "DAI") {
+  if (symbol === "USDC" || symbol === "USDT" || symbol === "DAI" || symbol === "USDT0" || symbol === "USD₮0") {
     return { priceUsd: 1, change24h: 0 };
   }
   const id =

@@ -1,10 +1,8 @@
 import { unstable_cache } from "next/cache";
-import { erc20Abi, formatUnits, parseAbiItem, type Address } from "viem";
-import { selectOpenApprovals } from "@/lib/approvals";
-import { AAVE_MARKETS, COMPOUND_MARKETS } from "@/lib/defi/markets";
+import { erc20Abi, formatUnits, type Address } from "viem";
+import { APPROVAL_TOPIC, decodeApprovalLog, isUnlimitedAllowance } from "@/lib/approvals";
+import { approvalSpenders, approvalTokens, RECENT_APPROVAL_BLOCKS, spenderLabel } from "@/lib/approvalCatalog";
 import { evmClient, trackedChains } from "../evm";
-
-const approvalEvent = parseAbiItem("event Approval(address indexed owner, address indexed spender, uint256 value)");
 
 const CHAIN_ID: Record<string, number> = {
   ethereum: 1,
@@ -15,19 +13,6 @@ const CHAIN_ID: Record<string, number> = {
   avalanche: 43114,
   "binance-smart-chain": 56,
 };
-
-/** How far back one log query tries. A failure retries a shorter window and marks the result partial. */
-const LOOKBACK: Record<string, bigint> = {
-  ethereum: BigInt(8_000_000),
-  base: BigInt(25_000_000),
-  arbitrum: BigInt(200_000_000),
-  optimism: BigInt(100_000_000),
-  polygon: BigInt(50_000_000),
-  avalanche: BigInt(30_000_000),
-  "binance-smart-chain": BigInt(30_000_000),
-};
-
-const SHORT_LOOKBACK = BigInt(500_000);
 
 export type WalletApproval = {
   chain: string;
@@ -42,113 +27,163 @@ export type WalletApproval = {
   unlimited: boolean;
 };
 
-function knownSpenders(): Map<string, string> {
-  const known = new Map<string, string>();
-  known.set("0x000000000022d473030f116ddee9f6b43ac78ba3", "Permit2");
-  known.set("0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45", "Uniswap");
-  known.set("0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b", "Uniswap");
-  for (const market of Object.values(AAVE_MARKETS)) known.set(market.pool.toLowerCase(), "Aave");
-  for (const market of COMPOUND_MARKETS) known.set(market.comet.toLowerCase(), "Compound");
-  return known;
-}
+type Pair = { token: string; spender: string; symbol: string; decimals: number };
 
-async function logsFor(chain: string, owner: Address): Promise<{ events: { token: string; spender: string; value: bigint; block: bigint }[]; partial: boolean }> {
-  const client = evmClient(chain);
-  const latest = await client.getBlockNumber();
-  const windows = [LOOKBACK[chain] ?? SHORT_LOOKBACK, SHORT_LOOKBACK];
-  let lastError: unknown;
-  for (const [index, span] of windows.entries()) {
-    const fromBlock = latest > span ? latest - span : BigInt(1);
-    try {
-      const logs = await client.getLogs({
-        event: approvalEvent,
-        args: { owner },
-        fromBlock,
-        toBlock: latest,
-      });
-      return {
-        partial: index > 0,
-        events: logs.map((log) => ({
-          token: (log.address as string).toLowerCase(),
-          spender: (log.args.spender as string).toLowerCase(),
-          value: log.args.value as bigint,
-          block: log.blockNumber ?? BigInt(0),
-        })),
-      };
-    } catch (error) {
-      lastError = error;
-    }
-  }
-  console.error(`Approval logs failed on ${chain}`, lastError instanceof Error ? lastError.message : "unknown");
-  return { events: [], partial: true };
-}
-
+/**
+ * Open allowances are current state, so they are read with Multicall rather
+ * than a chain-wide eth_getLogs scan. Public RPCs reject that scan (and any
+ * window older than their recent tip), which used to return an empty partial
+ * list even when allowance() would have answered.
+ */
 async function readWalletApprovals(address: string): Promise<{ approvals: WalletApproval[]; partial: boolean }> {
   const owner = address as Address;
-  const labels = knownSpenders();
-  const scanned = await Promise.all(
+  const settled = await Promise.all(
     trackedChains().map(async (chain) => {
       try {
-        const found = await logsFor(chain, owner);
-        return { chain, ...found };
+        return await readChain(chain, owner);
       } catch (error) {
-        console.error(`Approval scan failed on ${chain}`, error instanceof Error ? error.message : "unknown");
-        return { chain, events: [], partial: true };
+        console.error(`Approval read failed on ${chain}`, error instanceof Error ? error.message : "unknown");
+        return { approvals: [] as WalletApproval[], partial: true };
       }
     }),
   );
+  return {
+    approvals: settled.flatMap((chain) => chain.approvals),
+    partial: settled.some((chain) => chain.partial),
+  };
+}
 
-  const partial = scanned.some((chain) => chain.partial);
-  const approvals: WalletApproval[] = [];
-
-  for (const chain of scanned) {
-    const latest = new Map<string, { token: string; spender: string; value: bigint; block: bigint }>();
-    for (const event of chain.events) latest.set(`${event.token}:${event.spender}`, event);
-    const rows = [...latest.values()].sort((a, b) => (a.block > b.block ? -1 : 1)).slice(0, 40);
-    if (rows.length === 0) continue;
-    const client = evmClient(chain.chain);
-    const contracts = rows.flatMap((row) => [
-      { address: row.token as Address, abi: erc20Abi, functionName: "allowance" as const, args: [owner, row.spender as Address] },
-      { address: row.token as Address, abi: erc20Abi, functionName: "balanceOf" as const, args: [owner] },
-      { address: row.token as Address, abi: erc20Abi, functionName: "decimals" as const },
-      { address: row.token as Address, abi: erc20Abi, functionName: "symbol" as const },
-    ]);
-    const results: { status: string; result?: unknown }[] = [];
-    for (let i = 0; i < contracts.length; i += 40) {
-      const batch = await client.multicall({ allowFailure: true, contracts: contracts.slice(i, i + 40) });
-      results.push(...batch);
-    }
-    const open = selectOpenApprovals(
-      rows.map((row) => ({ token: row.token, owner: address.toLowerCase(), spender: row.spender, value: row.value })),
-      rows.map((row, index) => ({
-        token: row.token,
-        spender: row.spender,
-        allowance: results[index * 4]?.status === "success" ? (results[index * 4].result as bigint) : BigInt(0),
-      })),
-    );
-    const byPair = new Map(open.map((row) => [`${row.token}:${row.spender}`, row]));
-    for (const [index, row] of rows.entries()) {
-      const current = byPair.get(`${row.token}:${row.spender}`);
-      if (!current) continue;
-      const balance = results[index * 4 + 1]?.status === "success" ? (results[index * 4 + 1].result as bigint) : BigInt(0);
-      const decimals = results[index * 4 + 2]?.status === "success" ? Number(results[index * 4 + 2].result) : 18;
-      const symbol = results[index * 4 + 3]?.status === "success" ? String(results[index * 4 + 3].result) : "token";
-      approvals.push({
-        chain: chain.chain,
-        chainId: CHAIN_ID[chain.chain] ?? 1,
-        token: row.token,
-        symbol,
-        decimals,
-        spender: row.spender,
-        spenderLabel: labels.get(row.spender) ?? null,
-        allowance: formatUnits(current.allowance, decimals),
-        balance: formatUnits(balance, decimals),
-        unlimited: current.unlimited,
+async function readChain(
+  chain: string,
+  owner: Address,
+): Promise<{ approvals: WalletApproval[]; partial: boolean }> {
+  const client = evmClient(chain);
+  const tokens = approvalTokens(chain);
+  const spenders = approvalSpenders(chain);
+  const pairs: Pair[] = [];
+  for (const token of tokens) {
+    for (const spender of spenders) {
+      pairs.push({
+        token: token.address,
+        spender: spender.address,
+        symbol: token.symbol,
+        decimals: token.decimals,
       });
     }
   }
 
+  const allowances = await batched(client, pairs.map((pair) => ({
+    address: pair.token as Address,
+    abi: erc20Abi,
+    functionName: "allowance" as const,
+    args: [owner, pair.spender as Address] as const,
+  })));
+  const balances = await batched(client, tokens.map((token) => ({
+    address: token.address as Address,
+    abi: erc20Abi,
+    functionName: "balanceOf" as const,
+    args: [owner] as const,
+  })));
+
+  const open = new Map<string, Pair & { allowance: bigint; balance: bigint }>();
+  pairs.forEach((pair, index) => {
+    const allowance = allowances[index]?.status === "success" ? (allowances[index].result as bigint) : BigInt(0);
+    if (allowance <= BigInt(0)) return;
+    const tokenIndex = tokens.findIndex((token) => token.address.toLowerCase() === pair.token.toLowerCase());
+    const balance = balances[tokenIndex]?.status === "success" ? (balances[tokenIndex].result as bigint) : BigInt(0);
+    open.set(keyOf(pair.token, pair.spender), { ...pair, allowance, balance });
+  });
+
+  let partial = false;
+  const held = tokens.filter((token, index) => balances[index]?.status === "success" && (balances[index].result as bigint) > BigInt(0));
+  try {
+    const latest = await client.getBlockNumber();
+    const from = latest > RECENT_APPROVAL_BLOCKS ? latest - RECENT_APPROVAL_BLOCKS : BigInt(1);
+    const ownerTopic = `0x${owner.slice(2).toLowerCase().padStart(64, "0")}`;
+    for (const token of held) {
+      let logs: { topics?: string[]; data?: string; address?: string }[] = [];
+      try {
+        logs = (await client.request({
+          method: "eth_getLogs",
+          params: [{
+            address: token.address,
+            fromBlock: `0x${from.toString(16)}`,
+            toBlock: `0x${latest.toString(16)}`,
+            topics: [APPROVAL_TOPIC, ownerTopic],
+          }],
+        })) as { topics?: string[]; data?: string; address?: string }[];
+      } catch {
+        partial = true;
+        continue;
+      }
+      const extraSpenders = new Set<string>();
+      for (const log of logs) {
+        const event = decodeApprovalLog({
+          address: log.address ?? token.address,
+          topics: log.topics ?? [],
+          data: log.data ?? "0x",
+        });
+        if (!event) continue;
+        if (!open.has(keyOf(event.token, event.spender))) extraSpenders.add(event.spender);
+      }
+      if (extraSpenders.size === 0) continue;
+      const extras = [...extraSpenders];
+      const current = await client.multicall({
+        allowFailure: true,
+        contracts: extras.map((spender) => ({
+          address: token.address as Address,
+          abi: erc20Abi,
+          functionName: "allowance" as const,
+          args: [owner, spender as Address] as const,
+        })),
+      });
+      const balance = balances[tokens.findIndex((item) => item.address.toLowerCase() === token.address.toLowerCase())];
+      extras.forEach((spender, index) => {
+        const allowance = current[index]?.status === "success" ? (current[index].result as bigint) : BigInt(0);
+        if (allowance <= BigInt(0)) return;
+        open.set(keyOf(token.address, spender), {
+          token: token.address,
+          spender,
+          symbol: token.symbol,
+          decimals: token.decimals,
+          allowance,
+          balance: balance?.status === "success" ? (balance.result as bigint) : BigInt(0),
+        });
+      });
+    }
+  } catch {
+    partial = true;
+  }
+
+  const approvals = [...open.values()].map((row) => ({
+    chain,
+    chainId: CHAIN_ID[chain] ?? 1,
+    token: row.token.toLowerCase(),
+    symbol: row.symbol,
+    decimals: row.decimals,
+    spender: row.spender.toLowerCase(),
+    spenderLabel: spenderLabel(chain, row.spender),
+    allowance: formatUnits(row.allowance, row.decimals),
+    balance: formatUnits(row.balance, row.decimals),
+    unlimited: isUnlimitedAllowance(row.allowance),
+  }));
   return { approvals, partial };
 }
 
-export const getWalletApprovals = unstable_cache(readWalletApprovals, ["approvals-v1"], { revalidate: 1800 });
+function keyOf(token: string, spender: string): string {
+  return `${token.toLowerCase()}:${spender.toLowerCase()}`;
+}
+
+async function batched(
+  client: ReturnType<typeof evmClient>,
+  contracts: Parameters<ReturnType<typeof evmClient>["multicall"]>[0]["contracts"],
+) {
+  const results: { status: string; result?: unknown }[] = [];
+  for (let index = 0; index < contracts.length; index += 80) {
+    const batch = await client.multicall({ allowFailure: true, contracts: contracts.slice(index, index + 80) });
+    results.push(...batch);
+  }
+  return results;
+}
+
+export const getWalletApprovals = unstable_cache(readWalletApprovals, ["approvals-v2"], { revalidate: 1800 });

@@ -65,6 +65,8 @@ const STABLES = new Set([
   "TUSD",
   "USDE",
   "USD0",
+  "USDT0",
+  "USD₮0",
   "EURC",
   "USDM",
 ]);

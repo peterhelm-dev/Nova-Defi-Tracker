@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { isAddress } from "viem";
 import {
   generatedAvatarSrc,
   resolveWalletAvatar,
@@ -10,6 +11,7 @@ import {
   type WalletAvatarChoice,
 } from "@/lib/experience";
 import { shortenAddress } from "@/lib/format";
+import { explorerAddressUrl } from "@/lib/explorers";
 import { playUiSound } from "@/lib/sounds";
 import { MAX_WALLETS, type SavedWallet, type WalletIdentityPatch } from "@/hooks/useWalletBook";
 
@@ -19,8 +21,28 @@ export function AddWalletForm({
   onAdd: (input: string) => Promise<void>;
 }) {
   const [input, setInput] = useState("");
+  const [debounced, setDebounced] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(input.trim()), 400);
+    return () => clearTimeout(id);
+  }, [input]);
+
+  const preview = useQuery({
+    queryKey: ["ens-preview", debounced],
+    enabled: debounced.includes(".") || isAddress(debounced),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const res = await fetch(`/api/ens?name=${encodeURIComponent(debounced)}`);
+      const data = (await res.json().catch(() => ({}))) as { address?: string; error?: string };
+      if (!res.ok || !data.address || !isAddress(data.address)) {
+        throw new Error(data.error ?? "Could not resolve that name");
+      }
+      return data.address;
+    },
+  });
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -54,6 +76,12 @@ export function AddWalletForm({
       >
         {busy ? "Adding…" : "Add wallet"}
       </button>
+      {preview.data ? (
+        <p className="text-xs text-text-muted sm:basis-full">Resolves to {shortenAddress(preview.data, 6)}</p>
+      ) : null}
+      {preview.isError ? (
+        <p className="text-sm text-negative sm:basis-full">{preview.error instanceof Error ? preview.error.message : "Could not resolve that name"}</p>
+      ) : null}
       {error ? <p className="text-sm text-negative sm:basis-full">{error}</p> : null}
     </form>
   );
@@ -251,6 +279,10 @@ export function WalletBook({
                       <p className="text-xs text-text-muted">
                         {wallet.source === "connected" ? "Connected" : "Watch-only"}
                         {title ? ` · ${shortenAddress(wallet.address, 4)}` : ""}
+                        {" · "}
+                        <a href={explorerAddressUrl(wallet.address)} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+                          Etherscan
+                        </a>
                       </p>
                     </div>
                   </div>

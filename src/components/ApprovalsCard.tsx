@@ -52,17 +52,19 @@ export function ApprovalsCard({
           Review on revoke.cash
         </a>
       </div>
-      {query.isLoading ? <p className="mt-4 text-sm text-text-muted">Reading approval logs…</p> : null}
+      {query.isLoading ? <p className="mt-4 text-sm text-text-muted">Reading allowances…</p> : null}
       {query.isError ? (
-        <p className="mt-4 text-sm text-text-muted">Approval history didn&apos;t load. The revoke.cash link still opens the full list.</p>
+        <p className="mt-4 text-sm text-text-muted">Allowances didn&apos;t load. The revoke.cash link still opens the full list.</p>
       ) : null}
       {query.data?.partial ? (
         <p className="mt-3 text-xs text-text-muted">
-          Some chains only returned a recent window of logs. An older approval can still be open. Use revoke.cash for the full history.
+          A chain&apos;s recent history didn&apos;t load. Allowances to Aave, Compound, Permit2, Uniswap, and 1inch are still listed when the allowance call succeeded.
         </p>
       ) : null}
       {!query.isLoading && approvals.length === 0 && !query.isError ? (
-        <p className="mt-4 text-sm text-text-muted">No open approvals showed up in the logs we could read.</p>
+        <p className="mt-4 text-sm text-text-muted">
+          No open allowance to Aave, Compound, Permit2, Uniswap, or 1inch. An older approval to another spender can still exist. Review the full list on revoke.cash.
+        </p>
       ) : null}
       {approvals.length > 0 ? (
         <ul className="mt-4 flex flex-col divide-y divide-border-subtle">
