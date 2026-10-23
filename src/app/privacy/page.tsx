@@ -82,8 +82,9 @@ export default function PrivacyPage() {
           turned on. If it is, Stripe holds payment details under its own policy.
         </li>
         <li>
-          <strong>Analytics</strong> — if enabled, we use cookie-less Plausible,
-          which counts aggregate page views and does not identify you.
+          <strong>Analytics</strong> — wallet-connect telemetry to Coinbase is
+          turned off. If a Plausible domain is set, we use cookie-less page
+          counts that do not identify you. Otherwise no analytics script loads.
         </li>
       </ul>
 

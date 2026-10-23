@@ -202,7 +202,7 @@ export function TokenHoldingsTable({ holdings, isLoading }: TokenHoldingsTablePr
                   {formatTokenAmount(holding.balance)}
                 </td>
                 <td className="py-3 whitespace-nowrap text-foreground">
-                  {holding.priceUsd !== null ? formatUsd(holding.priceUsd, { decimals: 2 }) : "—"}
+                  {holding.priceUsd !== null ? formatUsd(holding.priceUsd, { decimals: 2 }) : "Price unavailable"}
                 </td>
                 <td
                   className={

@@ -680,7 +680,7 @@
         "variableDebtToken": "0x0c84331e39d6658Cd6e6b9ba04736cC4c4734351"
       },
       {
-        "symbol": "USDT",
+        "symbol": "USDT0",
         "underlying": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
         "aToken": "0x6ab707Aca953eDAeFBc4fD23bA73294241490620",
         "decimals": 6,

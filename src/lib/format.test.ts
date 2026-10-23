@@ -16,6 +16,10 @@ describe("formatUsd", () => {
     expect(formatUsd(125_000.4)).toBe("$125,000");
   });
 
+  it("keeps a sub-cent amount visible", () => {
+    expect(formatUsd(0.004)).toBe("$0.004");
+  });
+
   it("falls back to $0.00 for non-finite input", () => {
     expect(formatUsd(NaN)).toBe("$0.00");
     expect(formatUsd(Infinity)).toBe("$0.00");

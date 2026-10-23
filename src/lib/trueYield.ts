@@ -6,7 +6,7 @@ export const YIELD_GAS_UNITS = {
   withdraw: 300_000,
 } as const;
 
-const STABLES = new Set(["USDC", "USDT", "DAI", "USDBC", "USDS", "GHO", "LUSD", "FRAX", "PYUSD", "CRVUSD", "USDE", "USD0"]);
+const STABLES = new Set(["USDC", "USDT", "DAI", "USDBC", "USDS", "GHO", "LUSD", "FRAX", "PYUSD", "CRVUSD", "USDE", "USD0", "USDT0", "USD₮0"]);
 
 export function poolHasImpermanentLoss(symbol: string): boolean {
   const parts = symbol

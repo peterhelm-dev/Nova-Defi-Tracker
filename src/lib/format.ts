@@ -2,12 +2,14 @@ export function formatUsd(value: number, opts: { decimals?: number } = {}): stri
   const { decimals } = opts;
   if (!Number.isFinite(value)) return "$0.00";
 
-  const fractionDigits = decimals ?? (Math.abs(value) >= 1000 ? 0 : 2);
+  const abs = Math.abs(value);
+  const fractionDigits = decimals ?? (abs >= 1000 ? 0 : abs > 0 && abs < 0.01 ? 4 : 2);
+  const minimumFractionDigits = decimals ?? (abs > 0 && abs < 0.01 ? 2 : fractionDigits);
 
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    minimumFractionDigits: fractionDigits,
+    minimumFractionDigits,
     maximumFractionDigits: fractionDigits,
   }).format(value);
 }

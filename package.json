@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:unit": "vitest run",
+    "verify:addresses": "VERIFY_ADDRESSES=1 vitest run src/lib/defi/verifyAddresses.live.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {
