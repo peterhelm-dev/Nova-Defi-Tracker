@@ -21,11 +21,11 @@ export default function ErrorBoundary({
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 text-center text-foreground">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15 text-2xl">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-negative/15 text-2xl">
         ⚠️
       </span>
-      <h1 className="text-xl font-semibold text-white">Something went wrong</h1>
-      <p className="max-w-md text-sm text-white/60">
+      <h1 className="text-xl font-semibold text-foreground">Something went wrong</h1>
+      <p className="max-w-md text-sm text-text-secondary">
         The dashboard hit an unexpected error. Your funds are unaffected — this
         app is read-only. Try again, and if it keeps happening let us know via
         the support page.
@@ -40,7 +40,7 @@ export default function ErrorBoundary({
         </button>
         <a
           href="/support"
-          className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white/80 hover:border-white/30 hover:text-white"
+          className="rounded-lg border border-border-subtle px-4 py-2 text-sm font-medium text-foreground hover:border-border-strong hover:text-foreground"
         >
           Support
         </a>

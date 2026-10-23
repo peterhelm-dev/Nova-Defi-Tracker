@@ -73,12 +73,12 @@ export default function SupportPage() {
         {FAQ.map(({ q, a }) => (
           <details
             key={q}
-            className="group rounded-xl border border-white/10 bg-surface px-4 py-3"
+            className="group rounded-xl border border-border-subtle bg-surface px-4 py-3"
           >
-            <summary className="cursor-pointer list-none text-sm font-medium text-white/90 group-open:mb-2">
+            <summary className="cursor-pointer list-none text-sm font-medium text-foreground group-open:mb-2">
               {q}
             </summary>
-            <div className="text-sm text-white/60">{a}</div>
+            <div className="text-sm text-text-secondary">{a}</div>
           </details>
         ))}
       </div>

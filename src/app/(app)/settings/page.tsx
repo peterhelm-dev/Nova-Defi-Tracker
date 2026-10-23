@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { SyncControl } from "@/components/SyncControl";
 import { NORI_STORAGE_KEY, SOUND_STORAGE_KEY, TOUR_STORAGE_KEY } from "@/lib/experience";
+import { usePreferences } from "@/hooks/usePreferences";
 import { usePrivacyMode } from "@/lib/privacy";
 import { usePersistedState } from "@/lib/usePersistedState";
 import { shortenAddress } from "@/lib/format";
+import { applyTheme, THEMES } from "@/lib/themes";
 import { PositionDetailModal } from "@/components/nova/PositionDetailModal";
 
 export default function SettingsPage() {
@@ -17,6 +19,7 @@ export default function SettingsPage() {
   const [, setTourComplete] = usePersistedState(TOUR_STORAGE_KEY, false);
   const [noriHidden, setNoriHidden] = usePersistedState(NORI_STORAGE_KEY, false);
   const [showPositionPreview, setShowPositionPreview] = useState(false);
+  const { prefs, setPrefs } = usePreferences();
 
   return (
     <div className="flex max-w-xl flex-col gap-6">
@@ -38,6 +41,58 @@ export default function SettingsPage() {
       </section>
 
       <section className="rounded-xl border border-border-subtle bg-surface p-5">
+        <h2 className="text-sm font-semibold text-foreground">Appearance</h2>
+        <p className="mt-1 text-xs text-text-muted">
+          Violet is the main theme. Choosing another updates the app immediately.
+          The choice stays in this browser and, if you sign in, on your account.
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-3" role="radiogroup" aria-label="Color theme">
+          {THEMES.map((theme) => {
+            const selected = prefs.theme === theme.id;
+            return (
+              <button
+                key={theme.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => {
+                  applyTheme(theme.id);
+                  setPrefs((current) => ({ ...current, theme: theme.id }));
+                }}
+                className={`pressable rounded-xl border p-3 text-left ${
+                  selected ? "border-accent" : "border-border-subtle hover:border-border-strong"
+                }`}
+              >
+                <span
+                  className="flex items-center gap-2 rounded-lg border px-2 py-2"
+                  style={{
+                    background: theme.colors.background,
+                    borderColor: theme.colors.borderSubtle,
+                  }}
+                >
+                  <span
+                    className="rounded-md px-2 py-1 text-xs font-semibold"
+                    style={{ background: theme.colors.surface, color: theme.colors.foreground }}
+                  >
+                    Aa
+                  </span>
+                  <span
+                    className="rounded-md px-2 py-1 text-xs font-semibold"
+                    style={{ background: theme.colors.accent, color: theme.colors.textInverse }}
+                  >
+                    Go
+                  </span>
+                  <span className="ml-auto h-3 w-3 rounded-full" style={{ background: theme.colors.positive }} />
+                </span>
+                <span className="mt-2 block text-sm font-medium text-foreground">{theme.label}</span>
+                <span className="block text-xs text-text-muted">{theme.blurb}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border-subtle bg-surface p-5">
         <h2 className="text-sm font-semibold text-foreground">Privacy</h2>
         <div className="mt-3 flex items-center justify-between">
           <div className="pr-4">
@@ -54,12 +109,12 @@ export default function SettingsPage() {
             aria-label="Privacy mode"
             onClick={togglePrivacyMode}
             className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ${
-              privacyMode ? "bg-accent" : "bg-white/10"
+              privacyMode ? "bg-accent" : "bg-border-strong"
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform duration-200 ${
-                privacyMode ? "translate-x-5" : "translate-x-0.5"
+              className={`absolute top-0.5 h-5 w-5 rounded-full transition-transform duration-200 ${
+                privacyMode ? "translate-x-5 bg-text-inverse" : "translate-x-0.5 bg-foreground"
               }`}
             />
           </button>
@@ -83,12 +138,12 @@ export default function SettingsPage() {
             aria-label="Interface sounds"
             onClick={() => setSoundOn((value) => !value)}
             className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 ${
-              soundOn ? "bg-accent" : "bg-white/10"
+              soundOn ? "bg-accent" : "bg-border-strong"
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform duration-200 ${
-                soundOn ? "translate-x-5" : "translate-x-0.5"
+              className={`absolute top-0.5 h-5 w-5 rounded-full transition-transform duration-200 ${
+                soundOn ? "translate-x-5 bg-text-inverse" : "translate-x-0.5 bg-foreground"
               }`}
             />
           </button>

@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { useTokenPriceHistory } from "@/hooks/useTokenPriceHistory";
 import { formatUsd } from "@/lib/format";
+import { chartTooltipStyle } from "@/lib/themes";
 import { TokenAvatar } from "./TokenAvatar";
 
 const RANGES: { label: string; days: number }[] = [
@@ -67,26 +68,26 @@ export function TokenPriceChartModal({
       role="dialog"
       aria-modal="true"
       aria-label={`${symbol} price chart`}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-background-overlay p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl rounded-2xl border border-white/10 bg-surface p-6 shadow-2xl"
+        className="w-full max-w-xl rounded-2xl border border-border-subtle bg-surface p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
             <TokenAvatar iconUrl={iconUrl} symbol={symbol} chain={chain} address={address} size={28} />
             <div>
-              <p className="text-sm font-semibold text-white">{symbol}</p>
+              <p className="text-sm font-semibold text-foreground">{symbol}</p>
               {last !== undefined && (
                 <p className="flex items-center gap-2 text-xs">
-                  <span className="tabular-nums text-white/70">
+                  <span className="tabular-nums text-text-secondary">
                     {formatUsd(last, { decimals: last < 1 ? 4 : 2 })}
                   </span>
                   {changePct !== null && (
                     <span
-                      className={changePct >= 0 ? "text-emerald-400" : "text-red-400"}
+                      className={changePct >= 0 ? "text-positive" : "text-negative"}
                     >
                       {changePct >= 0 ? "+" : ""}
                       {changePct.toFixed(2)}%
@@ -100,7 +101,7 @@ export function TokenPriceChartModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-text-muted hover:text-white"
+            className="text-text-muted hover:text-foreground"
           >
             ✕
           </button>
@@ -115,7 +116,7 @@ export function TokenPriceChartModal({
               className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                 days === r.days
                   ? "bg-accent text-text-inverse"
-                  : "bg-white/5 text-white/50 hover:text-white/80"
+                  : "bg-surface-hover text-text-muted hover:text-foreground"
               }`}
             >
               {r.label}
@@ -137,13 +138,13 @@ export function TokenPriceChartModal({
               <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
                 <defs>
                   <linearGradient id="tokenPriceFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#c4784a" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#c4784a" stopOpacity={0} />
+                    <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
                   dataKey="t"
-                  stroke="rgba(255,255,255,0.3)"
+                  stroke="var(--text-muted)"
                   tick={{ fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
@@ -151,7 +152,7 @@ export function TokenPriceChartModal({
                   minTickGap={40}
                 />
                 <YAxis
-                  stroke="rgba(255,255,255,0.3)"
+                  stroke="var(--text-muted)"
                   tick={{ fontSize: 11 }}
                   tickLine={false}
                   axisLine={false}
@@ -160,19 +161,15 @@ export function TokenPriceChartModal({
                   width={70}
                 />
                 <Tooltip
-                  contentStyle={{
-                    background: "#2a211b",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 12,
-                  }}
+                  contentStyle={chartTooltipStyle}
                   labelFormatter={(t) => new Date(Number(t)).toLocaleString("en-US")}
-                  labelStyle={{ color: "rgba(255,255,255,0.6)" }}
+                  labelStyle={{ color: "var(--text-secondary)" }}
                   formatter={(value) => formatUsd(Number(value), { decimals: 4 })}
                 />
                 <Area
                   type="monotone"
                   dataKey="price"
-                  stroke="#c4784a"
+                  stroke="var(--accent)"
                   strokeWidth={2}
                   fill="url(#tokenPriceFill)"
                 />

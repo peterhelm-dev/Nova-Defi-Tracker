@@ -11,6 +11,7 @@ import {
 import { toCsv } from "@/lib/csv";
 import { formatUsd } from "@/lib/format";
 import type { NetWorthSnapshot } from "@/types";
+import { chartTooltipStyle } from "@/lib/themes";
 import { ExportCsvButton } from "./ExportCsvButton";
 
 function historyCsv(history: NetWorthSnapshot[]): string {
@@ -22,9 +23,9 @@ function historyCsv(history: NetWorthSnapshot[]): string {
 
 export function NetWorthChart({ history }: { history: NetWorthSnapshot[] }) {
   return (
-    <div className="h-full rounded-2xl border border-white/10 bg-surface p-6">
+    <div className="h-full rounded-2xl border border-border-subtle bg-surface p-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-white/50">Net worth history</p>
+        <p className="text-sm font-medium text-text-muted">Net worth history</p>
         <ExportCsvButton
           filenamePrefix="net-worth-history"
           getCsv={() => historyCsv(history)}
@@ -42,19 +43,19 @@ export function NetWorthChart({ history }: { history: NetWorthSnapshot[] }) {
             <AreaChart data={history} margin={{ top: 16, right: 8, left: 8, bottom: 0 }}>
               <defs>
                 <linearGradient id="netWorthFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#c4784a" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#c4784a" stopOpacity={0} />
+                  <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
                 dataKey="date"
-                stroke="rgba(255,255,255,0.3)"
+                stroke="var(--text-muted)"
                 tick={{ fontSize: 12 }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                stroke="rgba(255,255,255,0.3)"
+                stroke="var(--text-muted)"
                 tick={{ fontSize: 12 }}
                 tickLine={false}
                 axisLine={false}
@@ -62,18 +63,14 @@ export function NetWorthChart({ history }: { history: NetWorthSnapshot[] }) {
                 width={70}
               />
               <Tooltip
-                contentStyle={{
-                  background: "#2a211b",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: 12,
-                }}
-                labelStyle={{ color: "rgba(255,255,255,0.6)" }}
+                contentStyle={chartTooltipStyle}
+                labelStyle={{ color: "var(--text-secondary)" }}
                 formatter={(value) => formatUsd(Number(value))}
               />
               <Area
                 type="monotone"
                 dataKey="totalUsd"
-                stroke="#c4784a"
+                stroke="var(--accent)"
                 strokeWidth={2}
                 fill="url(#netWorthFill)"
               />

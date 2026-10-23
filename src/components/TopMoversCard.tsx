@@ -29,16 +29,16 @@ export function TopMoversCard({ holdings }: TopMoversCardProps) {
 
   if (gainers.length === 0 && losers.length === 0) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-surface p-6">
-        <p className="text-sm font-medium text-white/50">Top movers (24h)</p>
+      <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+        <p className="text-sm font-medium text-text-muted">Top movers (24h)</p>
         <p className="mt-3 text-sm text-text-muted">No priced moves in this view.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="mb-4 text-sm font-medium text-white/50">Top movers (24h)</p>
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+      <p className="mb-4 text-sm font-medium text-text-muted">Top movers (24h)</p>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <MoverList title="Gainers" items={gainers} tone="emerald" />
         <MoverList title="Losers" items={losers} tone="red" />
@@ -74,7 +74,7 @@ function MoverList({
             key={`${holding.chain}-${holding.address}`}
             className="flex items-center justify-between gap-2 text-sm"
           >
-            <span className="flex items-center gap-2 text-white/80">
+            <span className="flex items-center gap-2 text-foreground">
               <TokenAvatar
                 iconUrl={holding.iconUrl}
                 symbol={holding.symbol}
@@ -85,7 +85,7 @@ function MoverList({
               {holding.symbol}
             </span>
             <span className="flex items-center gap-2 tabular-nums">
-              <span className={tone === "emerald" ? "text-emerald-400" : "text-red-400"}>
+              <span className={tone === "emerald" ? "text-positive" : "text-negative"}>
                 {formatPercent(holding.change24h)}
               </span>
               <span className="text-text-muted">{formatUsd(holding.valueUsd)}</span>

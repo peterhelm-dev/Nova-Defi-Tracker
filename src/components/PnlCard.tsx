@@ -17,7 +17,7 @@ function GainStat({
   usd: number;
   pct: number | null;
 }) {
-  const tone = usd >= 0 ? "text-emerald-400" : "text-red-400";
+  const tone = usd >= 0 ? "text-positive" : "text-negative";
   return (
     <div>
       <p className="text-xs uppercase tracking-wide text-text-muted">{label}</p>
@@ -36,8 +36,8 @@ function GainStat({
 export function PnlCard({ pnl, isLoading }: PnlCardProps) {
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-surface p-6">
-        <p className="text-sm font-medium text-white/50">Profit & loss</p>
+      <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+        <p className="text-sm font-medium text-text-muted">Profit & loss</p>
         <p className="mt-4 text-sm text-text-muted">Loading…</p>
       </div>
     );
@@ -46,19 +46,19 @@ export function PnlCard({ pnl, isLoading }: PnlCardProps) {
   if (!pnl) return null;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="mb-4 text-sm font-medium text-white/50">Profit & loss</p>
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+      <p className="mb-4 text-sm font-medium text-text-muted">Profit & loss</p>
       <div className="grid grid-cols-3 gap-4">
         <GainStat label="Total" usd={pnl.totalGainUsd} pct={pnl.totalGainPct} />
         <GainStat label="Realized" usd={pnl.realizedGainUsd} pct={pnl.realizedGainPct} />
         <GainStat label="Unrealized" usd={pnl.unrealizedGainUsd} pct={pnl.unrealizedGainPct} />
       </div>
-      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-white/5 pt-3 text-xs text-text-muted">
+      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-border-subtle pt-3 text-xs text-text-muted">
         <span>
-          Total invested <span className="text-white/70">{formatUsd(pnl.totalInvestedUsd)}</span>
+          Total invested <span className="text-text-secondary">{formatUsd(pnl.totalInvestedUsd)}</span>
         </span>
         <span>
-          Net invested <span className="text-white/70">{formatUsd(pnl.netInvestedUsd)}</span>
+          Net invested <span className="text-text-secondary">{formatUsd(pnl.netInvestedUsd)}</span>
         </span>
       </div>
     </div>

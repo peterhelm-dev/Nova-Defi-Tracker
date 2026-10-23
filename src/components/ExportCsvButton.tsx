@@ -21,7 +21,7 @@ export function ExportCsvButton({
     <button
       type="button"
       onClick={() => downloadCsv(csvFilename(filenamePrefix), getCsv())}
-      className="rounded-md border border-white/10 px-2.5 py-1 text-xs text-white/50 hover:border-white/25 hover:text-white/80"
+      className="rounded-md border border-border-subtle px-2.5 py-1 text-xs text-text-muted hover:border-border-strong hover:text-foreground"
     >
       Export CSV
     </button>

@@ -14,17 +14,17 @@ type Level = { label: string; className: string };
 
 function levelFor(topSharePct: number): Level {
   if (topSharePct >= 50) {
-    return { label: "Highly concentrated", className: "border-red-500/30 bg-red-500/5 text-red-400" };
+    return { label: "Highly concentrated", className: "border-negative/30 bg-negative/10 text-negative" };
   }
   if (topSharePct >= 25) {
     return {
       label: "Moderately concentrated",
-      className: "border-amber-500/30 bg-amber-500/5 text-amber-400",
+      className: "border-warning/30 bg-warning/10 text-warning",
     };
   }
   return {
     label: "Well diversified",
-    className: "border-emerald-500/30 bg-emerald-500/5 text-emerald-400",
+    className: "border-positive/30 bg-positive/10 text-positive",
   };
 }
 
@@ -47,14 +47,14 @@ export function DiversificationCard({ items, totalUsd }: DiversificationCardProp
   const level = levelFor(topSharePct);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
-      <p className="mb-4 text-sm font-medium text-white/50">Diversification</p>
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
+      <p className="mb-4 text-sm font-medium text-text-muted">Diversification</p>
       <div className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${level.className}`}>
         {level.label}
       </div>
-      <p className="mt-3 text-sm text-white/70">
-        <span className="font-medium text-white">{top.label}</span> is{" "}
-        <span className="font-medium text-white">{topSharePct.toFixed(1)}%</span> of your net
+      <p className="mt-3 text-sm text-text-secondary">
+        <span className="font-medium text-foreground">{top.label}</span> is{" "}
+        <span className="font-medium text-foreground">{topSharePct.toFixed(1)}%</span> of your net
         worth ({formatUsd(top.valueUsd)}).
       </p>
       <p className="mt-1 text-xs text-text-muted">

@@ -1,47 +1,220 @@
 @import "tailwindcss";
 
 /*
- * Novafolio visual tokens. Warm ink and copper — calm, readable, and
- * deliberately unlike a neon trading terminal.
+ * Novafolio visual tokens. Violet is the default night palette. Other themes
+ * override the same variables on [data-theme]. Copper is the warm orange set.
+ * Accent text is lifted just enough to clear WCAG AA on raised surfaces.
+ * Keep src/lib/themes.ts in step with these values.
  */
-:root {
+:root,
+[data-theme="violet"] {
+  color-scheme: dark;
+  --background: #060816;
+  --background-sidebar: #080b1c;
+  --background-overlay: #0b1024;
+  --surface: #0d1226;
+  --surface-raised: #12182e;
+  --surface-hover: #171e38;
+  --border-subtle: #202945;
+  --border-strong: #354063;
+  --foreground: #f6f7ff;
+  --text-secondary: #aeb7d2;
+  --text-muted: #7f89a8;
+  --text-inverse: #090b18;
+  --accent: #9a72ff;
+  --brand-secondary: #cf4dff;
+  --brand-blue: #3478ff;
+  --brand-glow: #a56cff;
+  --positive: #4de59a;
+  --warning: #ffb84d;
+  --negative: #ff5c73;
+  --info: #66a3ff;
+  --focus: #b995ff;
+  --gradient-brand: linear-gradient(110deg, #c246e9 0%, #754cff 50%, #3478ff 100%);
+  --shadow-card: 0 16px 40px rgba(4, 6, 16, 0.35);
+  --shadow-glow: 0 0 40px rgba(124, 77, 255, 0.2);
+  --atmosphere-a: 154 114 255;
+  --atmosphere-b: 52 120 255;
+  --atmosphere-c: 77 229 154;
+  --atmosphere-strength: 0.22;
+}
+
+[data-theme="copper"] {
+  color-scheme: dark;
   --background: #1a1511;
   --background-sidebar: #14110e;
   --background-overlay: #241c16;
-
   --surface: #261e18;
   --surface-raised: #31261e;
   --surface-hover: #3a2d23;
-
   --border-subtle: #43362c;
   --border-strong: #6a5342;
-
   --foreground: #f6efe6;
   --text-secondary: #d4c4b2;
   --text-muted: #a8927c;
   --text-inverse: #1c1612;
-
-  --accent: #c4784a;
+  --accent: #c88858;
   --brand-secondary: #e0a36a;
   --brand-blue: #7f9aa8;
   --brand-glow: #e7b48a;
-
   --positive: #8fbf98;
   --warning: #e0a15c;
   --negative: #e08a7c;
   --info: #8aafc0;
   --focus: #e7c4a2;
-
   --gradient-brand: linear-gradient(120deg, #e0a36a 0%, #c4784a 48%, #8f6a4a 100%);
-  --gradient-chart: linear-gradient(180deg, rgba(196, 120, 74, 0.35) 0%, rgba(196, 120, 74, 0) 100%);
+  --shadow-card: 0 16px 40px rgba(28, 16, 8, 0.28);
+  --shadow-glow: 0 0 40px rgba(196, 120, 74, 0.16);
+  --atmosphere-a: 200 136 88;
+  --atmosphere-b: 127 154 168;
+  --atmosphere-c: 143 191 152;
+  --atmosphere-strength: 0.2;
+}
+
+[data-theme="harbor"] {
+  color-scheme: dark;
+  --background: #0e1716;
+  --background-sidebar: #0a1211;
+  --background-overlay: #13201e;
+  --surface: #162220;
+  --surface-raised: #1d2c29;
+  --surface-hover: #243632;
+  --border-subtle: #2a3d38;
+  --border-strong: #4d6a62;
+  --foreground: #eef6f3;
+  --text-secondary: #c5d6cf;
+  --text-muted: #93aea4;
+  --text-inverse: #1a140c;
+  --accent: #e2b56a;
+  --brand-secondary: #8fb9a8;
+  --brand-blue: #8eb8c4;
+  --brand-glow: #f0d7a4;
+  --positive: #7dcaa0;
+  --warning: #e2b56a;
+  --negative: #e59288;
+  --info: #8eb8c4;
+  --focus: #f0d7a4;
+  --gradient-brand: linear-gradient(120deg, #f0d7a4 0%, #e2b56a 46%, #3d6d62 100%);
+  --shadow-card: 0 16px 40px rgba(6, 14, 12, 0.32);
+  --shadow-glow: 0 0 40px rgba(226, 181, 106, 0.16);
+  --atmosphere-a: 226 181 106;
+  --atmosphere-b: 142 184 196;
+  --atmosphere-c: 125 202 160;
+  --atmosphere-strength: 0.2;
+}
+
+[data-theme="wine"] {
+  color-scheme: dark;
+  --background: #160e12;
+  --background-sidebar: #110a0e;
+  --background-overlay: #1c1016;
+  --surface: #24161c;
+  --surface-raised: #2e1c24;
+  --surface-hover: #3a2430;
+  --border-subtle: #3d2832;
+  --border-strong: #6a4556;
+  --foreground: #f8eef2;
+  --text-secondary: #e0c6d0;
+  --text-muted: #b48b9c;
+  --text-inverse: #241018;
+  --accent: #f0a0b8;
+  --brand-secondary: #c4b0e0;
+  --brand-blue: #c4b0e0;
+  --brand-glow: #f6c6d4;
+  --positive: #8fceaa;
+  --warning: #e7b56a;
+  --negative: #f0a0b8;
+  --info: #c4b0e0;
+  --focus: #f6c6d4;
+  --gradient-brand: linear-gradient(120deg, #f6c6d4 0%, #c45b78 48%, #5c3d72 100%);
+  --shadow-card: 0 16px 40px rgba(20, 8, 12, 0.32);
+  --shadow-glow: 0 0 40px rgba(240, 160, 184, 0.16);
+  --atmosphere-a: 240 160 184;
+  --atmosphere-b: 196 176 224;
+  --atmosphere-c: 143 206 170;
+  --atmosphere-strength: 0.2;
+}
+
+[data-theme="grove"] {
+  color-scheme: dark;
+  --background: #101610;
+  --background-sidebar: #0c120c;
+  --background-overlay: #141c14;
+  --surface: #182018;
+  --surface-raised: #202a20;
+  --surface-hover: #283428;
+  --border-subtle: #2c3a2c;
+  --border-strong: #4e624e;
+  --foreground: #f3f6ee;
+  --text-secondary: #d0d8c4;
+  --text-muted: #a3b096;
+  --text-inverse: #1a160c;
+  --accent: #e2c56a;
+  --brand-secondary: #9cbf8a;
+  --brand-blue: #9eb8c0;
+  --brand-glow: #f0e0a4;
+  --positive: #8fce8a;
+  --warning: #e2c56a;
+  --negative: #e59288;
+  --info: #9eb8c0;
+  --focus: #f0e0a4;
+  --gradient-brand: linear-gradient(120deg, #f0e0a4 0%, #e2c56a 42%, #3e5c40 100%);
+  --shadow-card: 0 16px 40px rgba(8, 14, 8, 0.32);
+  --shadow-glow: 0 0 40px rgba(226, 197, 106, 0.16);
+  --atmosphere-a: 226 197 106;
+  --atmosphere-b: 158 184 192;
+  --atmosphere-c: 143 206 138;
+  --atmosphere-strength: 0.2;
+}
+
+[data-theme="parchment"] {
+  color-scheme: light;
+  --background: #f4efe6;
+  --background-sidebar: #ebe3d4;
+  --background-overlay: #e7dfd2;
+  --surface: #fffaf3;
+  --surface-raised: #fffdf8;
+  --surface-hover: #f3eadc;
+  --border-subtle: #e0d4c4;
+  --border-strong: #c4b29e;
+  --foreground: #1c1612;
+  --text-secondary: #3f342c;
+  --text-muted: #5c4d42;
+  --text-inverse: #fffaf3;
+  --accent: #8a3f1d;
+  --brand-secondary: #8a4e10;
+  --brand-blue: #1e4f73;
+  --brand-glow: #c46a3a;
+  --positive: #1d6b3a;
+  --warning: #8a4e10;
+  --negative: #9d2f2a;
+  --info: #1e4f73;
+  --focus: #8a3f1d;
+  --gradient-brand: linear-gradient(120deg, #c46a3a 0%, #8a3f1d 55%, #1e4f73 100%);
+  --shadow-card: 0 16px 40px rgba(60, 40, 20, 0.08);
+  --shadow-glow: 0 0 32px rgba(138, 63, 29, 0.12);
+  --atmosphere-a: 138 63 29;
+  --atmosphere-b: 30 79 115;
+  --atmosphere-c: 29 107 58;
+  --atmosphere-strength: 0.12;
+}
+
+:root {
+  --gradient-chart: linear-gradient(180deg, rgb(var(--atmosphere-a) / 0.35) 0%, rgb(var(--atmosphere-a) / 0) 100%);
+  --chart-fill: color-mix(in srgb, var(--accent) 28%, transparent);
+  --chart-1: var(--accent);
+  --chart-2: var(--positive);
+  --chart-3: var(--brand-secondary);
+  --chart-4: var(--brand-blue);
+  --chart-5: var(--text-secondary);
+  --chart-6: var(--warning);
+  --chart-7: var(--info);
+  --chart-8: var(--text-muted);
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 22px;
-
-  --shadow-card: 0 16px 40px rgba(28, 16, 8, 0.28);
-  --shadow-glow: 0 0 40px rgba(196, 120, 74, 0.16);
 
   --sidebar-width: 232px;
   --content-max: 1440px;
@@ -97,9 +270,9 @@ h3,
 
 .app-atmosphere {
   background:
-    radial-gradient(900px 480px at 8% -10%, rgba(196, 120, 74, 0.2), transparent 60%),
-    radial-gradient(700px 420px at 100% 0%, rgba(127, 154, 168, 0.12), transparent 55%),
-    radial-gradient(800px 500px at 80% 110%, rgba(143, 191, 152, 0.08), transparent 50%);
+    radial-gradient(900px 480px at 8% -10%, rgb(var(--atmosphere-a) / var(--atmosphere-strength)), transparent 60%),
+    radial-gradient(700px 420px at 100% 0%, rgb(var(--atmosphere-b) / calc(var(--atmosphere-strength) * 0.65)), transparent 55%),
+    radial-gradient(800px 500px at 80% 110%, rgb(var(--atmosphere-c) / calc(var(--atmosphere-strength) * 0.45)), transparent 50%);
 }
 
 .app-grain {

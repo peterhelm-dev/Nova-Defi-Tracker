@@ -37,7 +37,7 @@ export function WaitlistForm() {
   }
 
   if (status === "done") {
-    return <p className="text-sm text-emerald-400">{message}</p>;
+    return <p className="text-sm text-positive">{message}</p>;
   }
 
   return (
@@ -49,7 +49,7 @@ export function WaitlistForm() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@email.com"
         aria-label="Email address"
-        className="flex-1 rounded-lg border border-white/15 bg-surface px-4 py-2.5 text-sm text-foreground placeholder:text-text-muted focus:border-accent focus:outline-none"
+        className="flex-1 rounded-lg border border-border-subtle bg-surface px-4 py-2.5 text-sm text-foreground placeholder:text-text-muted focus:border-accent focus:outline-none"
       />
       <button
         type="submit"
@@ -59,7 +59,7 @@ export function WaitlistForm() {
         {status === "submitting" ? "Joining…" : "Join waitlist"}
       </button>
       {status === "error" ? (
-        <p className="text-sm text-red-400 sm:basis-full">{message}</p>
+        <p className="text-sm text-negative sm:basis-full">{message}</p>
       ) : null}
     </form>
   );

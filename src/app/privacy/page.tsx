@@ -24,7 +24,7 @@ export default function PrivacyPage() {
       </p>
       <ul>
         <li>wallet addresses you paste, plus any nickname you give them,</li>
-        <li>dashboard layout, balance view, and currency display,</li>
+        <li>dashboard layout, balance view, currency display, and color theme,</li>
         <li>tokens and pools you save in Research,</li>
         <li>DeFi positions you track by hand,</li>
         <li>net-worth snapshots taken while this browser has the app open,</li>
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
       <ul>
         <li>daily net-worth snapshots (dates and USD totals),</li>
         <li>DeFi positions you track manually,</li>
-        <li>dashboard and Research preferences,</li>
+        <li>dashboard and Research preferences, including the color theme,</li>
         <li>price-alert rules you create, and alerts that have fired,</li>
         <li>
           subscription state if a paid plan is ever offered (plan, status, and

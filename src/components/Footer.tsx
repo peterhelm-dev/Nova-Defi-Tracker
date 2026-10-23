@@ -10,16 +10,16 @@ export function Footer({ className = "" }: { className?: string }) {
         unavailable. Nothing here is investment advice.
       </p>
       <nav className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-        <Link href="/pricing" className="hover:text-white/60">
+        <Link href="/pricing" className="hover:text-foreground">
           Pricing
         </Link>
-        <Link href="/terms" className="hover:text-white/60">
+        <Link href="/terms" className="hover:text-foreground">
           Terms
         </Link>
-        <Link href="/privacy" className="hover:text-white/60">
+        <Link href="/privacy" className="hover:text-foreground">
           Privacy
         </Link>
-        <Link href="/support" className="hover:text-white/60">
+        <Link href="/support" className="hover:text-foreground">
           Support
         </Link>
       </nav>

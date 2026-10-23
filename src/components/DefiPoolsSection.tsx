@@ -70,10 +70,10 @@ export function DefiPoolsSection({
   }
 
   return (
-    <div id="defi-pools" className="min-w-0 rounded-2xl border border-white/10 bg-surface p-4 sm:p-6">
+    <div id="defi-pools" className="min-w-0 rounded-2xl border border-border-subtle bg-surface p-4 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-white/50">DeFi pools</p>
+          <p className="text-sm font-medium text-text-muted">DeFi pools</p>
           <p className="text-xs text-text-muted">
             {unavailable
               ? "Tracked positions below stay saved in this browser. Nothing here moves funds."
@@ -87,13 +87,13 @@ export function DefiPoolsSection({
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search project or pair…"
               aria-label="Search pools"
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+              className="rounded-lg border border-border-subtle bg-background px-3 py-1.5 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <select
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value as SortKey)}
               aria-label="Sort pools"
-              className="rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent"
+              className="rounded-lg border border-border-subtle bg-background px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
             >
               <option value="tvl">Sort by TVL</option>
               <option value="apy">Sort by APY</option>
@@ -115,7 +115,7 @@ export function DefiPoolsSection({
               <th className="pb-3 text-right font-medium">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-border-subtle">
             {isLoading && (
               <tr>
                 <td colSpan={4} className="py-6 text-center text-text-muted">
@@ -147,17 +147,17 @@ export function DefiPoolsSection({
                         </span>
                       </span>
                       <span>
-                        <p className="font-medium text-white">{pool.project}</p>
+                        <p className="font-medium text-foreground">{pool.project}</p>
                         <p className="text-xs text-text-muted">
                           {pool.symbol} · {pool.chain}
                         </p>
                       </span>
                     </div>
                   </td>
-                  <td className="py-3 whitespace-nowrap text-white/80">
+                  <td className="py-3 whitespace-nowrap text-foreground">
                     {formatUsd(pool.tvlUsd)}
                   </td>
-                  <td className="py-3 whitespace-nowrap text-emerald-400">
+                  <td className="py-3 whitespace-nowrap text-positive">
                     {pool.apy !== null ? `${pool.apy.toFixed(2)}%` : "—"}
                   </td>
                   <td className="py-3 text-right">
@@ -166,7 +166,7 @@ export function DefiPoolsSection({
                     ) : (
                       <button
                         onClick={() => startTracking(pool)}
-                        className="whitespace-nowrap rounded-lg border border-white/15 px-2 py-1 text-xs font-medium text-white/80 hover:bg-white/10"
+                        className="whitespace-nowrap rounded-lg border border-border-subtle px-2 py-1 text-xs font-medium text-foreground hover:bg-surface-hover"
                       >
                         Track
                       </button>
@@ -187,7 +187,7 @@ export function DefiPoolsSection({
                           }}
                           placeholder="USD amount"
                           inputMode="decimal"
-                          className="w-28 rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-right text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
+                          className="w-28 rounded-lg border border-border-subtle bg-background px-2 py-1 text-right text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent"
                         />
                         <button
                           onClick={() => confirmTracking(pool)}
@@ -197,7 +197,7 @@ export function DefiPoolsSection({
                         </button>
                         <button
                           onClick={() => setTrackingPoolId(null)}
-                          className="rounded-lg border border-white/15 px-2 py-1 text-xs font-medium text-white/60 hover:bg-white/10"
+                          className="rounded-lg border border-border-subtle px-2 py-1 text-xs font-medium text-text-secondary hover:bg-surface-hover"
                         >
                           Cancel
                         </button>
@@ -212,9 +212,9 @@ export function DefiPoolsSection({
       </div>
       )}
 
-      <div className="mt-6 border-t border-white/10 pt-4">
+      <div className="mt-6 border-t border-border-subtle pt-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-medium text-white/50">
+          <p className="text-sm font-medium text-text-muted">
             Your tracked positions
           </p>
           <div className="flex items-center gap-3">
@@ -234,7 +234,7 @@ export function DefiPoolsSection({
                 )
               }
             />
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-foreground">
               {formatUsd(positionsTotal)}
             </p>
           </div>
@@ -245,7 +245,7 @@ export function DefiPoolsSection({
             your net worth.
           </p>
         ) : (
-          <ul className="mt-2 divide-y divide-white/5">
+          <ul className="mt-2 divide-y divide-border-subtle">
             {positions.map((position) => (
               <li
                 key={position.id}
@@ -261,12 +261,12 @@ export function DefiPoolsSection({
                     />
                   </span>
                   <div>
-                    <p className="font-medium text-white">{position.project}</p>
+                    <p className="font-medium text-foreground">{position.project}</p>
                     <p className="text-xs text-text-muted">{position.symbol}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-white/80">
+                  <span className="text-foreground">
                     {formatUsd(position.amountUsd)}
                   </span>
                   {position.apyAtEntry !== null && (
@@ -276,7 +276,7 @@ export function DefiPoolsSection({
                   )}
                   <button
                     onClick={() => onRemove(position.id)}
-                    className="text-xs text-text-muted hover:text-red-400"
+                    className="text-xs text-text-muted hover:text-negative"
                   >
                     Remove
                   </button>

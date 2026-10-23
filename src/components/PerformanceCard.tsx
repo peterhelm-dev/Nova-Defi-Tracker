@@ -20,9 +20,9 @@ export function PerformanceCard({ history }: { history: NetWorthSnapshot[] }) {
   if (periods.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-surface p-6">
+    <div className="rounded-2xl border border-border-subtle bg-surface p-6">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-white/50">Performance</p>
+        <p className="text-sm font-medium text-text-muted">Performance</p>
         <ExportCsvButton
           filenamePrefix="performance"
           getCsv={() =>
@@ -39,15 +39,15 @@ export function PerformanceCard({ history }: { history: NetWorthSnapshot[] }) {
             <p className="text-xs uppercase tracking-wide text-text-muted">
               {period.label}
             </p>
-            <p className="mt-1 text-lg font-semibold tabular-nums text-white">
+            <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">
               {signedUsd(period.deltaUsd)}
             </p>
             {period.deltaPct !== null ? (
               <span
                 className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                   period.deltaPct >= 0
-                    ? "bg-emerald-500/15 text-emerald-400"
-                    : "bg-red-500/15 text-red-400"
+                    ? "bg-positive/15 text-positive"
+                    : "bg-negative/15 text-negative"
                 }`}
               >
                 {formatPercent(period.deltaPct)}

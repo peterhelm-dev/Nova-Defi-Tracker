@@ -6,8 +6,8 @@ export default function NotFound() {
       <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-2xl">
         🔍
       </span>
-      <h1 className="text-xl font-semibold text-white">Page not found</h1>
-      <p className="max-w-md text-sm text-white/60">
+      <h1 className="text-xl font-semibold text-foreground">Page not found</h1>
+      <p className="max-w-md text-sm text-text-secondary">
         That page doesn&apos;t exist. Your portfolio is still where you left it.
       </p>
       <Link

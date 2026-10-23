@@ -122,7 +122,7 @@ export function TrueYieldCalculator({
               step={5}
               value={haircut}
               onChange={(event) => setHaircut(Number(event.target.value))}
-              className="mt-2 w-full accent-[var(--accent,#c4784a)]"
+              className="mt-2 w-full accent-accent"
             />
             <span className="mt-1 block text-text-secondary">
               Reward APY is often paid in the protocol&apos;s own token. 0% keeps the listed reward. 100% ignores it.

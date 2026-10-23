@@ -15,9 +15,10 @@ import { IconImg } from "./IconImg";
 type DeskTab = "token" | "pool" | "compare" | "saved";
 
 const chartStyle = {
-  background: "#2a211b",
-  border: "1px solid rgba(255,255,255,0.1)",
+  background: "var(--surface-raised)",
+  border: "1px solid var(--border-subtle)",
   borderRadius: 12,
+  color: "var(--foreground)",
 };
 
 export function ResearchDesk({
@@ -371,7 +372,7 @@ function TokenDetail({
             <XAxis dataKey="t" hide />
             <YAxis hide domain={["auto", "auto"]} />
             <Tooltip contentStyle={chartStyle} formatter={(value) => formatUsd(Number(value))} labelFormatter={(value) => new Date(Number(value)).toLocaleDateString()} />
-            <Area dataKey="priceUsd" stroke="#c4784a" fill="rgba(196,120,74,0.25)" strokeWidth={2} />
+            <Area dataKey="priceUsd" stroke="var(--accent)" fill="var(--chart-fill)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -444,7 +445,7 @@ function PoolDetail({
             <XAxis dataKey="t" hide />
             <YAxis hide domain={["auto", "auto"]} />
             <Tooltip contentStyle={chartStyle} />
-            <Area dataKey="apy" name="APY" stroke="#c4784a" fill="rgba(196,120,74,0.2)" strokeWidth={2} />
+            <Area dataKey="apy" name="APY" stroke="var(--accent)" fill="var(--chart-fill)" strokeWidth={2} />
             <Area dataKey="apyBase" name="Base APY" stroke="#8fbf98" fill="transparent" strokeWidth={1.5} />
           </AreaChart>
         </ResponsiveContainer>

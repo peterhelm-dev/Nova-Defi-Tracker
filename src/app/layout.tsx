@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
+import { cookies } from "next/headers";
 import Script from "next/script";
 import "@coinbase/onchainkit/styles.css";
 import {
@@ -10,6 +11,7 @@ import {
   metadataBaseUrl,
 } from "@/lib/brand";
 import "./globals.css";
+import { normalizeTheme, THEME_COOKIE, themeBootScript } from "@/lib/themes";
 import { Providers } from "./providers";
 
 const sourceSans = Source_Sans_3({
@@ -46,22 +48,27 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1a1511",
+  themeColor: "#060816",
   width: "device-width",
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jar = await cookies();
+  const theme = normalizeTheme(jar.get(THEME_COOKIE)?.value);
   return (
     <html
       lang="en"
+      data-theme={theme}
+      suppressHydrationWarning
       className={`${sourceSans.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript() }} />
         <Providers>{children}</Providers>
         {/* Privacy-respecting analytics (no cookies, no cross-site tracking).
             Loads only when a Plausible domain is configured. */}
