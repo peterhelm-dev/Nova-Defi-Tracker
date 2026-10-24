@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <InfoPage title="Privacy Policy" updated="October 23, 2026">
+    <InfoPage title="Privacy Policy" updated="October 24, 2026">
       <PendingLegalReview />
       <OperatorContact />
       <p>
@@ -90,6 +90,12 @@ export default function PrivacyPage() {
           wallet address. Wallet-connect telemetry to Coinbase is turned off.
           If a Plausible domain is set, that cookie-less counter loads as well.
         </li>
+        <li>
+          <strong>Health-factor email</strong> — if you confirm an alert, Resend
+          receives your email, the wallet address, and the health factor so it
+          can deliver the message. The email is not sent to Alchemy. Upstash
+          Redis stores the alert when that store is configured.
+        </li>
       </ul>
 
       <h2>Host and logs</h2>
@@ -107,6 +113,22 @@ export default function PrivacyPage() {
         The wallet address is not part of the counter.
       </p>
 
+      <h2>Health factor alerts</h2>
+      <p>
+        You can ask for an email when an Aave or Compound health factor drops
+        below a number you choose. No account is required. Nothing is emailed
+        until you open the confirmation link, and every email has an unsubscribe
+        link. For that alert we store the wallet address, the threshold, and the
+        email, plus a random confirmation token (stored only as a hash) and an
+        unsubscribe token so later messages can include the same link. The daily
+        check sends the wallet address to Alchemy or a public RPC, the same way
+        a portfolio view does. The email address stays with Novafolio and, when
+        delivery is on, with Resend. The record is kept in Upstash Redis when
+        that is configured, otherwise in the account database, otherwise only in
+        a local file during development. Unsubscribing deletes it. You can also
+        ask for it to be deleted.
+      </p>
+
       <h2>Waitlist</h2>
       <p>
         If you join the Pro waitlist we store the email you submit, solely to
@@ -117,7 +139,8 @@ export default function PrivacyPage() {
       <p>
         Data in this browser stays until you clear it. Server account data, when
         sign-in is enabled, is kept while the account exists. A waitlist email
-        is kept until you ask for it to be deleted. Rate-limit counters expire
+        is kept until you ask for it to be deleted. A health-factor alert is
+        kept until you unsubscribe or ask for it to be deleted. Rate-limit counters expire
         after about a minute. Request logs last only as long as the host retains
         them.
       </p>

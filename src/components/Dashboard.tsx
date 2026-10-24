@@ -198,7 +198,7 @@ export function Dashboard() {
         return <TopMoversCard holdings={viewHoldings} />;
       case "defi":
         return detectedPositions.length > 0 ? (
-          <DetectedPositionsCard positions={detectedPositions} />
+          <DetectedPositionsCard positions={detectedPositions} fallbackAddress={primary} />
         ) : (
           <p className="rounded-2xl border border-border-subtle bg-surface px-4 py-8 text-sm text-text-muted">
             No Aave, Compound, or staking position showed up in this view. You can still track a pool by hand below.

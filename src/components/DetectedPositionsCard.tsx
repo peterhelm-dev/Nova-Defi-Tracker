@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { formatChainName, formatUsd } from "@/lib/format";
+import { HEALTH_FACTOR_GLOSS, loanDetailSentence, loanLinesFromPositions } from "@/lib/defi/loanCopy";
 import { protocolIconUrl } from "@/lib/chainIcons";
 import type { DetectedPosition } from "@/types";
 import { Badge } from "./Badge";
 import { EstimateNote } from "./EstimateNote";
+import { HealthAlertForm } from "./HealthAlertForm";
 import { TokenAvatar } from "./TokenAvatar";
 
 type PositionRow =
@@ -57,8 +59,10 @@ function groupIntoRows(items: DetectedPosition[]): PositionRow[] {
  */
 export function DetectedPositionsCard({
   positions,
+  fallbackAddress,
 }: {
   positions: DetectedPosition[];
+  fallbackAddress?: string;
 }) {
   const [protocolFilter, setProtocolFilter] = useState("all");
   const [chainFilter, setChainFilter] = useState("all");
@@ -94,12 +98,24 @@ export function DetectedPositionsCard({
       .map(([protocol, items]) => ({
         protocol,
         protocolIconUrl: items.find((p) => p.protocolIconUrl)?.protocolIconUrl ?? protocolIconUrl(protocol),
-        healthFactor: items.find((p) => typeof p.healthFactor === "number" && p.healthFactor < 1_000_000)?.healthFactor ?? null,
         rows: groupIntoRows(items).sort((a, b) => b.totalUsd - a.totalUsd),
         totalUsd: items.reduce((sum, p) => sum + p.valueUsd, 0),
       }))
       .sort((a, b) => b.totalUsd - a.totalUsd);
   }, [positions, protocolFilter, chainFilter, search]);
+
+  const loanLines = loanLinesFromPositions(positions);
+  const severalWallets = new Set(loanLines.map((line) => line.walletAddress).filter(Boolean)).size > 1;
+  const lendingWallets = [
+    ...new Set(
+      positions
+        .filter((position) => position.protocol === "Aave" || position.protocol === "Compound")
+        .map((position) => position.walletAddress)
+        .filter((address): address is string => Boolean(address)),
+    ),
+  ];
+  const alertWallets = lendingWallets.length > 0 ? lendingWallets : fallbackAddress ? [fallbackAddress] : [];
+  const hasLending = positions.some((position) => position.protocol === "Aave" || position.protocol === "Compound");
 
   if (positions.length === 0) return null;
 
@@ -151,6 +167,14 @@ export function DetectedPositionsCard({
           )}
         </div>
       </div>
+      {loanLines.length > 0 ? (
+        <p className="mb-4 text-xs text-text-muted">{HEALTH_FACTOR_GLOSS}</p>
+      ) : null}
+      {hasLending && loanLines.length === 0 ? (
+        <p className="mb-4 text-sm text-text-secondary">
+          No health factor was read for this lending position. You can still subscribe, and the daily check will look again.
+        </p>
+      ) : null}
       {groups.length === 0 ? (
         <p className="py-4 text-center text-sm text-text-muted">
           No positions match your filters.
@@ -162,14 +186,17 @@ export function DetectedPositionsCard({
               <div className="mb-1.5 flex items-center justify-between">
                 <Badge label={group.protocol} iconUrl={group.protocolIconUrl} />
                 <span className="text-right text-xs font-medium tabular-nums text-text-muted">
-                  {typeof group.healthFactor === "number" ? (
-                    <span className={group.healthFactor < 1.2 ? "text-negative" : "text-text-secondary"}>
-                      Health {group.healthFactor.toFixed(2)}
-                    </span>
-                  ) : null}{" "}
                   {formatUsd(group.totalUsd)}
                 </span>
               </div>
+              {loanLinesFromPositions(group.rows.flatMap((row) => (row.kind === "single" ? [row.position] : row.legs))).map((line) => (
+                <p
+                  key={`${line.walletAddress ?? ""}-${line.protocol}-${line.chain}-${line.market ?? ""}-${line.healthFactor}`}
+                  className={`mb-2 text-sm ${line.healthFactor <= 1.2 ? "text-negative" : "text-text-secondary"}`}
+                >
+                  {loanDetailSentence(line, severalWallets)}
+                </p>
+              ))}
               <ul className="flex flex-col divide-y divide-border-subtle">
                 {group.rows.map((row) =>
                   row.kind === "single" ? (
@@ -258,6 +285,11 @@ export function DetectedPositionsCard({
           ))}
         </div>
       )}
+      {hasLending ? (
+        <div className="mt-4 border-t border-border-subtle pt-4">
+          <HealthAlertForm wallets={alertWallets} />
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -76,7 +76,7 @@ export function PositionDetailModal({ onClose }: { onClose: () => void }) {
         <EstimateNote className="mt-4 block" />
         <p className="mt-2 text-xs text-text-muted">
           Sample only. These figures are not a wallet you watch. Detected lending on the
-          portfolio page shows the health factor that was read onchain.
+          portfolio page shows the health factor and an estimated liquidation price for that loan.
         </p>
       </div>
     </div>

@@ -40,7 +40,9 @@ function mergeTokens(tokens: TokenHolding[]): TokenHolding[] {
 export function mergePortfolios(portfolios: AutoPortfolio[]): AutoPortfolio | null {
   if (portfolios.length === 0) return null;
   const tokens = mergeTokens(portfolios.flatMap((portfolio) => portfolio.tokens));
-  const positions = portfolios.flatMap((portfolio) => portfolio.positions);
+  const positions = portfolios.flatMap((portfolio) =>
+    portfolio.positions.map((position) => ({ ...position, walletAddress: portfolio.address })),
+  );
   const walletUsd = tokens.reduce((sum, token) => sum + token.valueUsd, 0);
   const defiUsd = positions.reduce((sum, position) => sum + position.valueUsd, 0);
   const coverage = portfolios.some((portfolio) => portfolio.coverage === "major-tokens")

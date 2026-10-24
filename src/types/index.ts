@@ -70,8 +70,17 @@ export type DetectedPosition = {
   valueUsd: number;
   /** Token amount. Borrows stay positive here; `valueUsd` carries the sign. */
   amount?: number | null;
-  /** Aave health factor for this wallet on this chain, when the pool reported one. */
+  /** Wallet this position was read for, set when several wallets are shown together. */
+  walletAddress?: string | null;
+  /** Aave or Compound health factor for this loan. Null when the wallet has no debt. */
   healthFactor?: number | null;
+  /** Estimated price of the largest collateral at which this loan reaches health factor 1. */
+  liquidationPriceUsd?: number | null;
+  liquidationSymbol?: string | null;
+  /** Compound base market, such as USDC. Null for Aave, which has one pool per chain. */
+  liquidationMarket?: string | null;
+  liquidationBlended?: boolean | null;
+  liquidationCovered?: boolean | null;
 };
 
 /**
