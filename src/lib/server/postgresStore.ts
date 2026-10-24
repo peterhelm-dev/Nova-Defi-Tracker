@@ -14,19 +14,22 @@ import type { UserDataStore } from "./store";
  * the file store is not. The `pg` driver is imported lazily so it's only loaded
  * when `DATABASE_URL` is configured.
  */
-export class PostgresStore implements UserDataStore {
-  private poolPromise: Promise<Pool> | undefined;
+const pools = new Map<string, Promise<Pool>>();
 
+/** One pool per connection string, shared with the health-alert store. */
+export function sharedPgPool(connectionString: string): Promise<Pool> {
+  const existing = pools.get(connectionString);
+  if (existing) return existing;
+  const created = import("pg").then(({ default: pg }) => new pg.Pool({ connectionString, max: 5 }));
+  pools.set(connectionString, created);
+  return created;
+}
+
+export class PostgresStore implements UserDataStore {
   constructor(private readonly connectionString: string) {}
 
   private pool(): Promise<Pool> {
-    if (!this.poolPromise) {
-      this.poolPromise = import("pg").then(({ default: pg }) => {
-        const pool = new pg.Pool({ connectionString: this.connectionString });
-        return pool;
-      });
-    }
-    return this.poolPromise;
+    return sharedPgPool(this.connectionString);
   }
 
   private async ensureUser(address: string): Promise<void> {

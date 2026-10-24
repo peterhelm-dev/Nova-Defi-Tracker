@@ -125,6 +125,9 @@ The wallet address is not part of the counter.
 | `DATABASE_URL` | Neon or Supabase free Postgres | Turns on sign-in sync, the waitlist, and daily snapshots. |
 | `SESSION_SECRET` | `openssl rand -base64 32` | Required before anyone can sign in. |
 | `CRON_SECRET` | `openssl rand -base64 32` | Vercel Cron sends this as `Authorization: Bearer`. A `?secret=` query param is rejected. |
+| `RESEND_API_KEY` | [resend.com](https://resend.com) free tier | Sends health-factor alert email. Leave unset and the form says alerts are coming soon. |
+| `ALERT_FROM_EMAIL` | A sender on a domain you verified in Resend | Example: `Novafolio <alerts@novafolio.app>`. Required together with `RESEND_API_KEY`. |
+| `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` | Upstash free Redis | Preferred store for health-factor alerts (address, threshold, email). Also shares rate-limit counters. If both are unset, alerts use `DATABASE_URL` when that is set. |
 
 Do **not** set `STRIPE_SECRET_KEY`, `STRIPE_PRO_PRICE_ID`, or
 `STRIPE_WEBHOOK_SECRET` until you intend to charge. Pro stays “coming soon”.
@@ -137,9 +140,10 @@ those writes unless `DATABASE_URL` is set:
 
 - Sign-in returns a clear error instead of issuing a session.
 - Waitlist returns “not saved” and the pricing page does not show the form.
-- Positions, snapshots, and alerts APIs return 503.
+- Positions, snapshots, and signed-in price alerts return 503.
+- Health-factor email stays off until Resend is set and a store exists (Upstash, or Postgres, or the local file below).
 - The header says the portfolio stays in this browser.
-- Both cron jobs return immediately and do nothing.
+- The snapshot cron returns immediately. The 07:00 cron returns immediately unless health-factor email is configured.
 
 Local `npm run dev` still uses the file store, which is fine on one machine.
 
@@ -152,7 +156,16 @@ Hobby cron jobs may run **once per day**. An hourly schedule fails the deploy.
 - price alerts at 07:00 UTC
 
 Hobby may run each job any time during that hour. Alerts are therefore daily,
-not instant. Both jobs no-op without `DATABASE_URL`.
+not instant. The snapshot job and the signed-in price alerts no-op without
+`DATABASE_URL`. The 07:00 UTC job also sends health-factor email when
+`RESEND_API_KEY`, `ALERT_FROM_EMAIL`, and a store are set. The store is Upstash
+when both Redis variables are set, otherwise Postgres (`DATABASE_URL`, apply
+`migrations/005_health_alerts.sql`), otherwise a local JSON file when you are
+not on Vercel. There is no second cron. Telegram is not wired. While a loan
+stays under the threshold you chose, Novafolio sends at most one email every
+6 days, and a repeat run the same day does not send another. Subscribe is
+limited to 5 requests per IP per hour. The confirmation link opens a page
+with a button, so a mail program that only fetches the URL does not opt anyone in.
 
 ## Deploy
 
@@ -175,7 +188,11 @@ not instant. Both jobs no-op without `DATABASE_URL`.
 
 Add `DATABASE_URL` and `SESSION_SECRET` later if you want sign-in. Apply
 `migrations/001_init.sql` (and `002_subscriptions.sql` before any future
-billing) to that database first.
+billing) to that database first. Health-factor email also needs
+`RESEND_API_KEY` and `ALERT_FROM_EMAIL`. Prefer the Upstash pair as the alert
+store. If you use Postgres for those alerts instead, apply
+`migrations/005_health_alerts.sql`. The app creates that table on first use
+when `DATABASE_URL` is the store, and the migration file is the same statements.
 
 ## Pre-launch checklist
 

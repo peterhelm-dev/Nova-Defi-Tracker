@@ -1,11 +1,13 @@
 import { unstable_cache } from "next/cache";
 import { erc20Abi, formatUnits, parseAbi, type Address } from "viem";
 import { applyDefiReadings, isMeaningfulBalance, type DefiKind, type DefiReading } from "@/lib/defi/applyPositions";
+import { assessAaveAccount } from "@/lib/defi/liquidation";
 import { AAVE_MARKETS, COMPOUND_MARKETS, STABLE_SYMBOLS, STAKING_TOKENS } from "@/lib/defi/markets";
 import { coingeckoPlatform } from "@/lib/coingeckoPlatforms";
 import { siteOrigin } from "@/lib/server/prices";
 import type { AutoPortfolio } from "@/types";
 import { evmClient } from "../evm";
+import { readCometRisk, type CometRisk } from "./cometLoan";
 
 const poolAbi = parseAbi([
   "function getUserAccountData(address user) view returns (uint256 totalCollateralBase, uint256 totalDebtBase, uint256 availableBorrowsBase, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor)",
@@ -107,9 +109,23 @@ function jobsFor(chain: string): Job[] {
   return jobs;
 }
 
-async function readChain(chain: string, user: Address): Promise<DefiReading[]> {
+type AaveSnapshot = {
+  chain: string;
+  debtUsd8: string;
+  collateralUsd8: string;
+  thresholdBps: string;
+  healthFactor: number | null;
+};
+
+function reportedHealth(factor: bigint, debt: bigint): number | null {
+  if (debt <= BigInt(0) || factor > BigInt(10) ** BigInt(30)) return null;
+  const health = Number(factor) / 1e18;
+  return Number.isFinite(health) ? health : null;
+}
+
+async function readChain(chain: string, user: Address): Promise<{ readings: DefiReading[]; aave: AaveSnapshot | null }> {
   const jobs = jobsFor(chain);
-  if (jobs.length === 0) return [];
+  if (jobs.length === 0) return { readings: [], aave: null };
   const client = evmClient(chain);
   const raw: bigint[] = [];
   for (let i = 0; i < jobs.length; i += 40) {
@@ -127,6 +143,7 @@ async function readChain(chain: string, user: Address): Promise<DefiReading[]> {
   }
 
   let healthFactor: number | null = null;
+  let aave: AaveSnapshot | null = null;
   const borrowed = jobs.some((job, index) => job.protocol === "Aave" && job.kind === "borrowed" && (raw[index] ?? BigInt(0)) > BigInt(0));
   if (borrowed && AAVE_MARKETS[chain]) {
     try {
@@ -136,11 +153,29 @@ async function readChain(chain: string, user: Address): Promise<DefiReading[]> {
         functionName: "getUserAccountData",
         args: [user],
       });
-      const factor = data[5];
-      healthFactor = factor > BigInt(10) ** BigInt(30) ? null : Number(factor) / 1e18;
+      const debt = data[1];
+      healthFactor = reportedHealth(data[5], debt);
+      if (debt > BigInt(0)) {
+        aave = {
+          chain,
+          collateralUsd8: data[0].toString(),
+          debtUsd8: debt.toString(),
+          thresholdBps: data[3].toString(),
+          healthFactor,
+        };
+      }
     } catch {
       healthFactor = null;
     }
+  }
+
+  const cometRisk = new Map<string, CometRisk | null>();
+  for (let index = 0; index < jobs.length; index += 1) {
+    const job = jobs[index];
+    if (!job || job.protocol !== "Compound" || job.kind !== "borrowed") continue;
+    const borrowRaw = raw[index] ?? BigInt(0);
+    if (borrowRaw <= BigInt(0)) continue;
+    cometRisk.set(job.receiptAddress.toLowerCase(), await readCometRisk(client, job.receiptAddress, user, borrowRaw));
   }
 
   const readings: DefiReading[] = [];
@@ -149,6 +184,7 @@ async function readChain(chain: string, user: Address): Promise<DefiReading[]> {
     if (!isMeaningfulBalance(amountRaw)) return;
     const amount = Number(formatUnits(amountRaw, job.decimals));
     if (!Number.isFinite(amount) || amount <= 0) return;
+    const comet = job.protocol === "Compound" ? cometRisk.get(job.receiptAddress.toLowerCase()) : undefined;
     readings.push({
       chain,
       protocol: job.protocol,
@@ -157,11 +193,18 @@ async function readChain(chain: string, user: Address): Promise<DefiReading[]> {
       receiptAddress: job.receiptAddress,
       priceAddress: job.priceAddress,
       amount,
+      amountRaw: amountRaw.toString(),
+      decimals: job.decimals,
       priceUsd: STABLE_SYMBOLS.has(job.symbol.toUpperCase()) ? 1 : null,
-      healthFactor: job.protocol === "Aave" ? healthFactor : null,
+      healthFactor: job.protocol === "Aave" ? healthFactor : comet?.healthFactor ?? null,
+      liquidationPriceUsd: comet?.liquidationPriceUsd ?? null,
+      liquidationSymbol: comet?.liquidationSymbol ?? null,
+      liquidationMarket: job.protocol === "Compound" ? job.symbol : null,
+      liquidationBlended: comet?.blended ?? false,
+      liquidationCovered: comet?.covered ?? false,
     });
   });
-  return readings;
+  return { readings, aave };
 }
 
 async function ethPrice(): Promise<number | null> {
@@ -262,6 +305,40 @@ async function withPrices(readings: DefiReading[]): Promise<DefiReading[]> {
   return priced;
 }
 
+function withAaveLiquidation(readings: DefiReading[], snapshots: AaveSnapshot[]): DefiReading[] {
+  const stamps = new Map<string, ReturnType<typeof assessAaveAccount>>();
+  for (const snapshot of snapshots) {
+    const legs = readings
+      .filter((reading) => reading.protocol === "Aave" && reading.kind === "supplied" && reading.chain === snapshot.chain && reading.amountRaw)
+      .map((reading) => ({
+        symbol: reading.symbol,
+        amountRaw: BigInt(reading.amountRaw ?? "0"),
+        decimals: reading.decimals ?? 18,
+        priceUsd: typeof reading.priceUsd === "number" ? reading.priceUsd : null,
+      }));
+    stamps.set(snapshot.chain, assessAaveAccount({
+      debtUsd8: BigInt(snapshot.debtUsd8),
+      collateralUsd8: BigInt(snapshot.collateralUsd8),
+      thresholdBps: BigInt(snapshot.thresholdBps),
+      reportedHealthFactor: snapshot.healthFactor,
+      legs,
+    }));
+  }
+  return readings.map((reading) => {
+    const stamp = reading.protocol === "Aave" ? stamps.get(reading.chain) : undefined;
+    if (!stamp) return reading;
+    return {
+      ...reading,
+      healthFactor: stamp.healthFactor,
+      liquidationPriceUsd: stamp.liquidationPriceUsd,
+      liquidationSymbol: stamp.liquidationSymbol,
+      liquidationMarket: null,
+      liquidationBlended: stamp.blended,
+      liquidationCovered: stamp.coveredByOtherCollateral,
+    };
+  });
+}
+
 async function readDefiReadings(address: string): Promise<DefiReading[]> {
   const user = address as Address;
   const chains = [...new Set([...Object.keys(AAVE_MARKETS), ...COMPOUND_MARKETS.map((market) => market.chain), ...STAKING_TOKENS.map((token) => token.chain)])];
@@ -270,13 +347,15 @@ async function readDefiReadings(address: string): Promise<DefiReading[]> {
       return await readChain(chain, user);
     } catch (error) {
       console.error(`DeFi read failed on ${chain}`, error instanceof Error ? error.message : "unknown");
-      return [] as DefiReading[];
+      return { readings: [] as DefiReading[], aave: null };
     }
   }));
-  return withPrices(settled.flat());
+  const priced = await withPrices(settled.flatMap((chain) => chain.readings));
+  const snapshots = settled.flatMap((chain) => (chain.aave ? [chain.aave] : []));
+  return withAaveLiquidation(priced, snapshots);
 }
 
-const cachedReadings = unstable_cache(readDefiReadings, ["defi-readings-v1"], { revalidate: 300 });
+const cachedReadings = unstable_cache(readDefiReadings, ["defi-readings-v2"], { revalidate: 300 });
 
 /** Adds Aave, Compound, and staking positions. A failed read leaves the portfolio unchanged. */
 export async function attachDetectedPositions(portfolio: AutoPortfolio): Promise<AutoPortfolio> {

@@ -14,8 +14,16 @@ export type DefiReading = {
   /** Address whose price should value this balance. The underlying for Aave and Compound. */
   priceAddress: string;
   amount: number;
+  /** Raw token units, kept so liquidation math does not pass through a float. */
+  amountRaw?: string;
+  decimals?: number;
   priceUsd?: number | null;
   healthFactor?: number | null;
+  liquidationPriceUsd?: number | null;
+  liquidationSymbol?: string | null;
+  liquidationMarket?: string | null;
+  liquidationBlended?: boolean | null;
+  liquidationCovered?: boolean | null;
   iconUrl?: string | null;
 };
 
@@ -90,6 +98,11 @@ export function applyDefiReadings(portfolio: AutoPortfolio, readings: DefiReadin
       valueUsd,
       amount: reading.amount,
       healthFactor: reading.healthFactor ?? null,
+      liquidationPriceUsd: reading.liquidationPriceUsd ?? null,
+      liquidationSymbol: reading.liquidationSymbol ?? null,
+      liquidationMarket: reading.liquidationMarket ?? null,
+      liquidationBlended: reading.liquidationBlended ?? false,
+      liquidationCovered: reading.liquidationCovered ?? false,
     });
   }
 

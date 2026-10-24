@@ -63,7 +63,10 @@ the tab and their funds are unchanged, because the funds were never here.
 - **User escape.** Watch an address you are willing to show an RPC. Do not sign
   in. Leave Plausible unset. Self-host and choose the RPC. Clearing browser
   storage removes guest data. Server-side deletion is a signed request on the
-  support page.
+  support page. A health-factor alert is optional and stores the email next to
+  the wallet address until you use the unsubscribe link. That link is in every
+  alert email. Resend sees the email and the wallet only after you confirm.
+  Skip the form and nothing is stored. Telegram is not connected.
 
 ## Security
 
