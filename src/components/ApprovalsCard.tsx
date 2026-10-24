@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { revokeUrl, valueAtRisk } from "@/lib/approvals";
+import { riskLevelLabel, type ApprovalRiskLevel } from "@/lib/approvalRisk";
 import { formatChainName, formatUsd, shortenAddress } from "@/lib/format";
 import type { TokenHolding } from "@/types";
 import type { WalletApproval } from "@/lib/server/approvals/read";
@@ -40,7 +41,7 @@ export function ApprovalsCard({
         <div>
           <h2 className="text-sm font-semibold text-foreground">Token approvals</h2>
           <p className="mt-1 max-w-xl text-sm text-text-secondary">
-            Open ERC-20 approvals for this wallet. Novafolio only reads logs and allowances. Nothing is signed here.
+            Open ERC-20 approvals for this wallet. Novafolio only reads allowances. Nothing is signed here, and nothing is revoked here. A risk label describes the allowance. It is not a recommendation.
           </p>
         </div>
         <a
@@ -87,8 +88,10 @@ export function ApprovalsCard({
                   </p>
                   <p className="text-xs text-text-secondary">
                     {approval.unlimited ? "Unlimited approval" : `Allowance ${approval.allowance}`}
-                    {approval.unlimited ? "" : ""}
                     {risk === null ? "" : ` · ${formatUsd(risk)} at risk`}
+                  </p>
+                  <p className={`text-xs ${riskTone(approval.riskLevel)}`}>
+                    {riskLevelLabel(approval.riskLevel)}: {approval.riskReason}
                   </p>
                 </div>
                 <a
@@ -97,7 +100,7 @@ export function ApprovalsCard({
                   rel="noreferrer"
                   className="text-xs text-accent"
                 >
-                  Revoke on revoke.cash
+                  Review on revoke.cash
                 </a>
               </li>
             );
@@ -106,4 +109,10 @@ export function ApprovalsCard({
       ) : null}
     </section>
   );
+}
+
+function riskTone(level: ApprovalRiskLevel): string {
+  if (level === "high") return "text-negative";
+  if (level === "review") return "text-warning";
+  return "text-text-secondary";
 }

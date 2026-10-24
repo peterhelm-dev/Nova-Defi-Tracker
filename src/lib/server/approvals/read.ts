@@ -1,8 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { erc20Abi, formatUnits, type Address } from "viem";
 import { APPROVAL_TOPIC, decodeApprovalLog, isUnlimitedAllowance } from "@/lib/approvals";
+import { classifyApproval, type ApprovalRiskLevel, type SpenderCode } from "@/lib/approvalRisk";
 import { approvalSpenders, approvalTokens, RECENT_APPROVAL_BLOCKS, spenderLabel } from "@/lib/approvalCatalog";
 import { evmClient, trackedChains } from "../evm";
+import { exploitName } from "./exploits";
 
 const CHAIN_ID: Record<string, number> = {
   ethereum: 1,
@@ -25,6 +27,8 @@ export type WalletApproval = {
   allowance: string;
   balance: string;
   unlimited: boolean;
+  riskLevel: ApprovalRiskLevel;
+  riskReason: string;
 };
 
 type Pair = { token: string; spender: string; symbol: string; decimals: number };
@@ -155,7 +159,7 @@ async function readChain(
     partial = true;
   }
 
-  const approvals = [...open.values()].map((row) => ({
+  const rows = [...open.values()].map((row) => ({
     chain,
     chainId: CHAIN_ID[chain] ?? 1,
     token: row.token.toLowerCase(),
@@ -167,7 +171,41 @@ async function readChain(
     balance: formatUnits(row.balance, row.decimals),
     unlimited: isUnlimitedAllowance(row.allowance),
   }));
+  const unknownSpenders = [...new Set(rows.filter((row) => !row.spenderLabel).map((row) => row.spender))];
+  const codes = await spenderCodes(client, unknownSpenders);
+  const approvals = rows.map((row) => {
+    const known = Boolean(row.spenderLabel);
+    const code: SpenderCode = known ? "contract" : codes.get(row.spender) ?? "unknown";
+    const risk = classifyApproval({
+      unlimited: row.unlimited,
+      knownSpender: known,
+      code,
+      exploitName: exploitName(row.chainId, row.spender),
+    });
+    return { ...row, riskLevel: risk.level, riskReason: risk.reason };
+  });
   return { approvals, partial };
+}
+
+/** At most this many eth_getCode calls per chain. The rest stay "unknown", not EOA. */
+const CODE_LIMIT = 40;
+
+async function spenderCodes(
+  client: ReturnType<typeof evmClient>,
+  spenders: string[],
+): Promise<Map<string, SpenderCode>> {
+  const codes = new Map<string, SpenderCode>();
+  const checked = spenders.slice(0, CODE_LIMIT);
+  await Promise.all(checked.map(async (spender) => {
+    try {
+      const code = await client.getCode({ address: spender as Address });
+      codes.set(spender, code && code !== "0x" ? "contract" : "eoa");
+    } catch {
+      codes.set(spender, "unknown");
+    }
+  }));
+  for (const spender of spenders.slice(CODE_LIMIT)) codes.set(spender, "unknown");
+  return codes;
 }
 
 function keyOf(token: string, spender: string): string {
@@ -189,4 +227,4 @@ async function batched(
   return results;
 }
 
-export const getWalletApprovals = unstable_cache(readWalletApprovals, ["approvals-v2"], { revalidate: 1800 });
+export const getWalletApprovals = unstable_cache(readWalletApprovals, ["approvals-v3"], { revalidate: 1800 });

@@ -76,11 +76,19 @@ the tab and their funds are unchanged, because the funds were never here.
   `allowance()`, not by trusting a log scan. A recent, token-filtered log
   window only adds extra spenders, and those are confirmed with `allowance()`
   before they are shown. Known-protocol allowances still appear when that
-  window fails, and the card says the history was partial. Users revoke
-  elsewhere. MetaMask analytics in the connector is off.
-- **User escape.** Do not sign a message you did not expect. Revoke in the
-  token contract or on revoke.cash. If the site disappears, funds and positions
-  remain where they were.
+  window fails, and the card says the history was partial. Each open allowance
+  is labeled: no spending limit, a spender with no contract code, a spender
+  that is not in Novafolio's known-contract list, or a spender on Revoke.cash's
+  MIT-licensed approval exploit list (copied 24 Oct 2026, notice in
+  `src/lib/exploits/REVOKE-CASH-MIT.txt`). The label does not read contract
+  source, so it cannot say who can upgrade the spender or whether a timelock
+  or multisig guards that upgrade. Novafolio does not send a revoke. MetaMask
+  analytics in the connector is off.
+- **User escape.** Do not sign a message you did not expect. Review and change
+  the allowance on revoke.cash, or in the token contract, including if this
+  site disappears. Funds stay in the wallet either way. An unlimited allowance
+  to a known contract can still be used by that contract until the user changes
+  it there.
 
 ## Accepted compromises
 

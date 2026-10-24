@@ -30,7 +30,7 @@ host only for image URLs.
   stays on manual “Track”.
 - Research: token and pool pages, a true-yield estimate, and a before-you-deposit
   checklist. Compare and saved items stay in the browser.
-- Open ERC-20 approvals (with revoke.cash links), dust versus gas, and a short
+- Open ERC-20 approvals (with a revoke.cash review link on each row), dust versus gas, and a short
   gas and transfer history. Those three need the Alchemy key. Profit and loss
   is not estimated.
 - DeFi pool list for those chains, with manual “Track” and CSV export.
@@ -85,7 +85,7 @@ Vercel’s shared IPs, used to wipe every quote and return 502.
 | Token balances | 5 minutes | 2 portfolio calls, 720 CU |
 | Aave, Compound, staking | 5 minutes | a few multicalls per chain, a few hundred CU |
 | Prices and gas prices | 5–10 minutes, shared by everyone | not per wallet |
-| Approvals | 30 minutes | one log query per chain |
+| Approvals | 30 minutes | one recent log query per chain, plus at most 40 `eth_getCode` calls for spenders outside the known list. Exploit matches use a bundled Revoke.cash list (MIT), not a live fetch. |
 | Gas and recent transfers | 10 minutes | a handful of transfer calls, then at most 6 receipts per chain |
 
 The browser asks again every 5 minutes while a dashboard tab is open, and the
